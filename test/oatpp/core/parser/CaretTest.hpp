@@ -29,15 +29,16 @@
 
 namespace oatpp { namespace test { namespace parser {
 
-class CaretTest : public UnitTest{
+class CaretTest: public UnitTest {
 public:
-
-  CaretTest():UnitTest("TEST[parser::CaretTest]"){}
+  CaretTest()
+    : UnitTest("TEST[parser::CaretTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}
 
 
-#endif //oatpp_test_base_CaretTest_hpp
+#endif // oatpp_test_base_CaretTest_hpp

@@ -31,14 +31,17 @@ namespace oatpp { namespace web { namespace mime { namespace multipart {
 
 PartsParser::PartsParser(Multipart* multipart)
   : m_multipart(multipart)
-{}
+{
+}
 
 PartsParser::PartsParser(Multipart* multipart, const PartReadersMap& readersMap)
   : m_readers(readersMap)
   , m_multipart(multipart)
-{}
+{
+}
 
-void PartsParser::onPartHeaders(const Headers& partHeaders) {
+void PartsParser::onPartHeaders(const Headers& partHeaders)
+{
 
   m_currPart = std::make_shared<Part>(partHeaders);
 
@@ -54,10 +57,10 @@ void PartsParser::onPartHeaders(const Headers& partHeaders) {
   if(m_currReader) {
     m_currReader->onNewPart(m_currPart);
   }
-
 }
 
-void PartsParser::onPartData(p_char8 data, v_buff_size size) {
+void PartsParser::onPartData(p_char8 data, v_buff_size size)
+{
   if(size > 0) {
     if(m_currReader) {
       m_currReader->onPartData(m_currPart, data, size);
@@ -70,11 +73,13 @@ void PartsParser::onPartData(p_char8 data, v_buff_size size) {
   }
 }
 
-void PartsParser::setPartReader(const oatpp::String& partName, const std::shared_ptr<PartReader>& reader) {
-  m_readers[partName] = reader;
+void PartsParser::setPartReader(const oatpp::String& partName, const std::shared_ptr<PartReader>& reader)
+{
+  m_readers [ partName ] = reader;
 }
 
-void PartsParser::setDefaultPartReader(const std::shared_ptr<PartReader>& reader) {
+void PartsParser::setDefaultPartReader(const std::shared_ptr<PartReader>& reader)
+{
   m_defaultReader = reader;
 }
 
@@ -83,14 +88,17 @@ void PartsParser::setDefaultPartReader(const std::shared_ptr<PartReader>& reader
 
 AsyncPartsParser::AsyncPartsParser(Multipart* multipart)
   : m_multipart(multipart)
-{}
+{
+}
 
 AsyncPartsParser::AsyncPartsParser(Multipart* multipart, const AsyncPartReadersMap& readersMap)
   : m_readers(readersMap)
   , m_multipart(multipart)
-{}
+{
+}
 
-async::CoroutineStarter AsyncPartsParser::onPartHeadersAsync(const Headers& partHeaders) {
+async::CoroutineStarter AsyncPartsParser::onPartHeadersAsync(const Headers& partHeaders)
+{
 
   m_currPart = std::make_shared<Part>(partHeaders);
 
@@ -108,10 +116,10 @@ async::CoroutineStarter AsyncPartsParser::onPartHeadersAsync(const Headers& part
   }
 
   return nullptr;
-
 }
 
-async::CoroutineStarter AsyncPartsParser::onPartDataAsync(p_char8 data, v_buff_size size) {
+async::CoroutineStarter AsyncPartsParser::onPartDataAsync(p_char8 data, v_buff_size size)
+{
   if(size > 0) {
     if(m_currReader) {
       return m_currReader->onPartDataAsync(m_currPart, data, size);
@@ -125,11 +133,13 @@ async::CoroutineStarter AsyncPartsParser::onPartDataAsync(p_char8 data, v_buff_s
   return nullptr;
 }
 
-void AsyncPartsParser::setPartReader(const oatpp::String& partName, const std::shared_ptr<AsyncPartReader>& reader) {
-  m_readers[partName] = reader;
+void AsyncPartsParser::setPartReader(const oatpp::String& partName, const std::shared_ptr<AsyncPartReader>& reader)
+{
+  m_readers [ partName ] = reader;
 }
 
-void AsyncPartsParser::setDefaultPartReader(const std::shared_ptr<AsyncPartReader>& reader) {
+void AsyncPartsParser::setDefaultPartReader(const std::shared_ptr<AsyncPartReader>& reader)
+{
   m_defaultReader = reader;
 }
 
@@ -139,19 +149,23 @@ void AsyncPartsParser::setDefaultPartReader(const std::shared_ptr<AsyncPartReade
 Reader::Reader(Multipart* multipart)
   : m_partsParser(std::make_shared<PartsParser>(multipart))
   , m_parser(multipart->getBoundary(), m_partsParser, nullptr)
-{}
+{
+}
 
-v_io_size Reader::write(const void *data, v_buff_size count, async::Action& action) {
+v_io_size Reader::write(const void* data, v_buff_size count, async::Action& action)
+{
   data::buffer::InlineWriteData inlineData(data, count);
   m_parser.parseNext(inlineData, action);
   return count - inlineData.bytesLeft;
 }
 
-void Reader::setPartReader(const oatpp::String& partName, const std::shared_ptr<PartReader>& reader) {
-  m_partsParser->m_readers[partName] = reader;
+void Reader::setPartReader(const oatpp::String& partName, const std::shared_ptr<PartReader>& reader)
+{
+  m_partsParser->m_readers [ partName ] = reader;
 }
 
-void Reader::setDefaultPartReader(const std::shared_ptr<PartReader>& reader) {
+void Reader::setDefaultPartReader(const std::shared_ptr<PartReader>& reader)
+{
   m_partsParser->m_defaultReader = reader;
 }
 
@@ -162,9 +176,11 @@ AsyncReader::AsyncReader(const std::shared_ptr<Multipart>& multipart)
   : m_partsParser(std::make_shared<AsyncPartsParser>(multipart.get()))
   , m_parser(multipart->getBoundary(), nullptr, m_partsParser)
   , m_multipart(multipart)
-{}
+{
+}
 
-v_io_size AsyncReader::write(const void *data, v_buff_size count, async::Action& action) {
+v_io_size AsyncReader::write(const void* data, v_buff_size count, async::Action& action)
+{
 
   data::buffer::InlineWriteData inlineData(data, count);
   while(inlineData.bytesLeft > 0 && !m_parser.finished() && action.isNone()) {
@@ -172,14 +188,15 @@ v_io_size AsyncReader::write(const void *data, v_buff_size count, async::Action&
   }
 
   return count - inlineData.bytesLeft;
-
 }
 
-void AsyncReader::setPartReader(const oatpp::String& partName, const std::shared_ptr<AsyncPartReader>& reader) {
-  m_partsParser->m_readers[partName] = reader;
+void AsyncReader::setPartReader(const oatpp::String& partName, const std::shared_ptr<AsyncPartReader>& reader)
+{
+  m_partsParser->m_readers [ partName ] = reader;
 }
 
-void AsyncReader::setDefaultPartReader(const std::shared_ptr<AsyncPartReader>& reader) {
+void AsyncReader::setDefaultPartReader(const std::shared_ptr<AsyncPartReader>& reader)
+{
   m_partsParser->m_defaultReader = reader;
 }
 

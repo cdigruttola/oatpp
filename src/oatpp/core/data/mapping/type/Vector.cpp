@@ -24,10 +24,6 @@
 
 #include "Vector.hpp"
 
-namespace oatpp { namespace data { namespace mapping { namespace type {
-
-namespace __class {
-  const ClassId AbstractVector::CLASS_ID("Vector");
-}
-
-}}}}
+namespace oatpp { namespace data { namespace mapping { namespace type { namespace __class {
+const ClassId AbstractVector::CLASS_ID("Vector");
+}}}}}

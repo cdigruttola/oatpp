@@ -28,10 +28,10 @@
 #include "./Coroutine.hpp"
 #include "oatpp/core/collection/FastQueue.hpp"
 
-#include <mutex>
-#include <list>
-#include <vector>
 #include <condition_variable>
+#include <list>
+#include <mutex>
+#include <vector>
 
 namespace oatpp { namespace async {
 
@@ -42,7 +42,6 @@ namespace oatpp { namespace async {
  */
 class Processor {
 private:
-
   class TaskSubmission {
   public:
     virtual ~TaskSubmission() {};
@@ -56,36 +55,41 @@ private:
    * // 2, 2, {} // 1, 1, {2} // 0, 0, {1, 2} // 0, {0, 1, 2}
    * where {...} is int...S
    */
-  template<int ...> struct IndexSequence {};
-  template<int N, int ...S> struct SequenceGenerator : SequenceGenerator <N - 1, N - 1, S...> {};
-  template<int ...S>
+  template<int...>
+  struct IndexSequence {
+  };
+  template<int N, int... S>
+  struct SequenceGenerator: SequenceGenerator<N - 1, N - 1, S...> {
+  };
+  template<int... S>
   struct SequenceGenerator<0, S...> {
     typedef IndexSequence<S...> type;
   };
 
-  template<typename CoroutineType, typename ... Args>
-  class SubmissionTemplate : public TaskSubmission {
+  template<typename CoroutineType, typename... Args>
+  class SubmissionTemplate: public TaskSubmission {
   private:
     std::tuple<Args...> m_params;
-  public:
 
+  public:
     SubmissionTemplate(Args... params)
       : m_params(std::make_tuple(params...))
-    {}
+    {
+    }
 
-    virtual CoroutineHandle* createCoroutine(Processor* processor) {
+    virtual CoroutineHandle* createCoroutine(Processor* processor)
+    {
       return creator(processor, typename SequenceGenerator<sizeof...(Args)>::type());
     }
 
-    template<int ...S>
-    CoroutineHandle* creator(Processor* processor, IndexSequence<S...>) {
-      return new CoroutineHandle(processor, new CoroutineType(std::get<S>(m_params) ...));
+    template<int... S>
+    CoroutineHandle* creator(Processor* processor, IndexSequence<S...>)
+    {
+      return new CoroutineHandle(processor, new CoroutineType(std::get<S>(m_params)...));
     }
-
   };
 
 private:
-
   std::vector<std::shared_ptr<worker::Worker>> m_ioWorkers;
   std::vector<std::shared_ptr<worker::Worker>> m_timerWorkers;
 
@@ -96,23 +100,19 @@ private:
   v_uint32 m_timerBalancer = 0;
 
 private:
-
   oatpp::concurrency::SpinLock m_taskLock;
   std::condition_variable_any m_taskCondition;
   std::list<std::shared_ptr<TaskSubmission>> m_taskList;
   oatpp::collection::FastQueue<CoroutineHandle> m_pushList;
 
 private:
-
   oatpp::collection::FastQueue<CoroutineHandle> m_queue;
 
 private:
-
   bool m_running = true;
   std::atomic<v_int32> m_tasksCounter;
 
 private:
-
   void popIOTask(CoroutineHandle* coroutine);
   void popTimerTask(CoroutineHandle* coroutine);
 
@@ -122,11 +122,11 @@ private:
   void pushQueues();
 
 public:
-
   Processor()
     : m_running(true)
     , m_tasksCounter(0)
-  {}
+  {
+  }
 
   /**
    * Add dedicated co-worker to processor.
@@ -136,13 +136,15 @@ public:
 
   /**
    * Push one Coroutine back to processor.
-   * @param coroutine - &id:oatpp::async::CoroutineHandle; previously popped-out(rescheduled to coworker) from this processor.
+   * @param coroutine - &id:oatpp::async::CoroutineHandle; previously popped-out(rescheduled to coworker) from this
+   * processor.
    */
   void pushOneTask(CoroutineHandle* coroutine);
 
   /**
    * Push list of Coroutines back to processor.
-   * @param tasks - &id:oatpp::collection::FastQueue; of &id:oatpp::async::CoroutineHandle; previously popped-out(rescheduled to coworker) from this processor.
+   * @param tasks - &id:oatpp::collection::FastQueue; of &id:oatpp::async::CoroutineHandle; previously
+   * popped-out(rescheduled to coworker) from this processor.
    */
   void pushTasks(oatpp::collection::FastQueue<CoroutineHandle>& tasks);
 
@@ -152,10 +154,11 @@ public:
    * @tparam Args - types of arguments to be passed to Coroutine constructor.
    * @param params - actual arguments to be passed to Coroutine constructor.
    */
-  template<typename CoroutineType, typename ... Args>
-  void execute(Args... params) {
+  template<typename CoroutineType, typename... Args>
+  void execute(Args... params)
+  {
     auto submission = std::make_shared<SubmissionTemplate<CoroutineType, Args...>>(params...);
-    ++ m_tasksCounter;
+    ++m_tasksCounter;
     {
       std::lock_guard<oatpp::concurrency::SpinLock> lock(m_taskLock);
       m_taskList.push_back(submission);
@@ -185,10 +188,8 @@ public:
    * @return - number of not-finished tasks.
    */
   v_int32 getTasksCount();
-
-  
 };
-  
+
 }}
 
 #endif /* oatpp_async_Processor_hpp */

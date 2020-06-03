@@ -35,40 +35,43 @@ String::String(const std::shared_ptr<oatpp::base::StrBuffer>& ptr, const type::T
     throw std::runtime_error("Value type does not match");
   }
 }
-  
-String operator + (const char* a, const String& b) {
-  return oatpp::base::StrBuffer::createSharedConcatenated(a, (v_int32) std::strlen(a), b->getData(), b->getSize());
+
+String operator+(const char* a, const String& b)
+{
+  return oatpp::base::StrBuffer::createSharedConcatenated(a, (v_int32)std::strlen(a), b->getData(), b->getSize());
 }
 
-String operator + (const String& b, const char* a) {
-  return oatpp::base::StrBuffer::createSharedConcatenated(b->getData(), b->getSize(), a, (v_int32) std::strlen(a));
+String operator+(const String& b, const char* a)
+{
+  return oatpp::base::StrBuffer::createSharedConcatenated(b->getData(), b->getSize(), a, (v_int32)std::strlen(a));
 }
 
-String operator + (const String& a, const String& b) {
+String operator+(const String& a, const String& b)
+{
   return oatpp::base::StrBuffer::createSharedConcatenated(a->getData(), a->getSize(), b->getData(), b->getSize());
 }
-  
+
 namespace __class {
-  
-  const ClassId String::CLASS_ID("String");
 
-  const ClassId Int8::CLASS_ID("Int8");
-  const ClassId UInt8::CLASS_ID("UInt8");
+const ClassId String::CLASS_ID("String");
 
-  const ClassId Int16::CLASS_ID("Int16");
-  const ClassId UInt16::CLASS_ID("UInt16");
+const ClassId Int8::CLASS_ID("Int8");
+const ClassId UInt8::CLASS_ID("UInt8");
 
-  const ClassId Int32::CLASS_ID("Int32");
-  const ClassId UInt32::CLASS_ID("UInt32");
+const ClassId Int16::CLASS_ID("Int16");
+const ClassId UInt16::CLASS_ID("UInt16");
 
-  const ClassId Int64::CLASS_ID("Int64");
-  const ClassId UInt64::CLASS_ID("UInt64");
+const ClassId Int32::CLASS_ID("Int32");
+const ClassId UInt32::CLASS_ID("UInt32");
 
-  const ClassId Float32::CLASS_ID("Float32");
-  const ClassId Float64::CLASS_ID("Float64");
+const ClassId Int64::CLASS_ID("Int64");
+const ClassId UInt64::CLASS_ID("UInt64");
 
-  const ClassId Boolean::CLASS_ID("Boolean");
+const ClassId Float32::CLASS_ID("Float32");
+const ClassId Float64::CLASS_ID("Float64");
+
+const ClassId Boolean::CLASS_ID("Boolean");
 
 }
-  
+
 }}}}

@@ -25,16 +25,16 @@
 #include "./Connection.hpp"
 
 #if defined(WIN32) || defined(_WIN32)
-  #include <io.h>
-  #include <WinSock2.h>
+#include <WinSock2.h>
+#include <io.h>
 #else
-  #include <unistd.h>
-  #include <sys/socket.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #endif
 
-#include <thread>
 #include <chrono>
 #include <fcntl.h>
+#include <thread>
 
 namespace oatpp { namespace network {
 
@@ -58,7 +58,7 @@ Connection::Connection(v_io_handle handle)
 
   auto flags = fcntl(m_handle, F_GETFL);
 
-  if (flags < 0) {
+  if(flags < 0) {
     throw std::runtime_error("[oatpp::network::Connection::Connection()]: Error. Can't get socket flags.");
   }
 
@@ -69,24 +69,25 @@ Connection::Connection(v_io_handle handle)
   }
 
 #endif
-
 }
 
-Connection::~Connection(){
+Connection::~Connection()
+{
   close();
 }
 
-v_io_size Connection::write(const void *buff, v_buff_size count, async::Action& action){
+v_io_size Connection::write(const void* buff, v_buff_size count, async::Action& action)
+{
 
 #if defined(WIN32) || defined(_WIN32)
 
-  auto result = ::send(m_handle, (const char*) buff, (int)count, 0);
+  auto result = ::send(m_handle, (const char*)buff, (int)count, 0);
 
   if(result == SOCKET_ERROR) {
 
     auto e = WSAGetLastError();
 
-    if(e == WSAEWOULDBLOCK){
+    if(e == WSAEWOULDBLOCK) {
       if(m_mode == data::stream::ASYNCHRONOUS) {
         action = oatpp::async::Action::createIOWaitAction(m_handle, oatpp::async::Action::IOEventType::IO_EVENT_WRITE);
       }
@@ -96,7 +97,7 @@ v_io_size Connection::write(const void *buff, v_buff_size count, async::Action& 
     } else if(e == WSAECONNRESET) {
       return IOError::BROKEN_PIPE;
     } else {
-      //OATPP_LOGD("Connection", "write errno=%d", e);
+      // OATPP_LOGD("Connection", "write errno=%d", e);
       return IOError::BROKEN_PIPE; // Consider all other errors as a broken pipe.
     }
   }
@@ -115,7 +116,7 @@ v_io_size Connection::write(const void *buff, v_buff_size count, async::Action& 
 
   if(result < 0) {
     auto e = errno;
-    if(e == EAGAIN || e == EWOULDBLOCK){
+    if(e == EAGAIN || e == EWOULDBLOCK) {
       if(m_mode == data::stream::ASYNCHRONOUS) {
         action = oatpp::async::Action::createIOWaitAction(m_handle, oatpp::async::Action::IOEventType::IO_EVENT_WRITE);
       }
@@ -125,17 +126,17 @@ v_io_size Connection::write(const void *buff, v_buff_size count, async::Action& 
     } else if(e == EPIPE) {
       return IOError::BROKEN_PIPE;
     } else {
-      //OATPP_LOGD("Connection", "write errno=%d", e);
+      // OATPP_LOGD("Connection", "write errno=%d", e);
       return IOError::BROKEN_PIPE; // Consider all other errors as a broken pipe.
     }
   }
   return result;
 
 #endif
-
 }
 
-v_io_size Connection::read(void *buff, v_buff_size count, async::Action& action){
+v_io_size Connection::read(void* buff, v_buff_size count, async::Action& action)
+{
 
 #if defined(WIN32) || defined(_WIN32)
 
@@ -145,7 +146,7 @@ v_io_size Connection::read(void *buff, v_buff_size count, async::Action& action)
 
     auto e = WSAGetLastError();
 
-    if(e == WSAEWOULDBLOCK){
+    if(e == WSAEWOULDBLOCK) {
       if(m_mode == data::stream::ASYNCHRONOUS) {
         action = oatpp::async::Action::createIOWaitAction(m_handle, oatpp::async::Action::IOEventType::IO_EVENT_READ);
       }
@@ -155,7 +156,7 @@ v_io_size Connection::read(void *buff, v_buff_size count, async::Action& action)
     } else if(e == WSAECONNRESET) {
       return IOError::BROKEN_PIPE;
     } else {
-      //OATPP_LOGD("Connection", "write errno=%d", e);
+      // OATPP_LOGD("Connection", "write errno=%d", e);
       return IOError::BROKEN_PIPE; // Consider all other errors as a broken pipe.
     }
   }
@@ -169,7 +170,7 @@ v_io_size Connection::read(void *buff, v_buff_size count, async::Action& action)
 
   if(result < 0) {
     auto e = errno;
-    if(e == EAGAIN || e == EWOULDBLOCK){
+    if(e == EAGAIN || e == EWOULDBLOCK) {
       if(m_mode == data::stream::ASYNCHRONOUS) {
         action = oatpp::async::Action::createIOWaitAction(m_handle, oatpp::async::Action::IOEventType::IO_EVENT_READ);
       }
@@ -179,98 +180,108 @@ v_io_size Connection::read(void *buff, v_buff_size count, async::Action& action)
     } else if(e == ECONNRESET) {
       return IOError::BROKEN_PIPE;
     } else {
-      //OATPP_LOGD("Connection", "write errno=%d", e);
+      // OATPP_LOGD("Connection", "write errno=%d", e);
       return IOError::BROKEN_PIPE; // Consider all other errors as a broken pipe.
     }
   }
   return result;
 
 #endif
-
 }
 
 #if defined(WIN32) || defined(_WIN32)
-void Connection::setStreamIOMode(oatpp::data::stream::IOMode ioMode) {
+void Connection::setStreamIOMode(oatpp::data::stream::IOMode ioMode)
+{
 
   u_long flags;
 
   switch(ioMode) {
-    case data::stream::BLOCKING:
-      flags = 0;
-      if(NO_ERROR != ioctlsocket(m_handle, FIONBIO, &flags)) {
-          throw std::runtime_error("[oatpp::network::Connection::setStreamIOMode()]: Error. Can't set stream I/O mode to IOMode::BLOCKING.");
-      }
-      m_mode = data::stream::BLOCKING;
-      break;
-    case data::stream::ASYNCHRONOUS:
-      flags = 1;
-      if(NO_ERROR != ioctlsocket(m_handle, FIONBIO, &flags)) {
-          throw std::runtime_error("[oatpp::network::Connection::setStreamIOMode()]: Error. Can't set stream I/O mode to IOMode::ASYNCHRONOUS.");
-      }
-      m_mode = data::stream::ASYNCHRONOUS;
-      break;
+  case data::stream::BLOCKING:
+    flags = 0;
+    if(NO_ERROR != ioctlsocket(m_handle, FIONBIO, &flags)) {
+      throw std::runtime_error(
+       "[oatpp::network::Connection::setStreamIOMode()]: Error. Can't set stream I/O mode to IOMode::BLOCKING.");
+    }
+    m_mode = data::stream::BLOCKING;
+    break;
+  case data::stream::ASYNCHRONOUS:
+    flags = 1;
+    if(NO_ERROR != ioctlsocket(m_handle, FIONBIO, &flags)) {
+      throw std::runtime_error(
+       "[oatpp::network::Connection::setStreamIOMode()]: Error. Can't set stream I/O mode to IOMode::ASYNCHRONOUS.");
+    }
+    m_mode = data::stream::ASYNCHRONOUS;
+    break;
   }
-
 }
 #else
-void Connection::setStreamIOMode(oatpp::data::stream::IOMode ioMode) {
+void Connection::setStreamIOMode(oatpp::data::stream::IOMode ioMode)
+{
 
   auto flags = fcntl(m_handle, F_GETFL);
-  if (flags < 0) {
+  if(flags < 0) {
     throw std::runtime_error("[oatpp::network::Connection::setStreamIOMode()]: Error. Can't get socket flags.");
   }
 
   switch(ioMode) {
 
-    case oatpp::data::stream::IOMode::BLOCKING:
-      flags = flags & (~O_NONBLOCK);
-      if (fcntl(m_handle, F_SETFL, flags) < 0) {
-        throw std::runtime_error("[oatpp::network::Connection::setStreamIOMode()]: Error. Can't set stream I/O mode to IOMode::BLOCKING.");
-      }
-      m_mode = data::stream::BLOCKING;
-      break;
+  case oatpp::data::stream::IOMode::BLOCKING:
+    flags = flags & (~O_NONBLOCK);
+    if(fcntl(m_handle, F_SETFL, flags) < 0) {
+      throw std::runtime_error(
+       "[oatpp::network::Connection::setStreamIOMode()]: Error. Can't set stream I/O mode to IOMode::BLOCKING.");
+    }
+    m_mode = data::stream::BLOCKING;
+    break;
 
-    case oatpp::data::stream::IOMode::ASYNCHRONOUS:
-      flags = (flags | O_NONBLOCK);
-      if (fcntl(m_handle, F_SETFL, flags) < 0) {
-        throw std::runtime_error("[oatpp::network::Connection::setStreamIOMode()]: Error. Can't set stream I/O mode to IOMode::ASYNCHRONOUS.");
-      }
-      m_mode = data::stream::ASYNCHRONOUS;
-      break;
-
+  case oatpp::data::stream::IOMode::ASYNCHRONOUS:
+    flags = (flags | O_NONBLOCK);
+    if(fcntl(m_handle, F_SETFL, flags) < 0) {
+      throw std::runtime_error(
+       "[oatpp::network::Connection::setStreamIOMode()]: Error. Can't set stream I/O mode to IOMode::ASYNCHRONOUS.");
+    }
+    m_mode = data::stream::ASYNCHRONOUS;
+    break;
   }
 }
 #endif
 
-void Connection::setOutputStreamIOMode(oatpp::data::stream::IOMode ioMode) {
+void Connection::setOutputStreamIOMode(oatpp::data::stream::IOMode ioMode)
+{
   setStreamIOMode(ioMode);
 }
 
-oatpp::data::stream::IOMode Connection::getOutputStreamIOMode() {
+oatpp::data::stream::IOMode Connection::getOutputStreamIOMode()
+{
   return m_mode;
 }
 
-oatpp::data::stream::Context& Connection::getOutputStreamContext() {
+oatpp::data::stream::Context& Connection::getOutputStreamContext()
+{
   return DEFAULT_CONTEXT;
 }
 
-void Connection::setInputStreamIOMode(oatpp::data::stream::IOMode ioMode) {
+void Connection::setInputStreamIOMode(oatpp::data::stream::IOMode ioMode)
+{
   setStreamIOMode(ioMode);
 }
 
-oatpp::data::stream::IOMode Connection::getInputStreamIOMode() {
+oatpp::data::stream::IOMode Connection::getInputStreamIOMode()
+{
   return m_mode;
 }
 
-oatpp::data::stream::Context& Connection::getInputStreamContext() {
+oatpp::data::stream::Context& Connection::getInputStreamContext()
+{
   return DEFAULT_CONTEXT;
 }
 
-void Connection::close(){
+void Connection::close()
+{
 #if defined(WIN32) || defined(_WIN32)
-	::closesocket(m_handle);
+  ::closesocket(m_handle);
 #else
-	::close(m_handle);
+  ::close(m_handle);
 #endif
 }
 

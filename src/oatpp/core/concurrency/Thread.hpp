@@ -47,7 +47,9 @@ v_int32 setThreadAffinityToOneCpu(std::thread::native_handle_type nativeHandle, 
  * @return - zero on success. Negative value on failure.
  * -1 if platform that runs application does not support this call.
  */
-v_int32 setThreadAffinityToCpuRange(std::thread::native_handle_type nativeHandle, v_int32 firstCpuIndex, v_int32 lastCpuIndex);
+v_int32 setThreadAffinityToCpuRange(std::thread::native_handle_type nativeHandle,
+                                    v_int32 firstCpuIndex,
+                                    v_int32 lastCpuIndex);
 
 /**
  * Get hardware concurrency.

@@ -25,10 +25,10 @@
 #ifndef oatpp_web_protocol_http_incoming_BodyDecoder_hpp
 #define oatpp_web_protocol_http_incoming_BodyDecoder_hpp
 
-#include "oatpp/web/protocol/http/Http.hpp"
+#include "oatpp/core/async/Coroutine.hpp"
 #include "oatpp/core/data/mapping/ObjectMapper.hpp"
 #include "oatpp/core/data/stream/ChunkedBuffer.hpp"
-#include "oatpp/core/async/Coroutine.hpp"
+#include "oatpp/web/protocol/http/Http.hpp"
 
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace incoming {
 
@@ -40,17 +40,16 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
  */
 class BodyDecoder {
 private:
-  
   template<class Wrapper>
-  class ToDtoDecoder : public oatpp::async::CoroutineWithResult<ToDtoDecoder<Wrapper>, const Wrapper&> {
+  class ToDtoDecoder: public oatpp::async::CoroutineWithResult<ToDtoDecoder<Wrapper>, const Wrapper&> {
   private:
     const BodyDecoder* m_decoder;
     Headers m_headers;
     std::shared_ptr<oatpp::data::stream::InputStream> m_bodyStream;
     std::shared_ptr<oatpp::data::mapping::ObjectMapper> m_objectMapper;
     std::shared_ptr<oatpp::data::stream::ChunkedBuffer> m_outputStream;
+
   public:
-    
     ToDtoDecoder(const BodyDecoder* decoder,
                  Headers& headers,
                  const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
@@ -60,13 +59,17 @@ private:
       , m_bodyStream(bodyStream)
       , m_objectMapper(objectMapper)
       , m_outputStream(std::make_shared<oatpp::data::stream::ChunkedBuffer>())
-    {}
-    
-    oatpp::async::Action act() override {
-      return m_decoder->decodeAsync(m_headers, m_bodyStream, m_outputStream).next(this->yieldTo(&ToDtoDecoder::onDecoded));
+    {
     }
-    
-    oatpp::async::Action onDecoded() {
+
+    oatpp::async::Action act() override
+    {
+      return m_decoder->decodeAsync(m_headers, m_bodyStream, m_outputStream)
+       .next(this->yieldTo(&ToDtoDecoder::onDecoded));
+    }
+
+    oatpp::async::Action onDecoded()
+    {
       auto body = m_outputStream->toString();
       oatpp::parser::Caret caret(body);
       auto dto = m_objectMapper->readFromCaret<Wrapper>(caret);
@@ -75,11 +78,9 @@ private:
       }
       return this->_return(dto);
     }
-    
   };
-  
-public:
 
+public:
   /**
    * Virtual destructor.
    */
@@ -91,7 +92,9 @@ public:
    * @param bodyStream - pointer to &id:oatpp::data::stream::InputStream;.
    * @param writeCallback - &id:oatpp::data::stream::WriteCallback;.
    */
-  virtual void decode(const Headers& headers, data::stream::InputStream* bodyStream, data::stream::WriteCallback* writeCallback) const = 0;
+  virtual void decode(const Headers& headers,
+                      data::stream::InputStream* bodyStream,
+                      data::stream::WriteCallback* writeCallback) const = 0;
 
   /**
    * Implement this method! Same as &l:BodyDecoder::decode (); but Async.
@@ -100,9 +103,10 @@ public:
    * @param writeCallback - `std::shared_ptr` to &id:oatpp::data::stream::WriteCallback;.
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  virtual oatpp::async::CoroutineStarter decodeAsync(const Headers& headers,
-                                                     const std::shared_ptr<data::stream::InputStream>& bodyStream,
-                                                     const std::shared_ptr<data::stream::WriteCallback>& writeCallback) const = 0;
+  virtual oatpp::async::CoroutineStarter decodeAsync(
+   const Headers& headers,
+   const std::shared_ptr<data::stream::InputStream>& bodyStream,
+   const std::shared_ptr<data::stream::WriteCallback>& writeCallback) const = 0;
 
   /**
    * Read body stream and decode it to string.
@@ -110,14 +114,16 @@ public:
    * @param bodyStream - pointer to &id:oatpp::data::stream::InputStream;.
    * @return - &oatpp::String;.
    */
-  oatpp::String decodeToString(const Headers& headers, data::stream::InputStream* bodyStream) const {
+  oatpp::String decodeToString(const Headers& headers, data::stream::InputStream* bodyStream) const
+  {
     oatpp::data::stream::ChunkedBuffer stream;
     decode(headers, bodyStream, &stream);
     return stream.toString();
   }
 
   /**
-   * Read body stream, decode, and deserialize it as DTO Object (see [Data Transfer Object (DTO)](https://oatpp.io/docs/components/dto/)).
+   * Read body stream, decode, and deserialize it as DTO Object (see [Data Transfer Object
+   * (DTO)](https://oatpp.io/docs/components/dto/)).
    * @tparam Wrapper - ObjectWrapper type.
    * @param headers - Headers map. &id:oatpp::web::protocol::http::Headers;.
    * @param bodyStream - pointer to &id:oatpp::data::stream::InputStream;.
@@ -127,7 +133,8 @@ public:
   template<class Wrapper>
   Wrapper decodeToDto(const Headers& headers,
                       data::stream::InputStream* bodyStream,
-                      data::mapping::ObjectMapper* objectMapper) const {
+                      data::mapping::ObjectMapper* objectMapper) const
+  {
     return objectMapper->readFromString<Wrapper>(decodeToString(headers, bodyStream));
   }
 
@@ -137,8 +144,8 @@ public:
    * @param bodyStream - `std::shared_ptr` to &id:oatpp::data::stream::InputStream;.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  oatpp::async::CoroutineStarterForResult<const oatpp::String&>
-  decodeToStringAsync(const Headers& headers, const std::shared_ptr<data::stream::InputStream>& bodyStream) const;
+  oatpp::async::CoroutineStarterForResult<const oatpp::String&> decodeToStringAsync(
+   const Headers& headers, const std::shared_ptr<data::stream::InputStream>& bodyStream) const;
 
   /**
    * Same as &l:BodyDecoder::decodeToDto (); but Async.
@@ -149,15 +156,15 @@ public:
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
   template<class Wrapper>
-  oatpp::async::CoroutineStarterForResult<const Wrapper&>
-  decodeToDtoAsync(const Headers& headers,
-                   const std::shared_ptr<data::stream::InputStream>& bodyStream,
-                   const std::shared_ptr<data::mapping::ObjectMapper>& objectMapper) const {
+  oatpp::async::CoroutineStarterForResult<const Wrapper&> decodeToDtoAsync(
+   const Headers& headers,
+   const std::shared_ptr<data::stream::InputStream>& bodyStream,
+   const std::shared_ptr<data::mapping::ObjectMapper>& objectMapper) const
+  {
     return ToDtoDecoder<Wrapper>::startForResult(this, headers, bodyStream, objectMapper);
   }
-  
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_incoming_BodyDecoder_hpp */

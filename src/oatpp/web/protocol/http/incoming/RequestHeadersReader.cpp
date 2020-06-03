@@ -29,8 +29,8 @@
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace incoming {
 
 v_io_size RequestHeadersReader::readHeadersSectionIterative(ReadHeadersIteration& iteration,
-                                                                  data::stream::InputStreamBufferedProxy* stream,
-                                                                  async::Action& action)
+                                                            data::stream::InputStreamBufferedProxy* stream,
+                                                            async::Action& action)
 {
 
   v_buff_size desiredToRead = m_readChunkSize;
@@ -48,9 +48,9 @@ v_io_size RequestHeadersReader::readHeadersSectionIterative(ReadHeadersIteration
 
     m_bufferStream->setCurrentPosition(m_bufferStream->getCurrentPosition() + res);
 
-    for(v_buff_size i = 0; i < res; i ++) {
+    for(v_buff_size i = 0; i < res; i++) {
       iteration.accumulator <<= 8;
-      iteration.accumulator |= bufferData[i];
+      iteration.accumulator |= bufferData [ i ];
       if(iteration.accumulator == SECTION_END) {
         stream->commitReadOffset(i + 1);
         iteration.done = true;
@@ -59,15 +59,14 @@ v_io_size RequestHeadersReader::readHeadersSectionIterative(ReadHeadersIteration
     }
 
     stream->commitReadOffset(res);
-
   }
-  
+
   return res;
-  
 }
-  
+
 RequestHeadersReader::Result RequestHeadersReader::readHeaders(data::stream::InputStreamBufferedProxy* stream,
-                                                               http::HttpError::Info& error) {
+                                                               http::HttpError::Info& error)
+{
 
   m_bufferStream->setCurrentPosition(0);
 
@@ -80,8 +79,10 @@ RequestHeadersReader::Result RequestHeadersReader::readHeaders(data::stream::Inp
     error.ioStatus = readHeadersSectionIterative(iteration, stream, action);
 
     if(!action.isNone()) {
-      OATPP_LOGE("[oatpp::web::protocol::http::incoming::RequestHeadersReader::readHeaders]", "Error. Async action is unexpected.");
-      throw std::runtime_error("[oatpp::web::protocol::http::incoming::RequestHeadersReader::readHeaders]: Error. Async action is unexpected.");
+      OATPP_LOGE("[oatpp::web::protocol::http::incoming::RequestHeadersReader::readHeaders]",
+                 "Error. Async action is unexpected.");
+      throw std::runtime_error(
+       "[oatpp::web::protocol::http::incoming::RequestHeadersReader::readHeaders]: Error. Async action is unexpected.");
     }
 
     if(error.ioStatus > 0) {
@@ -91,44 +92,42 @@ RequestHeadersReader::Result RequestHeadersReader::readHeaders(data::stream::Inp
     } else {
       break;
     }
-
   }
-  
+
   if(error.ioStatus > 0) {
-    oatpp::parser::Caret caret (m_bufferStream->getData(), m_bufferStream->getCurrentPosition());
+    oatpp::parser::Caret caret(m_bufferStream->getData(), m_bufferStream->getCurrentPosition());
     http::Status status;
     http::Parser::parseRequestStartingLine(result.startingLine, nullptr, caret, status);
     if(status.code == 0) {
       http::Parser::parseHeaders(result.headers, nullptr, caret, status);
     }
   }
-  
+
   return result;
-  
 }
-  
-  
-oatpp::async::CoroutineStarterForResult<const RequestHeadersReader::Result&>
-RequestHeadersReader::readHeadersAsync(const std::shared_ptr<data::stream::InputStreamBufferedProxy>& stream)
+
+
+oatpp::async::CoroutineStarterForResult<const RequestHeadersReader::Result&> RequestHeadersReader::readHeadersAsync(
+ const std::shared_ptr<data::stream::InputStreamBufferedProxy>& stream)
 {
-  
-  class ReaderCoroutine : public oatpp::async::CoroutineWithResult<ReaderCoroutine, const Result&> {
+
+  class ReaderCoroutine: public oatpp::async::CoroutineWithResult<ReaderCoroutine, const Result&> {
   private:
     std::shared_ptr<data::stream::InputStreamBufferedProxy> m_stream;
     RequestHeadersReader* m_this;
     ReadHeadersIteration m_iteration;
     RequestHeadersReader::Result m_result;
+
   public:
-    
-    ReaderCoroutine(RequestHeadersReader* _this,
-                    const std::shared_ptr<data::stream::InputStreamBufferedProxy>& stream)
+    ReaderCoroutine(RequestHeadersReader* _this, const std::shared_ptr<data::stream::InputStreamBufferedProxy>& stream)
       : m_stream(stream)
       , m_this(_this)
     {
       m_this->m_bufferStream->setCurrentPosition(0);
     }
-    
-    Action act() override {
+
+    Action act() override
+    {
 
       async::Action action;
       auto res = m_this->readHeadersSectionIterative(m_iteration, m_stream.get(), action);
@@ -141,21 +140,21 @@ RequestHeadersReader::readHeadersAsync(const std::shared_ptr<data::stream::Input
         return yieldTo(&ReaderCoroutine::parseHeaders);
       } else {
 
-        if (res > 0) {
+        if(res > 0) {
           return repeat();
-        } else if (res == IOError::RETRY_READ || res == IOError::RETRY_WRITE) {
+        } else if(res == IOError::RETRY_READ || res == IOError::RETRY_WRITE) {
           return repeat();
         }
-
       }
 
-      return error<Error>("[oatpp::web::protocol::http::incoming::RequestHeadersReader::readHeadersAsync()]: Error. Error reading connection stream.");
-
+      return error<Error>("[oatpp::web::protocol::http::incoming::RequestHeadersReader::readHeadersAsync()]: Error. "
+                          "Error reading connection stream.");
     }
-    
-    Action parseHeaders() {
 
-      oatpp::parser::Caret caret (m_this->m_bufferStream->getData(), m_this->m_bufferStream->getCurrentPosition());
+    Action parseHeaders()
+    {
+
+      oatpp::parser::Caret caret(m_this->m_bufferStream->getData(), m_this->m_bufferStream->getCurrentPosition());
       http::Status status;
       http::Parser::parseRequestStartingLine(m_result.startingLine, nullptr, caret, status);
       if(status.code == 0) {
@@ -163,18 +162,17 @@ RequestHeadersReader::readHeadersAsync(const std::shared_ptr<data::stream::Input
         if(status.code == 0) {
           return _return(m_result);
         } else {
-          return error<Error>("[oatpp::web::protocol::http::incoming::RequestHeadersReader::readHeadersAsync()]: Error. Error occurred while parsing headers.");
+          return error<Error>("[oatpp::web::protocol::http::incoming::RequestHeadersReader::readHeadersAsync()]: Error. "
+                              "Error occurred while parsing headers.");
         }
       } else {
-        return error<Error>("[oatpp::web::protocol::http::incoming::RequestHeadersReader::readHeadersAsync()]: Error. Can't parse starting line.");
+        return error<Error>("[oatpp::web::protocol::http::incoming::RequestHeadersReader::readHeadersAsync()]: Error. "
+                            "Can't parse starting line.");
       }
-
     }
-    
   };
-  
+
   return ReaderCoroutine::startForResult(this, stream);
-  
 }
 
 }}}}}

@@ -32,11 +32,11 @@ namespace oatpp { namespace async {
 /**
  * Class to hold and communicate errors between Coroutines
  */
-class Error : public oatpp::base::Countable {
+class Error: public oatpp::base::Countable {
 private:
   const char* m_what;
-public:
 
+public:
   /**
    * Constructor.
    * @param what - error explanation.
@@ -60,13 +60,13 @@ public:
    * @return - `true` if error is of specified class
    */
   template<class ErrorClass>
-  bool is() const {
+  bool is() const
+  {
     return dynamic_cast<const ErrorClass*>(this) != nullptr;
   }
-
 };
 
 }}
 
 
-#endif //oatpp_async_Error_hpp
+#endif // oatpp_async_Error_hpp

@@ -25,8 +25,8 @@
 #ifndef oatpp_parser_json_mapping_Serializer_hpp
 #define oatpp_parser_json_mapping_Serializer_hpp
 
-#include "oatpp/parser/json/Beautifier.hpp"
 #include "oatpp/core/Types.hpp"
+#include "oatpp/parser/json/Beautifier.hpp"
 #include <vector>
 
 namespace oatpp { namespace parser { namespace json { namespace mapping {
@@ -42,24 +42,27 @@ public:
   typedef oatpp::data::mapping::type::Type::Properties Properties;
 
   typedef oatpp::String String;
+
 public:
   /**
    * Serializer config.
    */
-  class Config : public oatpp::base::Countable {
+  class Config: public oatpp::base::Countable {
   public:
     /**
      * Constructor.
      */
     Config()
-    {}
-  public:
+    {
+    }
 
+  public:
     /**
      * Create shared config.
      * @return - `std::shared_ptr` to Config.
      */
-    static std::shared_ptr<Config> createShared(){
+    static std::shared_ptr<Config> createShared()
+    {
       return std::make_shared<Config>();
     }
 
@@ -90,29 +93,31 @@ public:
      * Beautifier new line.
      */
     oatpp::String beautifierNewLine = "\n";
-
   };
-public:
-  typedef void (*SerializerMethod)(Serializer*,
-                                   data::stream::ConsistentOutputStream*,
-                                   const oatpp::Void&);
-private:
 
+public:
+  typedef void (*SerializerMethod)(Serializer*, data::stream::ConsistentOutputStream*, const oatpp::Void&);
+
+private:
   template<class T>
   static void serializePrimitive(Serializer* serializer,
                                  data::stream::ConsistentOutputStream* stream,
-                                 const oatpp::Void& polymorph){
-    (void) serializer;
+                                 const oatpp::Void& polymorph)
+  {
+    (void)serializer;
 
-    if(polymorph){
-      stream->writeAsString(* static_cast<typename T::ObjectType*>(polymorph.get()));
+    if(polymorph) {
+      stream->writeAsString(*static_cast<typename T::ObjectType*>(polymorph.get()));
     } else {
       stream->writeSimple("null", 4);
     }
   }
 
   template<class Collection>
-  static void serializeList(Serializer* serializer, data::stream::ConsistentOutputStream* stream, const oatpp::Void& polymorph) {
+  static void serializeList(Serializer* serializer,
+                            data::stream::ConsistentOutputStream* stream,
+                            const oatpp::Void& polymorph)
+  {
 
     if(!polymorph) {
       stream->writeSimple("null", 4);
@@ -124,7 +129,7 @@ private:
     stream->writeCharSimple('[');
     bool first = true;
 
-    for(auto& value : *list) {
+    for(auto& value: *list) {
       if(value || serializer->getConfig()->includeNullFields) {
         (first) ? first = false : stream->writeSimple(",", 1);
         serializer->serialize(stream, value);
@@ -132,11 +137,13 @@ private:
     }
 
     stream->writeCharSimple(']');
-
   }
 
   template<class Collection>
-  static void serializeKeyValue(Serializer* serializer, data::stream::ConsistentOutputStream* stream, const oatpp::Void& polymorph) {
+  static void serializeKeyValue(Serializer* serializer,
+                                data::stream::ConsistentOutputStream* stream,
+                                const oatpp::Void& polymorph)
+  {
 
     if(!polymorph) {
       stream->writeSimple("null", 4);
@@ -148,7 +155,7 @@ private:
     stream->writeCharSimple('{');
     bool first = true;
 
-    for(auto& pair : *map) {
+    for(auto& pair: *map) {
       const auto& value = pair.second;
       if(value || serializer->getConfig()->includeNullFields) {
         (first) ? first = false : stream->writeSimple(",", 1);
@@ -160,7 +167,6 @@ private:
     }
 
     stream->writeCharSimple('}');
-
   }
 
   static void serializeString(oatpp::data::stream::ConsistentOutputStream* stream, p_char8 data, v_buff_size size);
@@ -185,8 +191,8 @@ private:
 private:
   std::shared_ptr<Config> m_config;
   std::vector<SerializerMethod> m_methods;
-public:
 
+public:
   /**
    * Constructor.
    * @param config - serializer config.
@@ -196,7 +202,8 @@ public:
   /**
    * Set serializer method for type.
    * @param classId - &id:oatpp::data::mapping::type::ClassId;.
-   * @param method - `typedef void (*SerializerMethod)(Serializer*, data::stream::ConsistentOutputStream*, const oatpp::Void&)`.
+   * @param method - `typedef void (*SerializerMethod)(Serializer*, data::stream::ConsistentOutputStream*, const
+   * oatpp::Void&)`.
    */
   void setSerializerMethod(const data::mapping::type::ClassId& classId, SerializerMethod method);
 
@@ -212,7 +219,6 @@ public:
    * @return
    */
   const std::shared_ptr<Config>& getConfig();
-
 };
 
 }}}}

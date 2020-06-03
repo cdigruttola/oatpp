@@ -30,7 +30,8 @@
 
 namespace oatpp { namespace test { namespace network {
 
-void UrlTest::onRun() {
+void UrlTest::onRun()
+{
 
   typedef oatpp::network::Url Url;
 
@@ -129,7 +130,7 @@ void UrlTest::onRun() {
   }
 
   {
-    const char *urlText = "?key1=value1&key2&key3=value3";
+    const char* urlText = "?key1=value1&key2&key3=value3";
     OATPP_LOGV(TAG, "urlText='%s'", urlText);
     auto params = Url::Parser::parseQueryParams(urlText);
     OATPP_ASSERT(params.getSize() == 3);
@@ -139,7 +140,7 @@ void UrlTest::onRun() {
   }
 
   {
-    const char *urlText = "?key1=value1&key2&key3";
+    const char* urlText = "?key1=value1&key2&key3";
     OATPP_LOGV(TAG, "urlText='%s'", urlText);
     auto params = Url::Parser::parseQueryParams(urlText);
     OATPP_ASSERT(params.getSize() == 3);
@@ -149,7 +150,7 @@ void UrlTest::onRun() {
   }
 
   {
-    const char *urlText = "label?key1=value1&key2=value2&key3=value3";
+    const char* urlText = "label?key1=value1&key2=value2&key3=value3";
     OATPP_LOGV(TAG, "urlText='%s'", urlText);
     auto params = Url::Parser::parseQueryParams(urlText);
     OATPP_ASSERT(params.getSize() == 3);
@@ -177,7 +178,6 @@ void UrlTest::onRun() {
     OATPP_ASSERT(params.get("key2") == "");
     OATPP_ASSERT(params.get("key3") == "");
   }
-
 }
 
 }}}

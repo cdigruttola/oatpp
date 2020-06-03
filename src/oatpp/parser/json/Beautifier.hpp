@@ -32,24 +32,27 @@ namespace oatpp { namespace parser { namespace json {
 /**
  * JSON output stream beautifier.
  */
-class Beautifier : public oatpp::data::stream::ConsistentOutputStream {
+class Beautifier: public oatpp::data::stream::ConsistentOutputStream {
 public:
   typedef oatpp::data::stream::ConsistentOutputStream ConsistentOutputStream;
   typedef oatpp::data::stream::IOMode IOMode;
   typedef oatpp::data::stream::Context Context;
+
 private:
   ConsistentOutputStream* m_outputStream;
   oatpp::String m_indent;
   oatpp::String m_newLine;
+
 private:
   v_int32 m_level;
   bool m_wantIndent;
   bool m_isCharEscaped;
   bool m_isInString;
+
 private:
   void writeIndent(ConsistentOutputStream* outputStream);
+
 public:
-  
   /**
    * Constructor.
    * @param outputStream - destination output stream.
@@ -65,7 +68,7 @@ public:
    * @param action
    * @return - actual number of bytes written. &id:oatpp::v_io_size;.
    */
-  v_io_size write(const void *data, v_buff_size count, async::Action& action) override;
+  v_io_size write(const void* data, v_buff_size count, async::Action& action) override;
 
   /**
    * Set stream I/O mode.
@@ -84,7 +87,6 @@ public:
    * @return
    */
   Context& getOutputStreamContext() override;
-
 };
 
 }}}

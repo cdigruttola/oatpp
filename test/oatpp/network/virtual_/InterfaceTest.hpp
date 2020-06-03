@@ -28,13 +28,16 @@
 #include "oatpp-test/UnitTest.hpp"
 
 namespace oatpp { namespace test { namespace network { namespace virtual_ {
-  
-class InterfaceTest : public UnitTest {
+
+class InterfaceTest: public UnitTest {
 public:
-  InterfaceTest():UnitTest("TEST[network::virtual_::InterfaceTest]"){}
+  InterfaceTest()
+    : UnitTest("TEST[network::virtual_::InterfaceTest]")
+  {
+  }
   void onRun() override;
 };
-  
+
 }}}}
 
 #endif /* oatpp_test_network_virtual__InterfaceTest_hpp */

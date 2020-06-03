@@ -25,14 +25,14 @@
 #ifndef oatpp_data_Stream
 #define oatpp_data_Stream
 
-#include "oatpp/core/data/share/LazyStringMap.hpp"
 #include "oatpp/core/async/Coroutine.hpp"
 #include "oatpp/core/data/buffer/IOBuffer.hpp"
 #include "oatpp/core/data/buffer/Processor.hpp"
+#include "oatpp/core/data/share/LazyStringMap.hpp"
 
 #include "oatpp/core/IODefinitions.hpp"
 
-namespace oatpp { namespace data{ namespace stream {
+namespace oatpp { namespace data { namespace stream {
 
 /**
  * Stream Type.
@@ -61,16 +61,18 @@ public:
    * Convenience typedef for &id:oatpp::data::share::LazyStringMap;.
    */
   typedef oatpp::data::share::LazyStringMap<oatpp::data::share::StringKeyLabel> Properties;
+
 private:
   Properties m_properties;
+
 protected:
   /**
    * `protected`. Get mutable additional optional context specific properties.
    * @return - &l:Context::Properties;.
    */
   Properties& getMutableProperties();
-public:
 
+public:
   /**
    * Default constructor.
    */
@@ -116,24 +118,25 @@ public:
    */
   const Properties& getProperties() const;
 
-  inline bool operator == (const Context& other){
+  inline bool operator==(const Context& other)
+  {
     return this == &other;
   }
 
-  inline bool operator != (const Context& other){
+  inline bool operator!=(const Context& other)
+  {
     return this != &other;
   }
-
 };
 
 /**
  * The default implementation for context with no initialization.
  */
-class DefaultInitializedContext : public oatpp::data::stream::Context {
+class DefaultInitializedContext: public oatpp::data::stream::Context {
 private:
   StreamType m_streamType;
-public:
 
+public:
   /**
    * Constructor.
    * @param streamType - &l:StreamType;.
@@ -172,7 +175,6 @@ public:
    * @return - &l:StreamType;.
    */
   StreamType getStreamType() const override;
-
 };
 
 /**
@@ -196,7 +198,6 @@ enum IOMode : v_int32 {
  */
 class WriteCallback {
 public:
-
   /**
    * Default virtual destructor.
    */
@@ -210,15 +211,15 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual number of bytes written. 0 - to indicate end-of-file.
    */
-  virtual v_io_size write(const void *data, v_buff_size count, async::Action& action) = 0;
+  virtual v_io_size write(const void* data, v_buff_size count, async::Action& action) = 0;
 
   v_io_size write(data::buffer::InlineWriteData& inlineData, async::Action& action);
 
-  v_io_size writeSimple(const void *data, v_buff_size count);
+  v_io_size writeSimple(const void* data, v_buff_size count);
 
   v_io_size writeExactSizeDataSimple(data::buffer::InlineWriteData& inlineData);
 
-  v_io_size writeExactSizeDataSimple(const void *data, v_buff_size count);
+  v_io_size writeExactSizeDataSimple(const void* data, v_buff_size count);
 
   async::Action writeExactSizeDataAsyncInline(data::buffer::InlineWriteData& inlineData, async::Action&& nextAction);
 
@@ -229,7 +230,8 @@ public:
    * @param data - data to write.
    * @return - actual number of bytes written. &id:oatpp::v_io_size;.
    */
-  v_io_size writeSimple(const char* data){
+  v_io_size writeSimple(const char* data)
+  {
     return writeSimple((p_char8)data, std::strlen(data));
   }
 
@@ -238,7 +240,8 @@ public:
    * @param str - data to write.
    * @return - actual number of bytes written. &id:oatpp::v_io_size;.
    */
-  v_io_size writeSimple(const oatpp::String& str){
+  v_io_size writeSimple(const oatpp::String& str)
+  {
     return writeSimple(str->getData(), str->getSize());
   }
 
@@ -247,18 +250,17 @@ public:
    * @param c - one char to write.
    * @return - actual number of bytes written. &id:oatpp::v_io_size;.
    */
-  v_io_size writeCharSimple(v_char8 c){
+  v_io_size writeCharSimple(v_char8 c)
+  {
     return writeSimple(&c, 1);
   }
-
 };
 
 /**
  * Output Stream.
  */
-class OutputStream : public WriteCallback {
+class OutputStream: public WriteCallback {
 public:
-
   /**
    * Default virtual destructor.
    */
@@ -281,7 +283,6 @@ public:
    * @return - &l:Context;.
    */
   virtual Context& getOutputStreamContext() = 0;
-
 };
 
 /**
@@ -289,7 +290,6 @@ public:
  */
 class ReadCallback {
 public:
-
   /**
    * Default virtual destructor.
    */
@@ -303,28 +303,26 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual number of bytes written to buffer. 0 - to indicate end-of-file.
    */
-  virtual v_io_size read(void *buffer, v_buff_size count, async::Action& action) = 0;
+  virtual v_io_size read(void* buffer, v_buff_size count, async::Action& action) = 0;
 
   v_io_size read(data::buffer::InlineReadData& inlineData, async::Action& action);
 
   v_io_size readExactSizeDataSimple(data::buffer::InlineReadData& inlineData);
 
-  v_io_size readExactSizeDataSimple(void *data, v_buff_size count);
+  v_io_size readExactSizeDataSimple(void* data, v_buff_size count);
 
   async::Action readExactSizeDataAsyncInline(data::buffer::InlineReadData& inlineData, async::Action&& nextAction);
 
   async::Action readSomeDataAsyncInline(data::buffer::InlineReadData& inlineData, async::Action&& nextAction);
 
-  v_io_size readSimple(void *data, v_buff_size count);
-
+  v_io_size readSimple(void* data, v_buff_size count);
 };
 
 /**
  * Input Stream.
  */
-class InputStream : public ReadCallback {
+class InputStream: public ReadCallback {
 public:
-
   /**
    * Default virtual destructor.
    */
@@ -347,15 +345,15 @@ public:
    * @return - &l:Context;.
    */
   virtual Context& getInputStreamContext() = 0;
-
 };
 
 /**
  * I/O Stream.
  */
-class IOStream : public InputStream, public OutputStream {
+class IOStream
+  : public InputStream
+  , public OutputStream {
 public:
-
   /**
    * Init input/output stream contexts.
    */
@@ -365,15 +363,14 @@ public:
    * Init input/output stream contexts in an async manner.
    */
   async::CoroutineStarter initContextsAsync();
-
 };
 
 /**
- * Streams that guarantee data to be written in exact amount as specified in call to &l:OutputStream::write (); should extend this class.
+ * Streams that guarantee data to be written in exact amount as specified in call to &l:OutputStream::write (); should
+ * extend this class.
  */
-class ConsistentOutputStream : public OutputStream {
+class ConsistentOutputStream: public OutputStream {
 public:
-
   /**
    * Convert value to string and write to stream.
    * @param value
@@ -450,60 +447,64 @@ public:
    * @return - actual number of bytes written. &id:oatpp::v_io_size;. <br>
    */
   v_io_size writeAsString(bool value);
-
 };
 
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const oatpp::String& str);
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const Int8& value);
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const UInt8& value);
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const Int16& value);
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const UInt16& value);
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const Int32& value);
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const UInt32& value);
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const Int64& value);
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const UInt64& value);
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const Float32& value);
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const Float64& value);
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const Boolean& value);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const oatpp::String& str);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const Int8& value);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const UInt8& value);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const Int16& value);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const UInt16& value);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const Int32& value);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const UInt32& value);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const Int64& value);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const UInt64& value);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const Float32& value);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const Float64& value);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const Boolean& value);
 
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, const char* str);
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, const char* str);
 
 template<typename T>
-ConsistentOutputStream& operator << (ConsistentOutputStream& s, T value) {
+ConsistentOutputStream& operator<<(ConsistentOutputStream& s, T value)
+{
   s.writeAsString(value);
   return s;
 }
-//ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_int8 value);
-//ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_uint8 value);
-//ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_int16 value);
-//ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_uint16 value);
-//ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_int32 value);
-//ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_uint32 value);
-//ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_int64 value);
-//ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_uint64 value);
-//ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_float32 value);
-//ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_float64 value);
-//ConsistentOutputStream& operator << (ConsistentOutputStream& s, bool value);
+// ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_int8 value);
+// ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_uint8 value);
+// ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_int16 value);
+// ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_uint16 value);
+// ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_int32 value);
+// ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_uint32 value);
+// ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_int64 value);
+// ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_uint64 value);
+// ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_float32 value);
+// ConsistentOutputStream& operator << (ConsistentOutputStream& s, v_float64 value);
+// ConsistentOutputStream& operator << (ConsistentOutputStream& s, bool value);
 
 /**
  * Error of Asynchronous stream transfer.
  */
-class AsyncTransferError : public oatpp::async::Error {
+class AsyncTransferError: public oatpp::async::Error {
 public:
   /**
    * Constructor.
    * @param what
    */
-  AsyncTransferError(const char* what) : oatpp::async::Error(what) {}
+  AsyncTransferError(const char* what)
+    : oatpp::async::Error(what)
+  {
+  }
 };
 
 /**
  * Plain data transfer processor.
  * Transfers data as is.
  */
-class StatelessDataTransferProcessor : public data::buffer::Processor {
+class StatelessDataTransferProcessor: public data::buffer::Processor {
 public:
   static StatelessDataTransferProcessor INSTANCE;
+
 public:
   v_io_size suggestInputStreamReadSize() override;
   v_int32 iterate(data::buffer::InlineReadData& dataIn, data::buffer::InlineReadData& dataOut) override;
@@ -519,12 +520,13 @@ public:
  * @param processor - data processing to be applied during the transfer.
  * @return - the actual amout of bytes read from the `readCallback`.
  */
-v_io_size transfer(const base::ObjectHandle<ReadCallback>& readCallback,
-                         const base::ObjectHandle<WriteCallback>& writeCallback,
-                         v_io_size transferSize,
-                         void* buffer,
-                         v_buff_size bufferSize,
-                         const base::ObjectHandle<data::buffer::Processor>& processor = &StatelessDataTransferProcessor::INSTANCE);
+v_io_size transfer(
+ const base::ObjectHandle<ReadCallback>& readCallback,
+ const base::ObjectHandle<WriteCallback>& writeCallback,
+ v_io_size transferSize,
+ void* buffer,
+ v_buff_size bufferSize,
+ const base::ObjectHandle<data::buffer::Processor>& processor = &StatelessDataTransferProcessor::INSTANCE);
 
 /**
  * Transfer data from `readCallback` to `writeCallback` in Async manner.
@@ -535,13 +537,14 @@ v_io_size transfer(const base::ObjectHandle<ReadCallback>& readCallback,
  * @param processor - data processing to be applied during the transfer.
  * @return - &id:oatpp::async::CoroutineStarter;.
  */
-async::CoroutineStarter transferAsync(const base::ObjectHandle<ReadCallback>& readCallback,
-                                      const base::ObjectHandle<WriteCallback>& writeCallback,
-                                      v_buff_size transferSize,
-                                      const base::ObjectHandle<data::buffer::IOBuffer>& buffer,
-                                      const base::ObjectHandle<data::buffer::Processor>& processor = &StatelessDataTransferProcessor::INSTANCE);
+async::CoroutineStarter transferAsync(
+ const base::ObjectHandle<ReadCallback>& readCallback,
+ const base::ObjectHandle<WriteCallback>& writeCallback,
+ v_buff_size transferSize,
+ const base::ObjectHandle<data::buffer::IOBuffer>& buffer,
+ const base::ObjectHandle<data::buffer::Processor>& processor = &StatelessDataTransferProcessor::INSTANCE);
 
-  
+
 }}}
 
 #endif /* defined(_data_Stream) */

@@ -24,11 +24,11 @@
 
 #include "Server.hpp"
 
-#include <thread>
 #include <chrono>
+#include <thread>
 
 namespace oatpp { namespace network { namespace server {
-  
+
 const v_int32 Server::STATUS_CREATED = 0;
 const v_int32 Server::STATUS_RUNNING = 1;
 const v_int32 Server::STATUS_STOPPING = 2;
@@ -39,50 +39,55 @@ Server::Server(const std::shared_ptr<ServerConnectionProvider>& connectionProvid
   : m_status(STATUS_CREATED)
   , m_connectionProvider(connectionProvider)
   , m_connectionHandler(connectionHandler)
-{}
+{
+}
 
-void Server::mainLoop(){
-  
+void Server::mainLoop()
+{
+
   setStatus(STATUS_CREATED, STATUS_RUNNING);
 
   std::shared_ptr<const std::unordered_map<oatpp::String, oatpp::String>> params;
 
   while(getStatus() == STATUS_RUNNING) {
-    
+
     auto connection = m_connectionProvider->getConnection();
 
-    if (connection) {
-      if(getStatus() == STATUS_RUNNING){
+    if(connection) {
+      if(getStatus() == STATUS_RUNNING) {
         m_connectionHandler->handleConnection(connection, params /* null params */);
       } else {
         OATPP_LOGD("Server", "Already stopped. Closing connection...");
       }
     }
-    
   }
-  
+
   setStatus(STATUS_DONE);
-  
 }
 
-void Server::run(){
+void Server::run()
+{
   mainLoop();
 }
-  
-void Server::stop(){
+
+void Server::stop()
+{
   setStatus(STATUS_STOPPING);
 }
 
-bool Server::setStatus(v_int32 expectedStatus, v_int32 newStatus){
+bool Server::setStatus(v_int32 expectedStatus, v_int32 newStatus)
+{
   v_int32 expected = expectedStatus;
   return m_status.compare_exchange_weak(expected, newStatus);
 }
-  
-void Server::setStatus(v_int32 status){
+
+void Server::setStatus(v_int32 status)
+{
   m_status.store(status);
 }
-  
-v_int32 Server::getStatus(){
+
+v_int32 Server::getStatus()
+{
   return m_status.load();
 }
 

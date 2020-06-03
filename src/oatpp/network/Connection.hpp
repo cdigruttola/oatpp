@@ -33,22 +33,27 @@ namespace oatpp { namespace network {
 /**
  * TCP Connection implementation. Extends &id:oatpp::base::Countable; and &id:oatpp::data::stream::IOStream;.
  */
-class Connection : public oatpp::base::Countable, public oatpp::data::stream::IOStream {
+class Connection
+  : public oatpp::base::Countable
+  , public oatpp::data::stream::IOStream {
 private:
   static oatpp::data::stream::DefaultInitializedContext DEFAULT_CONTEXT;
+
 private:
   v_io_handle m_handle;
   data::stream::IOMode m_mode;
+
 private:
   void setStreamIOMode(oatpp::data::stream::IOMode ioMode);
+
 public:
   /**
    * Constructor.
    * @param handle - file descriptor (socket handle). See &id:oatpp::v_io_handle;.
    */
   Connection(v_io_handle handle);
-public:
 
+public:
   /**
    * Virtual Destructor (See &id:oatpp::base::Countable;).
    * Close socket handle.
@@ -63,7 +68,7 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual amount of bytes written. See &id:oatpp::v_io_size;.
    */
-  v_io_size write(const void *buff, v_buff_size count, async::Action& action) override;
+  v_io_size write(const void* buff, v_buff_size count, async::Action& action) override;
 
   /**
    * Implementation of &id:oatpp::data::stream::IOStream::read;.
@@ -73,7 +78,7 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual amount of bytes read. See &id:oatpp::v_io_size;.
    */
-  v_io_size read(void *buff, v_buff_size count, async::Action& action) override;
+  v_io_size read(void* buff, v_buff_size count, async::Action& action) override;
 
   /**
    * Set OutputStream I/O mode.
@@ -120,12 +125,12 @@ public:
    * Get socket handle.
    * @return - socket handle. &id:oatpp::v_io_handle;.
    */
-  v_io_handle getHandle(){
+  v_io_handle getHandle()
+  {
     return m_handle;
   }
-  
 };
-  
+
 }}
 
 #endif /* oatpp_network_Connection_hpp */

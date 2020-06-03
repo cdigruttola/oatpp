@@ -29,18 +29,18 @@
 #include <fcntl.h>
 
 #if defined(WIN32) || defined(_WIN32)
-  #include <io.h>
-  #include <WinSock2.h>
-  #include <WS2tcpip.h>
+#include <WS2tcpip.h>
+#include <WinSock2.h>
+#include <io.h>
 #else
-  #include <netdb.h>
-  #include <arpa/inet.h>
-  #include <sys/socket.h>
-  #include <netinet/tcp.h>
-  #include <unistd.h>
-  #if defined(__FreeBSD__)
-    #include <netinet/in.h>
-  #endif
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/tcp.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#if defined(__FreeBSD__)
+#include <netinet/in.h>
+#endif
 #endif
 
 namespace oatpp { namespace network { namespace server {
@@ -52,16 +52,20 @@ const char* const SimpleTCPConnectionProvider::ExtendedConnection::PROPERTY_PEER
 const char* const SimpleTCPConnectionProvider::ExtendedConnection::PROPERTY_PEER_ADDRESS_FORMAT = "peer_address_format";
 const char* const SimpleTCPConnectionProvider::ExtendedConnection::PROPERTY_PEER_PORT = "peer_port";
 
-SimpleTCPConnectionProvider::ExtendedConnection::ExtendedConnection(v_io_handle handle, data::stream::Context::Properties&& properties)
+SimpleTCPConnectionProvider::ExtendedConnection::ExtendedConnection(v_io_handle handle,
+                                                                    data::stream::Context::Properties&& properties)
   : Connection(handle)
   , m_context(data::stream::StreamType::STREAM_INFINITE, std::forward<data::stream::Context::Properties>(properties))
-{}
+{
+}
 
-oatpp::data::stream::Context& SimpleTCPConnectionProvider::ExtendedConnection::getOutputStreamContext() {
+oatpp::data::stream::Context& SimpleTCPConnectionProvider::ExtendedConnection::getOutputStreamContext()
+{
   return m_context;
 }
 
-oatpp::data::stream::Context& SimpleTCPConnectionProvider::ExtendedConnection::getInputStreamContext() {
+oatpp::data::stream::Context& SimpleTCPConnectionProvider::ExtendedConnection::getInputStreamContext()
+{
   return m_context;
 }
 
@@ -78,30 +82,33 @@ SimpleTCPConnectionProvider::SimpleTCPConnectionProvider(v_uint16 port, bool use
   setProperty(PROPERTY_PORT, oatpp::utils::conversion::int32ToStr(port));
 }
 
-SimpleTCPConnectionProvider::~SimpleTCPConnectionProvider() {
+SimpleTCPConnectionProvider::~SimpleTCPConnectionProvider()
+{
   close();
 }
 
-void SimpleTCPConnectionProvider::close() {
+void SimpleTCPConnectionProvider::close()
+{
   if(!m_closed) {
     m_closed = true;
 #if defined(WIN32) || defined(_WIN32)
-	  ::closesocket(m_serverHandle);
+    ::closesocket(m_serverHandle);
 #else
-	  ::close(m_serverHandle);
+    ::close(m_serverHandle);
 #endif
   }
 }
 
 #if defined(WIN32) || defined(_WIN32)
 
-oatpp::v_io_handle SimpleTCPConnectionProvider::instantiateServer(){
+oatpp::v_io_handle SimpleTCPConnectionProvider::instantiateServer()
+{
 
   int iResult;
 
   SOCKET ListenSocket = INVALID_SOCKET;
 
-  struct addrinfo *result = NULL;
+  struct addrinfo* result = NULL;
   struct addrinfo hints;
 
   ZeroMemory(&hints, sizeof(hints));
@@ -111,56 +118,69 @@ oatpp::v_io_handle SimpleTCPConnectionProvider::instantiateServer(){
   hints.ai_flags = AI_PASSIVE;
   auto portStr = oatpp::utils::conversion::int32ToStr(m_port);
 
-  iResult = getaddrinfo(NULL, (const char*) portStr->getData(), &hints, &result);
-  if ( iResult != 0 ) {
+  iResult = getaddrinfo(NULL, (const char*)portStr->getData(), &hints, &result);
+  if(iResult != 0) {
     printf("getaddrinfo failed with error: %d\n", iResult);
-    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]", "Error. Call to getaddrinfo() failed with result=%d", iResult);
-    throw std::runtime_error("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to getaddrinfo() failed.");
+    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]",
+               "Error. Call to getaddrinfo() failed with result=%d",
+               iResult);
+    throw std::runtime_error(
+     "[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to getaddrinfo() failed.");
   }
 
   ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-  if (ListenSocket == INVALID_SOCKET) {
-    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]", "Error. Call to socket() failed with result=%ld", WSAGetLastError());
+  if(ListenSocket == INVALID_SOCKET) {
+    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]",
+               "Error. Call to socket() failed with result=%ld",
+               WSAGetLastError());
     freeaddrinfo(result);
-    throw std::runtime_error("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to socket() failed.");
+    throw std::runtime_error(
+     "[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to socket() failed.");
   }
 
   // Setup the TCP listening socket
-  iResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-  if (iResult == SOCKET_ERROR) {
-    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]", "Error. Call to bind() failed with result=%ld", WSAGetLastError());
+  iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
+  if(iResult == SOCKET_ERROR) {
+    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]",
+               "Error. Call to bind() failed with result=%ld",
+               WSAGetLastError());
     freeaddrinfo(result);
     closesocket(ListenSocket);
-    throw std::runtime_error("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to bind() failed.");
+    throw std::runtime_error(
+     "[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to bind() failed.");
   }
 
   freeaddrinfo(result);
 
   iResult = listen(ListenSocket, SOMAXCONN);
-  if (iResult == SOCKET_ERROR) {
-    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]", "Error. Call to listen() failed with result=%ld", WSAGetLastError());
+  if(iResult == SOCKET_ERROR) {
+    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]",
+               "Error. Call to listen() failed with result=%ld",
+               WSAGetLastError());
     closesocket(ListenSocket);
-    throw std::runtime_error("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to listen() failed.");
+    throw std::runtime_error(
+     "[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to listen() failed.");
   }
 
   u_long flags = 1;
   if(NO_ERROR != ioctlsocket(ListenSocket, FIONBIO, &flags)) {
-    throw std::runtime_error("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to ioctlsocket failed.");
+    throw std::runtime_error(
+     "[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to ioctlsocket failed.");
   }
 
   return ListenSocket;
-
 }
 
 #else
 
-oatpp::v_io_handle SimpleTCPConnectionProvider::instantiateServer(){
+oatpp::v_io_handle SimpleTCPConnectionProvider::instantiateServer()
+{
 
   oatpp::v_io_handle serverHandle;
   v_int32 ret;
   int yes = 1;
 
-  struct addrinfo *result = NULL;
+  struct addrinfo* result = NULL;
   struct addrinfo hints;
 
   memset(&hints, 0, sizeof(hints));
@@ -170,55 +190,73 @@ oatpp::v_io_handle SimpleTCPConnectionProvider::instantiateServer(){
   hints.ai_flags = AI_PASSIVE;
   auto portStr = oatpp::utils::conversion::int32ToStr(m_port);
 
-  ret = getaddrinfo(NULL, (const char *) portStr->getData(), &hints, &result);
-  if (ret != 0) {
-    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]", "Error. Call to getaddrinfo() failed with result=%d: %s", ret, strerror(errno));
-    throw std::runtime_error("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to getaddrinfo() failed.");
+  ret = getaddrinfo(NULL, (const char*)portStr->getData(), &hints, &result);
+  if(ret != 0) {
+    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]",
+               "Error. Call to getaddrinfo() failed with result=%d: %s",
+               ret,
+               strerror(errno));
+    throw std::runtime_error(
+     "[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Call to getaddrinfo() failed.");
   }
 
   serverHandle = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-  if (serverHandle < 0) {
-    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]", "Error. Couldn't open a socket: socket(%d, %d, %d) %s",
-               result->ai_family, result->ai_socktype, result->ai_protocol, strerror(errno));
-    throw std::runtime_error("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Couldn't open a socket");
+  if(serverHandle < 0) {
+    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]",
+               "Error. Couldn't open a socket: socket(%d, %d, %d) %s",
+               result->ai_family,
+               result->ai_socktype,
+               result->ai_protocol,
+               strerror(errno));
+    throw std::runtime_error(
+     "[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Couldn't open a socket");
   }
 
   ret = setsockopt(serverHandle, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
   if(ret < 0) {
-    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]", "Warning. Failed to set %s for accepting socket: %s", "SO_REUSEADDR", strerror(errno));
+    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]",
+               "Warning. Failed to set %s for accepting socket: %s",
+               "SO_REUSEADDR",
+               strerror(errno));
   }
 
-  ret = bind(serverHandle, result->ai_addr, (int) result->ai_addrlen);
+  ret = bind(serverHandle, result->ai_addr, (int)result->ai_addrlen);
 
   if(ret != 0) {
     ::close(serverHandle);
-      OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]", "Error. Failed to bind port %d: %s", m_port, strerror(errno));
-    throw std::runtime_error("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Can't bind to address: %s");
+    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]",
+               "Error. Failed to bind port %d: %s",
+               m_port,
+               strerror(errno));
+    throw std::runtime_error(
+     "[oatpp::network::server::SimpleTCPConnectionProvider::instantiateServer()]: Error. Can't bind to address: %s");
   }
 
   ret = listen(serverHandle, 10000);
   if(ret < 0) {
     ::close(serverHandle);
-    return -1 ;
+    return -1;
   }
 
   fcntl(serverHandle, F_SETFL, O_NONBLOCK);
 
   return serverHandle;
-
 }
 
 #endif
 
-bool SimpleTCPConnectionProvider::prepareConnectionHandle(oatpp::v_io_handle handle) {
+bool SimpleTCPConnectionProvider::prepareConnectionHandle(oatpp::v_io_handle handle)
+{
 
-  if (handle < 0) {
+  if(handle < 0) {
     v_int32 error = errno;
-    if(error == EAGAIN || error == EWOULDBLOCK){
+    if(error == EAGAIN || error == EWOULDBLOCK) {
       return false;
     } else {
       if(!m_closed) { // m_serverHandle==0 if ConnectionProvider was closed. Not an error.
-        OATPP_LOGD("[oatpp::network::server::SimpleTCPConnectionProvider::prepareConnectionHandle()]", "Error. %d", error);
+        OATPP_LOGD("[oatpp::network::server::SimpleTCPConnectionProvider::prepareConnectionHandle()]",
+                   "Error. %d",
+                   error);
       }
       return false;
     }
@@ -228,15 +266,17 @@ bool SimpleTCPConnectionProvider::prepareConnectionHandle(oatpp::v_io_handle han
   int yes = 1;
   v_int32 ret = setsockopt(handle, SOL_SOCKET, SO_NOSIGPIPE, &yes, sizeof(int));
   if(ret < 0) {
-    OATPP_LOGD("[oatpp::network::server::SimpleTCPConnectionProvider::prepareConnectionHandle()]", "Warning. Failed to set %s for socket", "SO_NOSIGPIPE");
+    OATPP_LOGD("[oatpp::network::server::SimpleTCPConnectionProvider::prepareConnectionHandle()]",
+               "Warning. Failed to set %s for socket",
+               "SO_NOSIGPIPE");
   }
 #endif
 
   return true;
-
 }
 
-std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getDefaultConnection() {
+std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getDefaultConnection()
+{
 
   oatpp::v_io_handle handle = accept(m_serverHandle, nullptr, nullptr);
 
@@ -249,41 +289,43 @@ std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getD
   }
 
   return nullptr;
-
 }
 
-std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getExtendedConnection() {
+std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getExtendedConnection()
+{
 
   struct sockaddr_storage clientAddress;
   socklen_t clientAddressSize = sizeof(clientAddress);
 
   data::stream::Context::Properties properties;
 
-  oatpp::v_io_handle handle = accept(m_serverHandle, (struct sockaddr*) &clientAddress, &clientAddressSize);
+  oatpp::v_io_handle handle = accept(m_serverHandle, (struct sockaddr*)&clientAddress, &clientAddressSize);
 
   if(!oatpp::isValidIOHandle(handle)) {
     return nullptr;
   }
 
-  if (clientAddress.ss_family == AF_INET) {
+  if(clientAddress.ss_family == AF_INET) {
 
-    char strIp[INET_ADDRSTRLEN];
-    struct sockaddr_in* sockAddress = (struct sockaddr_in*) &clientAddress;
+    char strIp [ INET_ADDRSTRLEN ];
+    struct sockaddr_in* sockAddress = (struct sockaddr_in*)&clientAddress;
     inet_ntop(AF_INET, &sockAddress->sin_addr, strIp, INET_ADDRSTRLEN);
 
-    properties.put_LockFree(ExtendedConnection::PROPERTY_PEER_ADDRESS, oatpp::String((const char*) strIp));
+    properties.put_LockFree(ExtendedConnection::PROPERTY_PEER_ADDRESS, oatpp::String((const char*)strIp));
     properties.put_LockFree(ExtendedConnection::PROPERTY_PEER_ADDRESS_FORMAT, "ipv4");
-    properties.put_LockFree(ExtendedConnection::PROPERTY_PEER_PORT, oatpp::utils::conversion::int32ToStr(sockAddress->sin_port));
+    properties.put_LockFree(ExtendedConnection::PROPERTY_PEER_PORT,
+                            oatpp::utils::conversion::int32ToStr(sockAddress->sin_port));
 
-  } else if (clientAddress.ss_family == AF_INET6) {
+  } else if(clientAddress.ss_family == AF_INET6) {
 
-    char strIp[INET6_ADDRSTRLEN];
-    struct sockaddr_in6* sockAddress = (struct sockaddr_in6*) &clientAddress;
+    char strIp [ INET6_ADDRSTRLEN ];
+    struct sockaddr_in6* sockAddress = (struct sockaddr_in6*)&clientAddress;
     inet_ntop(AF_INET6, &sockAddress->sin6_addr, strIp, INET6_ADDRSTRLEN);
 
-    properties.put_LockFree(ExtendedConnection::PROPERTY_PEER_ADDRESS, oatpp::String((const char*) strIp));
+    properties.put_LockFree(ExtendedConnection::PROPERTY_PEER_ADDRESS, oatpp::String((const char*)strIp));
     properties.put_LockFree(ExtendedConnection::PROPERTY_PEER_ADDRESS_FORMAT, "ipv6");
-    properties.put_LockFree(ExtendedConnection::PROPERTY_PEER_PORT, oatpp::utils::conversion::int32ToStr(sockAddress->sin6_port));
+    properties.put_LockFree(ExtendedConnection::PROPERTY_PEER_PORT,
+                            oatpp::utils::conversion::int32ToStr(sockAddress->sin6_port));
 
   } else {
 
@@ -293,9 +335,9 @@ std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getE
     ::close(handle);
 #endif
 
-    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::getExtendedConnection()]", "Error. Unknown address family.");
+    OATPP_LOGE("[oatpp::network::server::SimpleTCPConnectionProvider::getExtendedConnection()]",
+               "Error. Unknown address family.");
     return nullptr;
-
   }
 
   if(prepareConnectionHandle(handle)) {
@@ -303,10 +345,10 @@ std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getE
   }
 
   return nullptr;
-
 }
 
-std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getConnection() {
+std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getConnection()
+{
 
   fd_set set;
   struct timeval timeout;
@@ -320,10 +362,9 @@ std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getC
 
     auto res = select(m_serverHandle + 1, &set, nullptr, nullptr, &timeout);
 
-    if (res >= 0) {
+    if(res >= 0) {
       break;
     }
-
   }
 
   if(m_useExtendedConnections) {
@@ -331,10 +372,10 @@ std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getC
   }
 
   return getDefaultConnection();
-
 }
 
-void SimpleTCPConnectionProvider::invalidateConnection(const std::shared_ptr<IOStream>& connection) {
+void SimpleTCPConnectionProvider::invalidateConnection(const std::shared_ptr<IOStream>& connection)
+{
 
   /************************************************
    * WARNING!!!
@@ -356,7 +397,6 @@ void SimpleTCPConnectionProvider::invalidateConnection(const std::shared_ptr<IOS
 #else
   shutdown(handle, SHUT_RDWR);
 #endif
-
 }
 
 }}}

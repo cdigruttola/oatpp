@@ -29,12 +29,13 @@
 
 namespace oatpp { namespace test { namespace core { namespace data { namespace stream {
 
-class BufferStreamTest : public UnitTest{
+class BufferStreamTest: public UnitTest {
 public:
-
-  BufferStreamTest():UnitTest("TEST[core::data::stream::BufferStreamTest]"){}
+  BufferStreamTest()
+    : UnitTest("TEST[core::data::stream::BufferStreamTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}}}

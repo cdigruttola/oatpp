@@ -24,22 +24,23 @@
 
 #include "LazyStringMapTest.hpp"
 
-#include "oatpp/core/data/share/LazyStringMap.hpp"
 #include "oatpp/core/Types.hpp"
+#include "oatpp/core/data/share/LazyStringMap.hpp"
 
 namespace oatpp { namespace test { namespace core { namespace data { namespace share {
 
 namespace {
 
-  typedef oatpp::data::share::StringKeyLabel StringKeyLabel;
-  typedef oatpp::data::share::StringKeyLabelCI StringKeyLabelCI;
+typedef oatpp::data::share::StringKeyLabel StringKeyLabel;
+typedef oatpp::data::share::StringKeyLabelCI StringKeyLabelCI;
 
-  template<class T>
-  using LazyStringMap = oatpp::data::share::LazyStringMap<T>;
+template<class T>
+using LazyStringMap = oatpp::data::share::LazyStringMap<T>;
 
 }
 
-void LazyStringMapTest::onRun() {
+void LazyStringMapTest::onRun()
+{
 
   p_char8 text = (p_char8) "Hello World!";
 
@@ -67,8 +68,8 @@ void LazyStringMapTest::onRun() {
 
     auto all = map.getAll();
 
-    auto s13 = all["key1"];
-    auto s23 = all["key2"];
+    auto s13 = all [ "key1" ];
+    auto s23 = all [ "key2" ];
 
     OATPP_ASSERT(s13.getData() == s1->getData() && s13.getSize() == s1->getSize());
     OATPP_ASSERT(s23.getData() == s2->getData() && s23.getSize() == s2->getSize());
@@ -76,7 +77,6 @@ void LazyStringMapTest::onRun() {
     OATPP_ASSERT(s2.get() == s23.getMemoryHandle().get());
 
     OATPP_ASSERT(map.getSize() == 2);
-
   }
 
   {
@@ -109,7 +109,6 @@ void LazyStringMapTest::onRun() {
 
     OATPP_ASSERT(map.getAsMemoryLabel<StringKeyLabel>("KEY1") == s1);
     OATPP_ASSERT(map.getAsMemoryLabel<StringKeyLabel>("KEY2") == s2);
-
   }
 
   {
@@ -132,23 +131,22 @@ void LazyStringMapTest::onRun() {
 
       auto all = map2.getAll_Unsafe();
 
-      auto s1 = all["key1"];
-      auto s2 = all["key2"];
+      auto s1 = all [ "key1" ];
+      auto s2 = all [ "key2" ];
 
       OATPP_ASSERT(s1.getMemoryHandle() == nullptr);
       OATPP_ASSERT(s2.getMemoryHandle() == nullptr);
 
       OATPP_ASSERT(s1 == "Hello");
       OATPP_ASSERT(s2 == "World!");
-
     }
 
     {
 
       auto all = map2.getAll();
 
-      auto s1 = all["key1"];
-      auto s2 = all["key2"];
+      auto s1 = all [ "key1" ];
+      auto s2 = all [ "key2" ];
 
       OATPP_ASSERT(s1.getMemoryHandle());
       OATPP_ASSERT(s2.getMemoryHandle());
@@ -161,12 +159,8 @@ void LazyStringMapTest::onRun() {
 
       OATPP_ASSERT(s1.getMemoryHandle().get() == s12.get());
       OATPP_ASSERT(s2.getMemoryHandle().get() == s22.get());
-
     }
-
   }
-
-
 }
 
 }}}}}

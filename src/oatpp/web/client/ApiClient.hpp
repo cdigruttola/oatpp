@@ -33,9 +33,9 @@
 
 #include "oatpp/encoding/Base64.hpp"
 
+#include "oatpp/core/data/mapping/ObjectMapper.hpp"
 #include "oatpp/core/data/mapping/type/Primitive.hpp"
 #include "oatpp/core/data/mapping/type/Type.hpp"
-#include "oatpp/core/data/mapping/ObjectMapper.hpp"
 
 #include "oatpp/core/collection/ListMap.hpp"
 
@@ -43,8 +43,8 @@
 
 #include "oatpp/core/base/Countable.hpp"
 
-#include <string>
 #include <list>
+#include <string>
 #include <unordered_map>
 
 namespace oatpp { namespace web { namespace client {
@@ -52,16 +52,16 @@ namespace oatpp { namespace web { namespace client {
 /**
  * ApiClient class provides convenient Retrofit-like interface over the oatpp::web::client::RequestExecutor.
  */
-class ApiClient : public oatpp::base::Countable {
+class ApiClient: public oatpp::base::Countable {
 public:
   static constexpr const char* const TAG = "Client";
+
 protected:
   typedef std::unordered_map<std::string, oatpp::String> PathVariablesMap;
+
 public:
-  typedef oatpp::collection::ListMap<
-    oatpp::String,
-    oatpp::String
-  > StringToStringMap;
+  typedef oatpp::collection::ListMap<oatpp::String, oatpp::String> StringToStringMap;
+
 public:
   /**
    * Convenience typedef for &id:oatpp::web::protocol::http::Status;.
@@ -72,8 +72,8 @@ public:
    * Convenience typedef for &id:oatpp::web::protocol::http::Header;.
    */
   typedef oatpp::web::protocol::http::Header Header;
-public:
 
+public:
   /**
    * Convenience typedef for &id:oatpp::data::mapping::type::String;.
    */
@@ -134,46 +134,47 @@ public:
    */
   typedef oatpp::Boolean Boolean;
 
-  template <class T>
+  template<class T>
   using Enum = oatpp::data::mapping::type::Enum<T>;
 
-  template <class T>
+  template<class T>
   using Object = oatpp::Object<T>;
-public:
 
+public:
   /**
    * Convenience typedef for &id:oatpp::web::protocol::http::incoming::Response;.
    */
   typedef oatpp::web::protocol::http::incoming::Response Response;
-public:
 
+public:
   /**
    * Convenience typedef for &id:oatpp::web::client::RequestExecutor::AsyncCallback;.
    */
   typedef RequestExecutor::AsyncCallback AsyncCallback;
+
 protected:
-  
   class PathSegment {
   public:
     constexpr static const v_int32 SEG_PATH = 0;
     constexpr static const v_int32 SEG_VAR = 1;
+
   public:
     PathSegment(const std::string& pText, v_int32 pType)
-      : text (pText)
-      , type (pType)
-    {}
+      : text(pText)
+      , type(pType)
+    {
+    }
     const std::string text;
     const v_int32 type;
   };
-  
+
   typedef std::list<PathSegment> PathPattern;
-  
+
 private:
-  
   void formatPath(data::stream::ConsistentOutputStream* stream,
                   const PathPattern& pathPattern,
                   const std::shared_ptr<StringToStringMap>& params);
-  
+
   void addPathQueryParams(data::stream::ConsistentOutputStream* stream,
                           const std::shared_ptr<StringToStringMap>& params);
 
@@ -184,30 +185,30 @@ private:
   web::protocol::http::Headers mapToHeaders(const std::shared_ptr<StringToStringMap>& params);
 
 protected:
-  
   static PathSegment parsePathSegment(p_char8 data, v_buff_size size, v_buff_size& position);
   static PathSegment parseVarSegment(p_char8 data, v_buff_size size, v_buff_size& position);
   static PathPattern parsePathPattern(p_char8 data, v_buff_size size);
-  
+
 protected:
   std::shared_ptr<RequestExecutor> m_requestExecutor;
   std::shared_ptr<oatpp::data::mapping::ObjectMapper> m_objectMapper;
-  
+
 public:
   ApiClient(const std::shared_ptr<RequestExecutor>& requestExecutor,
             const std::shared_ptr<oatpp::data::mapping::ObjectMapper>& objectMapper)
     : m_requestExecutor(requestExecutor)
     , m_objectMapper(objectMapper)
-  {}
+  {
+  }
+
 public:
-  
   static std::shared_ptr<ApiClient> createShared(const std::shared_ptr<RequestExecutor>& requestExecutor,
-                                           const std::shared_ptr<oatpp::data::mapping::ObjectMapper>& objectMapper) {
+                                                 const std::shared_ptr<oatpp::data::mapping::ObjectMapper>& objectMapper)
+  {
     return std::make_shared<ApiClient>(requestExecutor, objectMapper);
   }
-  
-public:
 
+public:
   /**
    * Call &id:oatpp::web::client::RequestExecutor::getConnection;.
    * @return - &id:oatpp::web::client::RequestExecutor::ConnectionHandle;.
@@ -218,7 +219,8 @@ public:
    * Call &id:oatpp::web::client::RequestExecutor::getConnectionAsync;.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<RequestExecutor::ConnectionHandle>&> getConnectionAsync();
+  virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<RequestExecutor::ConnectionHandle>&>
+   getConnectionAsync();
 
   /**
    * Invalidate connection.
@@ -226,60 +228,62 @@ public:
    */
   void invalidateConnection(const std::shared_ptr<RequestExecutor::ConnectionHandle>& connectionHandle);
 
-  virtual std::shared_ptr<Response> executeRequest(const oatpp::String& method,
-                                                   const PathPattern& pathPattern,
-                                                   const std::shared_ptr<StringToStringMap>& headers,
-                                                   const std::shared_ptr<StringToStringMap>& pathParams,
-                                                   const std::shared_ptr<StringToStringMap>& queryParams,
-                                                   const std::shared_ptr<RequestExecutor::Body>& body,
-                                                   const std::shared_ptr<RequestExecutor::ConnectionHandle>& connectionHandle = nullptr);
-  
-  virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<Response>&>
-  executeRequestAsync(const oatpp::String& method,
-                      const PathPattern& pathPattern,
-                      const std::shared_ptr<StringToStringMap>& headers,
-                      const std::shared_ptr<StringToStringMap>& pathParams,
-                      const std::shared_ptr<StringToStringMap>& queryParams,
-                      const std::shared_ptr<RequestExecutor::Body>& body,
-                      const std::shared_ptr<RequestExecutor::ConnectionHandle>& connectionHandle = nullptr);
+  virtual std::shared_ptr<Response> executeRequest(
+   const oatpp::String& method,
+   const PathPattern& pathPattern,
+   const std::shared_ptr<StringToStringMap>& headers,
+   const std::shared_ptr<StringToStringMap>& pathParams,
+   const std::shared_ptr<StringToStringMap>& queryParams,
+   const std::shared_ptr<RequestExecutor::Body>& body,
+   const std::shared_ptr<RequestExecutor::ConnectionHandle>& connectionHandle = nullptr);
+
+  virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<Response>&> executeRequestAsync(
+   const oatpp::String& method,
+   const PathPattern& pathPattern,
+   const std::shared_ptr<StringToStringMap>& headers,
+   const std::shared_ptr<StringToStringMap>& pathParams,
+   const std::shared_ptr<StringToStringMap>& queryParams,
+   const std::shared_ptr<RequestExecutor::Body>& body,
+   const std::shared_ptr<RequestExecutor::ConnectionHandle>& connectionHandle = nullptr);
 
 public:
-
   template<typename T>
   struct TypeInterpretation {
 
-    static oatpp::String toString(const oatpp::String& typeName, const T& parameter) {
+    static oatpp::String toString(const oatpp::String& typeName, const T& parameter)
+    {
 
-      (void) parameter;
+      (void)parameter;
 
       OATPP_LOGE("[oatpp::web::client::ApiClient::TypeInterpretation::toString()]",
-                 "Error. No conversion from '%s' to '%s' is defined.", typeName->getData(), "oatpp::String");
+                 "Error. No conversion from '%s' to '%s' is defined.",
+                 typeName->getData(),
+                 "oatpp::String");
 
-      throw std::runtime_error(
-        "[oatpp::web::client::ApiClient::TypeInterpretation::toString()]: Error. "
-        "No conversion from '" + typeName->std_str() + "' to 'oatpp::String' is defined. "
-        "Please define type conversion."
-      );
-
+      throw std::runtime_error("[oatpp::web::client::ApiClient::TypeInterpretation::toString()]: Error. "
+                               "No conversion from '" +
+                               typeName->std_str() +
+                               "' to 'oatpp::String' is defined. "
+                               "Please define type conversion.");
     }
-
   };
-
 };
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::String> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::String &parameter) {
-    (void) typeName;
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::String& parameter)
+  {
+    (void)typeName;
     return parameter;
   }
 };
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::Int8> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::Int8 &parameter) {
-    (void) typeName;
-    if (parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::Int8& parameter)
+  {
+    (void)typeName;
+    if(parameter) {
       return utils::conversion::int32ToStr(*parameter);
     }
     return nullptr;
@@ -288,9 +292,10 @@ struct ApiClient::TypeInterpretation<oatpp::Int8> {
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::UInt8> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::UInt8 &parameter) {
-    (void) typeName;
-    if (parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::UInt8& parameter)
+  {
+    (void)typeName;
+    if(parameter) {
       return utils::conversion::uint32ToStr(*parameter);
     }
     return nullptr;
@@ -299,9 +304,10 @@ struct ApiClient::TypeInterpretation<oatpp::UInt8> {
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::Int16> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::Int16 &parameter) {
-    (void) typeName;
-    if (parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::Int16& parameter)
+  {
+    (void)typeName;
+    if(parameter) {
       return utils::conversion::int32ToStr(*parameter);
     }
     return nullptr;
@@ -310,9 +316,10 @@ struct ApiClient::TypeInterpretation<oatpp::Int16> {
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::UInt16> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::UInt16 &parameter) {
-    (void) typeName;
-    if (parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::UInt16& parameter)
+  {
+    (void)typeName;
+    if(parameter) {
       return utils::conversion::uint32ToStr(*parameter);
     }
     return nullptr;
@@ -321,9 +328,10 @@ struct ApiClient::TypeInterpretation<oatpp::UInt16> {
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::Int32> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::Int32 &parameter) {
-    (void) typeName;
-    if (parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::Int32& parameter)
+  {
+    (void)typeName;
+    if(parameter) {
       return utils::conversion::int32ToStr(*parameter);
     }
     return nullptr;
@@ -332,9 +340,10 @@ struct ApiClient::TypeInterpretation<oatpp::Int32> {
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::UInt32> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::UInt32 &parameter) {
-    (void) typeName;
-    if (parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::UInt32& parameter)
+  {
+    (void)typeName;
+    if(parameter) {
       return utils::conversion::uint32ToStr(*parameter);
     }
     return nullptr;
@@ -343,9 +352,10 @@ struct ApiClient::TypeInterpretation<oatpp::UInt32> {
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::Int64> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::Int64 &parameter) {
-    (void) typeName;
-    if (parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::Int64& parameter)
+  {
+    (void)typeName;
+    if(parameter) {
       return utils::conversion::int64ToStr(*parameter);
     }
     return nullptr;
@@ -354,9 +364,10 @@ struct ApiClient::TypeInterpretation<oatpp::Int64> {
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::UInt64> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::UInt64 &parameter) {
-    (void) typeName;
-    if (parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::UInt64& parameter)
+  {
+    (void)typeName;
+    if(parameter) {
       return utils::conversion::uint64ToStr(*parameter);
     }
     return nullptr;
@@ -365,9 +376,10 @@ struct ApiClient::TypeInterpretation<oatpp::UInt64> {
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::Float32> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::Float32 &parameter) {
-    (void) typeName;
-    if (parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::Float32& parameter)
+  {
+    (void)typeName;
+    if(parameter) {
       return utils::conversion::float32ToStr(*parameter);
     }
     return nullptr;
@@ -376,9 +388,10 @@ struct ApiClient::TypeInterpretation<oatpp::Float32> {
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::Float64> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::Float64 &parameter) {
-    (void) typeName;
-    if (parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::Float64& parameter)
+  {
+    (void)typeName;
+    if(parameter) {
       return utils::conversion::float64ToStr(*parameter);
     }
     return nullptr;
@@ -387,9 +400,10 @@ struct ApiClient::TypeInterpretation<oatpp::Float64> {
 
 template<>
 struct ApiClient::TypeInterpretation<oatpp::Boolean> {
-  static oatpp::String toString(const oatpp::String &typeName, const oatpp::Boolean &parameter) {
-    (void) typeName;
-    if (parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const oatpp::Boolean& parameter)
+  {
+    (void)typeName;
+    if(parameter) {
       return utils::conversion::boolToStr(*parameter);
     }
     return nullptr;
@@ -402,29 +416,27 @@ struct ApiClient::TypeInterpretation<data::mapping::type::EnumObjectWrapper<T, I
   typedef data::mapping::type::EnumObjectWrapper<T, I> EnumOW;
   typedef typename I::UnderlyingTypeObjectWrapper UTOW;
 
-  static oatpp::String toString(const oatpp::String &typeName, const EnumOW &parameter) {
+  static oatpp::String toString(const oatpp::String& typeName, const EnumOW& parameter)
+  {
 
     data::mapping::type::EnumInterpreterError error = data::mapping::type::EnumInterpreterError::OK;
     const auto& value = I::toInterpretation(parameter, error);
 
-    switch(error){
-      case data::mapping::type::EnumInterpreterError::OK: break;
-      case data::mapping::type::EnumInterpreterError::CONSTRAINT_NOT_NULL:
-        throw std::runtime_error(
-          "[oatpp::web::client::ApiClient::TypeInterpretation::toString()]: Error. Enum constraint violation - NotNull."
-        );
-      default:
-        throw std::runtime_error(
-          "[oatpp::web::client::ApiClient::TypeInterpretation::toString()]: Error. Can't interpret Enum."
-        );
+    switch(error) {
+    case data::mapping::type::EnumInterpreterError::OK:
+      break;
+    case data::mapping::type::EnumInterpreterError::CONSTRAINT_NOT_NULL:
+      throw std::runtime_error(
+       "[oatpp::web::client::ApiClient::TypeInterpretation::toString()]: Error. Enum constraint violation - NotNull.");
+    default:
+      throw std::runtime_error(
+       "[oatpp::web::client::ApiClient::TypeInterpretation::toString()]: Error. Can't interpret Enum.");
     }
 
     return ApiClient::TypeInterpretation<UTOW>::toString(typeName, value.template staticCast<UTOW>());
-
   }
-
 };
-  
+
 }}}
 
 #endif /* oatpp_web_client_Client_hpp */

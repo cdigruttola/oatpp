@@ -29,12 +29,13 @@
 
 namespace oatpp { namespace test { namespace parser { namespace json { namespace mapping {
 
-class UnorderedSetTest : public UnitTest{
+class UnorderedSetTest: public UnitTest {
 public:
-
-  UnorderedSetTest():UnitTest("TEST[parser::json::mapping::UnorderedSetTest]"){}
+  UnorderedSetTest()
+    : UnitTest("TEST[parser::json::mapping::UnorderedSetTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}}}

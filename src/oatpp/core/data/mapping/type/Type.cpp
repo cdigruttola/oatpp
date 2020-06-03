@@ -28,14 +28,15 @@
 namespace oatpp { namespace data { namespace mapping { namespace type {
 
 namespace __class {
-  
-  const ClassId Void::CLASS_ID("Void");
-  
-  Type* Void::getType(){
-    static Type type(CLASS_ID, nullptr);
-    return &type;
-  }
-  
+
+const ClassId Void::CLASS_ID("Void");
+
+Type* Void::getType()
+{
+  static Type type(CLASS_ID, nullptr);
+  return &type;
+}
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,10 +46,12 @@ std::atomic_int ClassId::ID_COUNTER(0);
 
 ClassId::ClassId(const char* pName)
   : name(pName)
-  , id(ID_COUNTER ++)
-{}
+  , id(ID_COUNTER++)
+{
+}
 
-int ClassId::getClassCount() {
+int ClassId::getClassCount()
+{
   return ID_COUNTER;
 }
 
@@ -56,13 +59,15 @@ int ClassId::getClassCount() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Type::Properties
 
-Type::Property* Type::Properties::pushBack(Property* property) {
+Type::Property* Type::Properties::pushBack(Property* property)
+{
   m_map.insert({property->name, property});
   m_list.push_back(property);
   return property;
 }
-  
-void Type::Properties::pushFrontAll(Properties* properties) {
+
+void Type::Properties::pushFrontAll(Properties* properties)
+{
   m_map.insert(properties->m_map.begin(), properties->m_map.end());
   m_list.insert(m_list.begin(), properties->m_list.begin(), properties->m_list.end());
 }
@@ -74,20 +79,24 @@ Type::Property::Property(v_int64 pOffset, const char* pName, Type* pType)
   : offset(pOffset)
   , name(pName)
   , type(pType)
-{}
+{
+}
 
-void Type::Property::set(void* object, const Void& value) {
-  Void* property = (Void*)(((v_int64) object) + offset);
+void Type::Property::set(void* object, const Void& value)
+{
+  Void* property = (Void*)(((v_int64)object) + offset);
   *property = value;
 }
 
-Void Type::Property::get(void* object) {
-  Void* property = (Void*)(((v_int64) object) + offset);
+Void Type::Property::get(void* object)
+{
+  Void* property = (Void*)(((v_int64)object) + offset);
   return *property;
 }
 
-Void& Type::Property::getAsRef(void* object) {
-  Void* property = (Void*)(((v_int64) object) + offset);
+Void& Type::Property::getAsRef(void* object)
+{
+  Void* property = (Void*)(((v_int64)object) + offset);
   return *property;
 }
 
@@ -104,6 +113,7 @@ Type::Type(const ClassId& pClassId,
   , creator(pCreator)
   , propertiesGetter(pPropertiesGetter)
   , polymorphicDispatcher(pPolymorphicDispatcher)
-{}
-  
+{
+}
+
 }}}}

@@ -27,12 +27,12 @@
 
 #include "ConnectionProvider.hpp"
 
-#include "oatpp/core/data/stream/Stream.hpp"
 #include "oatpp/core/async/CoroutineWaitList.hpp"
+#include "oatpp/core/data/stream/Stream.hpp"
 
-#include <list>
-#include <condition_variable>
 #include <chrono>
+#include <condition_variable>
+#include <list>
 
 namespace oatpp { namespace network {
 
@@ -42,19 +42,22 @@ namespace oatpp { namespace network {
 class ConnectionPool {
 public:
   typedef oatpp::data::stream::IOStream IOStream;
-private:
 
+private:
   struct ConnectionHandle {
     std::shared_ptr<IOStream> connection;
     v_int64 timestamp;
   };
 
 public:
-
-  class Pool : private oatpp::async::CoroutineWaitList::Listener, public oatpp::base::Countable {
+  class Pool
+    : private oatpp::async::CoroutineWaitList::Listener
+    , public oatpp::base::Countable {
     friend ConnectionPool;
+
   private:
     void onNewItem(oatpp::async::CoroutineWaitList& list) override;
+
   private:
     oatpp::async::CoroutineWaitList waitList;
     std::condition_variable condition;
@@ -63,37 +66,41 @@ public:
     v_int64 size = 0;
     v_int64 maxConnections;
     v_int64 maxConnectionTTL;
+
   private:
     std::atomic<bool> isOpen;
+
   public:
     Pool(v_int64 pMaxConnections, v_int64 pMmaxConnectionTTL)
       : maxConnections(pMaxConnections)
       , maxConnectionTTL(pMmaxConnectionTTL)
       , isOpen(true)
-    {}
+    {
+    }
   };
 
 public:
-
   /**
    * Wrapper over &id:oatpp::data::stream::IOStream;.
    * Will acquire connection from the pool on initialization and will return connection to the pool on destruction.
    */
-  class ConnectionWrapper : public oatpp::data::stream::IOStream {
+  class ConnectionWrapper: public oatpp::data::stream::IOStream {
     friend ConnectionPool;
+
   private:
     std::shared_ptr<IOStream> m_connection;
     std::shared_ptr<Pool> m_pool;
     bool m_recycleConnection;
+
   private:
     void invalidate();
-  public:
 
+  public:
     ConnectionWrapper(const std::shared_ptr<IOStream>& connection, const std::shared_ptr<Pool>& pool);
     ~ConnectionWrapper();
 
-    v_io_size write(const void *buff, v_buff_size count, async::Action& action) override;
-    v_io_size read(void *buff, v_buff_size count, async::Action& action) override;
+    v_io_size write(const void* buff, v_buff_size count, async::Action& action) override;
+    v_io_size read(void* buff, v_buff_size count, async::Action& action) override;
 
     void setOutputStreamIOMode(oatpp::data::stream::IOMode ioMode) override;
     oatpp::data::stream::IOMode getOutputStreamIOMode() override;
@@ -115,11 +122,9 @@ public:
      * @return
      */
     const std::shared_ptr<IOStream>& getUnderlyingConnection();
-
   };
 
 private:
-
   /*
    * Push connection to Pool.
    * @param connection
@@ -138,11 +143,12 @@ private:
 
 private:
   static void cleanupTask(std::shared_ptr<Pool> pool);
+
 private:
   std::shared_ptr<Pool> m_pool;
   std::shared_ptr<ConnectionProvider> m_connectionProvider;
-public:
 
+public:
   /**
    * Constructor.
    * @param connectionProvider - underlying connection provider.
@@ -184,8 +190,8 @@ public:
    * @param poolInstance
    * @return
    */
-  static oatpp::async::CoroutineStarterForResult<const std::shared_ptr<ConnectionWrapper>&>
-  getConnectionAsync(const std::shared_ptr<ConnectionProvider>& connectionProvider, const std::shared_ptr<Pool>& poolInstance);
+  static oatpp::async::CoroutineStarterForResult<const std::shared_ptr<ConnectionWrapper>&> getConnectionAsync(
+   const std::shared_ptr<ConnectionProvider>& connectionProvider, const std::shared_ptr<Pool>& poolInstance);
 
   /**
    * Get connection in Async manner.
@@ -206,17 +212,16 @@ public:
    * @param connection - **MUST** be instance of `&l:ConnectionPool::ConnectionWrapper;` or its subclass.
    */
   void invalidateConnection(const std::shared_ptr<IOStream>& connection);
-
 };
 
 /**
  * &id:oatpp::network::ServerConnectionProvider; based on &l:ConnectionPool;.
  */
-class ServerConnectionPool : public ServerConnectionProvider {
+class ServerConnectionPool: public ServerConnectionProvider {
 private:
   ConnectionPool m_pool;
-public:
 
+public:
   /**
    * Constructor.
    * @param connectionProvider - underlying connection provider.
@@ -252,17 +257,16 @@ public:
    * Close pool.
    */
   void close() override;
-
 };
 
 /**
  * &id:oatpp::network::ClientConnectionProvider; based on &l:ConnectionPool;.
  */
-class ClientConnectionPool : public ClientConnectionProvider {
+class ClientConnectionPool: public ClientConnectionProvider {
 private:
   ConnectionPool m_pool;
-public:
 
+public:
   /**
    * Constructor.
    * @param connectionProvider - underlying connection provider.
@@ -298,7 +302,6 @@ public:
    * Close pool.
    */
   void close() override;
-
 };
 
 }}

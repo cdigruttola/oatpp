@@ -36,15 +36,14 @@ namespace oatpp { namespace algorithm {
  */
 class CRC32 {
 public:
-
   /**
    * Precalculated table
    */
   static const p_uint32 TABLE_04C11DB7;
-public:
 
+public:
   static v_uint32 bitReverse(v_uint32 poly);
-  
+
   /**
    *  Generates v_uint32 table[256] for polynomial
    */
@@ -60,10 +59,14 @@ public:
    * @param table
    * @return - CRC32 value (v_uint32)
    */
-  static v_uint32 calc(const void *buffer, v_buff_size size, v_uint32 crc = 0, v_uint32 initValue = 0xFFFFFFFF, v_uint32 xorOut = 0xFFFFFFFF, p_uint32 table = TABLE_04C11DB7);
-  
+  static v_uint32 calc(const void* buffer,
+                       v_buff_size size,
+                       v_uint32 crc = 0,
+                       v_uint32 initValue = 0xFFFFFFFF,
+                       v_uint32 xorOut = 0xFFFFFFFF,
+                       p_uint32 table = TABLE_04C11DB7);
 };
-    
+
 }}
 
 #endif /* oatpp_algorithm_CRC_hpp */

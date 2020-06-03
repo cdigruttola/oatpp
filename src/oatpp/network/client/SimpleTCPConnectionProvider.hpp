@@ -27,18 +27,21 @@
 
 #include "oatpp/network/ConnectionProvider.hpp"
 
-#include "oatpp/core/data/stream/Stream.hpp"
 #include "oatpp/core/Types.hpp"
+#include "oatpp/core/data/stream/Stream.hpp"
 
 namespace oatpp { namespace network { namespace client {
 
 /**
  * Simple provider of clinet TCP connections.
  */
-class SimpleTCPConnectionProvider : public base::Countable, public ClientConnectionProvider {
+class SimpleTCPConnectionProvider
+  : public base::Countable
+  , public ClientConnectionProvider {
 protected:
   oatpp::String m_host;
   v_uint16 m_port;
+
 public:
   /**
    * Constructor.
@@ -46,22 +49,24 @@ public:
    * @param port - server port.
    */
   SimpleTCPConnectionProvider(const oatpp::String& host, v_uint16 port);
-public:
 
+public:
   /**
    * Create shared client SimpleTCPConnectionProvider.
    * @param host - host name without schema and port. Ex.: "oatpp.io", "127.0.0.1", "localhost".
    * @param port - server port.
    * @return - `std::shared_ptr` to SimpleTCPConnectionProvider.
    */
-  static std::shared_ptr<SimpleTCPConnectionProvider> createShared(const oatpp::String& host, v_uint16 port){
+  static std::shared_ptr<SimpleTCPConnectionProvider> createShared(const oatpp::String& host, v_uint16 port)
+  {
     return std::make_shared<SimpleTCPConnectionProvider>(host, port);
   }
 
   /**
    * Implements &id:oatpp::network::ConnectionProvider::close;. Here does nothing.
    */
-  void close() override {
+  void close() override
+  {
     // DO NOTHING
   }
 
@@ -75,7 +80,8 @@ public:
    * Get connection in asynchronous manner.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::stream::IOStream>&> getConnectionAsync() override;
+  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::stream::IOStream>&> getConnectionAsync()
+   override;
 
   /**
    * Call shutdown read and write on an underlying file descriptor.
@@ -88,7 +94,8 @@ public:
    * Get host name.
    * @return - host name.
    */
-  oatpp::String getHost() {
+  oatpp::String getHost()
+  {
     return m_host;
   }
 
@@ -96,12 +103,12 @@ public:
    * Get port.
    * @return - port.
    */
-  v_uint16 getPort(){
+  v_uint16 getPort()
+  {
     return m_port;
   }
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_netword_client_SimpleTCPConnectionProvider_hpp */

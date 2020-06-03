@@ -25,15 +25,15 @@
 #ifndef oatpp_web_mime_multipart_FileStreamProvider_hpp
 #define oatpp_web_mime_multipart_FileStreamProvider_hpp
 
-#include "StreamPartReader.hpp"
 #include "Reader.hpp"
+#include "StreamPartReader.hpp"
 
 namespace oatpp { namespace web { namespace mime { namespace multipart {
 
 /**
  * Stream provider for `StreamPartReader`.
  */
-class FileStreamProvider : public PartReaderStreamProvider {
+class FileStreamProvider: public PartReaderStreamProvider {
 public:
   /**
    * Convenience typedef for &id:oatpp::data::stream::OutputStream;.
@@ -44,10 +44,11 @@ public:
    * Convenience typedef for &id:oatpp::data::stream::InputStream;.
    */
   typedef oatpp::data::stream::InputStream InputStream;
+
 private:
   oatpp::String m_filename;
-public:
 
+public:
   /**
    * Constructor.
    * @param filename
@@ -68,13 +69,12 @@ public:
    * @return
    */
   std::shared_ptr<InputStream> getInputStream(const std::shared_ptr<Part>& part) override;
-
 };
 
 /**
  * Async stream provider for `AsyncStreamPartReader`.
  */
-class AsyncFileStreamProvider : public AsyncPartReaderStreamProvider {
+class AsyncFileStreamProvider: public AsyncPartReaderStreamProvider {
 public:
   /**
    * Convenience typedef for &id:oatpp::data::stream::OutputStream;.
@@ -85,12 +85,12 @@ public:
    * Convenience typedef for &id:oatpp::data::stream::InputStream;.
    */
   typedef oatpp::data::stream::InputStream InputStream;
-public:
 
+public:
 private:
   oatpp::String m_filename;
-public:
 
+public:
   /**
    * Constructor.
    * @param filename
@@ -115,7 +115,6 @@ public:
    */
   async::CoroutineStarter getInputStreamAsync(const std::shared_ptr<Part>& part,
                                               std::shared_ptr<data::stream::InputStream>& stream) override;
-
 };
 
 /**

@@ -25,8 +25,8 @@
 #ifndef oatpp_IODefinitions_hpp
 #define oatpp_IODefinitions_hpp
 
-#include "oatpp/core/async/Error.hpp"
 #include "oatpp/core/Types.hpp"
+#include "oatpp/core/async/Error.hpp"
 
 namespace oatpp {
 
@@ -34,13 +34,13 @@ namespace oatpp {
  * Represents I/O handle (ex.: file descriptor).
  */
 #if defined(WIN32) || defined(_WIN32)
-	#if defined(_WIN64)
-	  typedef unsigned long long v_io_handle;
-	#else
-	  typedef unsigned long v_io_handle;
-	#endif
+#if defined(_WIN64)
+typedef unsigned long long v_io_handle;
 #else
-  typedef int v_io_handle;
+typedef unsigned long v_io_handle;
+#endif
+#else
+typedef int v_io_handle;
 #endif
 
 /**
@@ -105,11 +105,11 @@ enum IOError : v_io_size {
  * Asynchronous I/O error. <br>
  * Extends &id:oatpp::async::Error;.
  */
-class AsyncIOError : public oatpp::async::Error {
+class AsyncIOError: public oatpp::async::Error {
 private:
   v_io_size m_code;
-public:
 
+public:
   /**
    * Constructor.
    * @param what - description of error type.
@@ -118,7 +118,8 @@ public:
   AsyncIOError(const char* what, v_io_size code)
     : oatpp::async::Error(what)
     , m_code(code)
-  {}
+  {
+  }
 
   /**
    * Constructor.
@@ -127,16 +128,17 @@ public:
   AsyncIOError(v_io_size code)
     : oatpp::async::Error("AsyncIOError")
     , m_code(code)
-  {}
+  {
+  }
 
   /**
    * Get I/O opersation error code.
    * @return - I/O opersation error code. &l:IOError;.
    */
-  v_io_size getCode() const {
+  v_io_size getCode() const
+  {
     return m_code;
   }
-
 };
 
 }

@@ -24,10 +24,6 @@
 
 #include "./Object.hpp"
 
-namespace oatpp { namespace data { namespace mapping { namespace type {
-  
-namespace __class {
-  const ClassId AbstractObject::CLASS_ID("Object");
-}
-  
-}}}}
+namespace oatpp { namespace data { namespace mapping { namespace type { namespace __class {
+const ClassId AbstractObject::CLASS_ID("Object");
+}}}}}

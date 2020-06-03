@@ -27,11 +27,11 @@
 
 #include "./DTOs.hpp"
 
-#include "oatpp/web/server/api/ApiController.hpp"
-#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
-#include "oatpp/core/utils/ConversionUtils.hpp"
 #include "oatpp/core/macro/codegen.hpp"
 #include "oatpp/core/macro/component.hpp"
+#include "oatpp/core/utils/ConversionUtils.hpp"
+#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
+#include "oatpp/web/server/api/ApiController.hpp"
 
 #include <sstream>
 
@@ -40,27 +40,32 @@ namespace oatpp { namespace test { namespace web { namespace app {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Default Basic Authorization
 
-class DefaultBasicAuthorizationController : public oatpp::web::server::api::ApiController {
+class DefaultBasicAuthorizationController: public oatpp::web::server::api::ApiController {
 private:
   static constexpr const char* TAG = "test::web::app::BasicAuthorizationController";
-public:
 
+public:
   DefaultBasicAuthorizationController(const std::shared_ptr<ObjectMapper>& objectMapper)
     : oatpp::web::server::api::ApiController(objectMapper)
   {
-    setDefaultAuthorizationHandler(std::make_shared<oatpp::web::server::handler::BasicAuthorizationHandler>("default-test-realm"));
+    setDefaultAuthorizationHandler(
+     std::make_shared<oatpp::web::server::handler::BasicAuthorizationHandler>("default-test-realm"));
   }
 
 public:
-
-  static std::shared_ptr<DefaultBasicAuthorizationController> createShared(const std::shared_ptr<ObjectMapper>& objectMapper = OATPP_GET_COMPONENT(std::shared_ptr<ObjectMapper>)){
+  static std::shared_ptr<DefaultBasicAuthorizationController> createShared(
+   const std::shared_ptr<ObjectMapper>& objectMapper = OATPP_GET_COMPONENT(std::shared_ptr<ObjectMapper>))
+  {
     return std::make_shared<DefaultBasicAuthorizationController>(objectMapper);
   }
 
 #include OATPP_CODEGEN_BEGIN(ApiController)
 
-  ENDPOINT("GET", "default-basic-authorization", basicAuthorization,
-           AUTHORIZATION(std::shared_ptr<oatpp::web::server::handler::DefaultBasicAuthorizationObject>, authObject)) {
+  ENDPOINT("GET",
+           "default-basic-authorization",
+           basicAuthorization,
+           AUTHORIZATION(std::shared_ptr<oatpp::web::server::handler::DefaultBasicAuthorizationObject>, authObject))
+  {
 
     auto dto = TestDto::createShared();
     dto->testValue = authObject->userId + ":" + authObject->password;
@@ -70,64 +75,69 @@ public:
     } else {
       return createDtoResponse(Status::CODE_401, dto);
     }
-
   }
 
 #include OATPP_CODEGEN_END(ApiController)
-
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Custom Basic Authorization
 
-class MyAuthorizationObject : public oatpp::web::server::handler::AuthorizationObject {
+class MyAuthorizationObject: public oatpp::web::server::handler::AuthorizationObject {
 public:
-
   MyAuthorizationObject(v_int64 pId, const oatpp::String& pAuthString)
     : id(pId)
     , authString(pAuthString)
-  {}
+  {
+  }
 
   v_int64 id;
   oatpp::String authString;
-
 };
 
-class MyBasicAuthorizationHandler : public oatpp::web::server::handler::BasicAuthorizationHandler {
+class MyBasicAuthorizationHandler: public oatpp::web::server::handler::BasicAuthorizationHandler {
 public:
-
   MyBasicAuthorizationHandler()
     : BasicAuthorizationHandler("custom-test-realm")
-  {}
+  {
+  }
 
-  std::shared_ptr<AuthorizationObject> authorize(const oatpp::String& userId, const oatpp::String& password) override {
+  std::shared_ptr<AuthorizationObject> authorize(const oatpp::String& userId, const oatpp::String& password) override
+  {
     if(userId == "foo" && password == "bar") {
       return std::make_shared<MyAuthorizationObject>(1337, userId + ":" + password);
     }
     return nullptr;
   }
-
 };
 
-class BasicAuthorizationController : public oatpp::web::server::api::ApiController {
+class BasicAuthorizationController: public oatpp::web::server::api::ApiController {
 private:
   static constexpr const char* TAG = "test::web::app::BasicAuthorizationController";
+
 public:
   std::shared_ptr<AuthorizationHandler> m_authHandler = std::make_shared<MyBasicAuthorizationHandler>();
+
 public:
   BasicAuthorizationController(const std::shared_ptr<ObjectMapper>& objectMapper)
     : oatpp::web::server::api::ApiController(objectMapper)
-  {}
-public:
+  {
+  }
 
-  static std::shared_ptr<BasicAuthorizationController> createShared(const std::shared_ptr<ObjectMapper>& objectMapper = OATPP_GET_COMPONENT(std::shared_ptr<ObjectMapper>)){
+public:
+  static std::shared_ptr<BasicAuthorizationController> createShared(
+   const std::shared_ptr<ObjectMapper>& objectMapper = OATPP_GET_COMPONENT(std::shared_ptr<ObjectMapper>))
+  {
     return std::make_shared<BasicAuthorizationController>(objectMapper);
   }
 
 #include OATPP_CODEGEN_BEGIN(ApiController)
 
-  ENDPOINT("GET", "basic-authorization", basicAuthorization,
-           AUTHORIZATION(std::shared_ptr<MyAuthorizationObject>, authObject, m_authHandler)) {
+  ENDPOINT("GET",
+           "basic-authorization",
+           basicAuthorization,
+           AUTHORIZATION(std::shared_ptr<MyAuthorizationObject>, authObject, m_authHandler))
+  {
 
     auto dto = TestDto::createShared();
     dto->testValue = authObject->authString;
@@ -137,11 +147,9 @@ public:
     } else {
       return createDtoResponse(Status::CODE_401, dto);
     }
-
   }
 
 #include OATPP_CODEGEN_END(ApiController)
-
 };
 
 }}}}

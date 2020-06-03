@@ -25,20 +25,21 @@
 #ifndef oatpp_web_protocol_http_outgoing_Request_hpp
 #define oatpp_web_protocol_http_outgoing_Request_hpp
 
-#include "oatpp/web/protocol/http/outgoing/Body.hpp"
 #include "oatpp/web/protocol/http/Http.hpp"
+#include "oatpp/web/protocol/http/outgoing/Body.hpp"
 
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace outgoing {
 
 /**
  * Class http::outgoing::Request AKA OutgoingRequest represents client's outgoing request to server.
  */
-class Request : public oatpp::base::Countable {
+class Request: public oatpp::base::Countable {
 public:
   /**
    * Convenience typedef for &id:oatpp::web::protocol::http::Headers;.
    */
   typedef protocol::http::Headers Headers;
+
 public:
   OBJECT_POOL(Outgoing_Request_Pool, Request, 32)
   SHARED_OBJECT_POOL(Shared_Outgoing_Request_Pool, Request, 32)
@@ -47,8 +48,8 @@ private:
   oatpp::data::share::StringKeyLabel m_path;
   Headers m_headers;
   std::shared_ptr<Body> m_body;
-public:
 
+public:
   /**
    * Constructor.
    * @param method - http method. &id:oatpp::data::share::StringKeyLabel;.
@@ -60,9 +61,8 @@ public:
           const oatpp::data::share::StringKeyLabel& path,
           const Headers& headers,
           const std::shared_ptr<Body>& body);
-  
-public:
 
+public:
   /**
    * Create shared Request.
    * @param method - http method. &id:oatpp::data::share::StringKeyLabel;.
@@ -108,7 +108,8 @@ public:
    * @param value - header value &id:oatpp::data::share::StringKeyLabel;.
    * @return - `true` if header was added to the map.
    */
-  bool putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key, const oatpp::data::share::StringKeyLabel& value);
+  bool putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key,
+                            const oatpp::data::share::StringKeyLabel& value);
 
   /**
    * Get http body.
@@ -130,9 +131,8 @@ public:
    */
   static oatpp::async::CoroutineStarter sendAsync(std::shared_ptr<Request> _this,
                                                   const std::shared_ptr<data::stream::OutputStream>& stream);
-  
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_outgoing_Request_hpp */

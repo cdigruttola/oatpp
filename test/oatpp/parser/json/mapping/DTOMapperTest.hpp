@@ -28,15 +28,16 @@
 #include "oatpp-test/UnitTest.hpp"
 
 namespace oatpp { namespace test { namespace parser { namespace json { namespace mapping {
-  
-class DTOMapperTest : public UnitTest{
+
+class DTOMapperTest: public UnitTest {
 public:
-  
-  DTOMapperTest():UnitTest("TEST[parser::json::mapping::DTOMapperTest]"){}
+  DTOMapperTest()
+    : UnitTest("TEST[parser::json::mapping::DTOMapperTest]")
+  {
+  }
   void onRun() override;
-  
 };
-  
+
 }}}}}
 
 #endif /* oatpp_test_parser_json_mapping_DTOMapperTest_hpp */

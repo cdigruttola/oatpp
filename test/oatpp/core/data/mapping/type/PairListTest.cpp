@@ -26,9 +26,10 @@
 
 #include "oatpp/core/Types.hpp"
 
-namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace  type {
+namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace type {
 
-void PairListTest::onRun() {
+void PairListTest::onRun()
+{
 
   {
     OATPP_LOGI(TAG, "test default constructor...");
@@ -101,8 +102,8 @@ void PairListTest::onRun() {
     OATPP_ASSERT(map1->size() == 1);
     OATPP_ASSERT(map2->size() == 2);
 
-    OATPP_ASSERT(map2["key1"] == "b");
-    OATPP_ASSERT(map2["key2"] == "c");
+    OATPP_ASSERT(map2 [ "key1" ] == "b");
+    OATPP_ASSERT(map2 [ "key2" ] == "c");
     OATPP_ASSERT(map2.getValueByKey("key1") == "b");
     OATPP_ASSERT(map2.getValueByKey("key2") == "c");
     OATPP_ASSERT(map2.getValueByKey("key3") == nullptr);
@@ -130,17 +131,17 @@ void PairListTest::onRun() {
     OATPP_ASSERT(map != nullptr);
     OATPP_ASSERT(map->size() == 3);
 
-    OATPP_ASSERT(map["key1"] == "a");
-    OATPP_ASSERT(map["key2"] == "b");
-    OATPP_ASSERT(map["key3"] == "c");
+    OATPP_ASSERT(map [ "key1" ] == "a");
+    OATPP_ASSERT(map [ "key2" ] == "b");
+    OATPP_ASSERT(map [ "key3" ] == "c");
 
-    map["key2"] = "Hello!";
+    map [ "key2" ] = "Hello!";
 
     OATPP_ASSERT(map->size() == 3);
 
-    OATPP_ASSERT(map["key1"] == "a");
-    OATPP_ASSERT(map["key2"] == "Hello!");
-    OATPP_ASSERT(map["key3"] == "c");
+    OATPP_ASSERT(map [ "key1" ] == "a");
+    OATPP_ASSERT(map [ "key2" ] == "Hello!");
+    OATPP_ASSERT(map [ "key3" ] == "c");
     OATPP_LOGI(TAG, "OK");
   }
 
@@ -148,21 +149,20 @@ void PairListTest::onRun() {
     OATPP_LOGI(TAG, "test polymorphicDispatcher...");
     oatpp::Fields<String> map = {{"key1", "a"}, {"key2", "b"}, {"key3", "c"}};
 
-    auto polymorphicDispatcher = static_cast<const typename oatpp::Fields<String>::Class::AbstractPolymorphicDispatcher*>(
-      map.valueType->polymorphicDispatcher
-    );
+    auto polymorphicDispatcher =
+     static_cast<const typename oatpp::Fields<String>::Class::AbstractPolymorphicDispatcher*>(
+      map.valueType->polymorphicDispatcher);
 
     polymorphicDispatcher->addPolymorphicItem(map, oatpp::String("key1"), oatpp::String("d"));
 
     OATPP_ASSERT(map->size() == 4);
 
-    OATPP_ASSERT(map[0].first == "key1" && map[0].second == "a");
-    OATPP_ASSERT(map[1].first == "key2" && map[1].second == "b");
-    OATPP_ASSERT(map[2].first == "key3" && map[2].second == "c");
-    OATPP_ASSERT(map[3].first == "key1" && map[3].second == "d");
+    OATPP_ASSERT(map [ 0 ].first == "key1" && map [ 0 ].second == "a");
+    OATPP_ASSERT(map [ 1 ].first == "key2" && map [ 1 ].second == "b");
+    OATPP_ASSERT(map [ 2 ].first == "key3" && map [ 2 ].second == "c");
+    OATPP_ASSERT(map [ 3 ].first == "key1" && map [ 3 ].second == "d");
     OATPP_LOGI(TAG, "OK");
   }
-
 }
 
 }}}}}}

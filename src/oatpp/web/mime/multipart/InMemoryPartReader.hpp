@@ -32,13 +32,14 @@ namespace oatpp { namespace web { namespace mime { namespace multipart {
 /**
  * In memory part reader.
  */
-class InMemoryPartReader : public PartReader {
+class InMemoryPartReader: public PartReader {
 private:
   static const char* const TAG_NAME;
+
 private:
   oatpp::v_io_size m_maxDataSize;
-public:
 
+public:
   /**
    * Constructor.
    * @param maxDataSize
@@ -59,19 +60,19 @@ public:
    * @param size - size of the buffer.
    */
   void onPartData(const std::shared_ptr<Part>& part, p_char8 data, oatpp::v_io_size size) override;
-
 };
 
 /**
  * Async in memory part reader.
  */
-class AsyncInMemoryPartReader : public AsyncPartReader {
+class AsyncInMemoryPartReader: public AsyncPartReader {
 private:
   static const char* const TAG_NAME;
+
 private:
   oatpp::v_io_size m_maxDataSize;
-public:
 
+public:
   /**
    * Constructor.
    * @param maxDataSize
@@ -93,8 +94,9 @@ public:
    * @param size - size of the buffer.
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  async::CoroutineStarter onPartDataAsync(const std::shared_ptr<Part>& part, p_char8 data, oatpp::v_io_size size) override;
-
+  async::CoroutineStarter onPartDataAsync(const std::shared_ptr<Part>& part,
+                                          p_char8 data,
+                                          oatpp::v_io_size size) override;
 };
 
 /**

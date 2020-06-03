@@ -27,41 +27,40 @@
 
 #include "./Type.hpp"
 
-#include <unordered_set>
 #include <initializer_list>
+#include <unordered_set>
 
 namespace oatpp { namespace data { namespace mapping { namespace type {
 
 namespace __class {
 
+/**
+ * Abstract Unordered Set class.
+ */
+class AbstractUnorderedSet {
+public:
   /**
-   * Abstract Unordered Set class.
+   * Class Id.
    */
-  class AbstractUnorderedSet {
+  static const ClassId CLASS_ID;
+
+public:
+  /**
+   * Polymorphic Dispatcher.
+   */
+  class AbstractPolymorphicDispatcher {
   public:
     /**
-     * Class Id.
+     * Add Item.
+     * @param object - UnorderedSet.
+     * @param item - Item.
      */
-    static const ClassId CLASS_ID;
-  public:
-
-    /**
-     * Polymorphic Dispatcher.
-     */
-    class AbstractPolymorphicDispatcher {
-    public:
-      /**
-       * Add Item.
-       * @param object - UnorderedSet.
-       * @param item - Item.
-       */
-      virtual void addPolymorphicItem(const type::Void& object, const type::Void& item) const = 0;
-    };
-
+    virtual void addPolymorphicItem(const type::Void& object, const type::Void& item) const = 0;
   };
+};
 
-  template<class T>
-  class UnorderedSet;
+template<class T>
+class UnorderedSet;
 
 }
 
@@ -71,28 +70,32 @@ namespace __class {
  * @tparam C - Class.
  */
 template<class T, class C>
-class UnorderedSetObjectWrapper : public type::ObjectWrapper<std::unordered_set<T>, C> {
+class UnorderedSetObjectWrapper: public type::ObjectWrapper<std::unordered_set<T>, C> {
 public:
   typedef std::unordered_set<T> TemplateObjectType;
   typedef C TemplateObjectClass;
-public:
 
+public:
   OATPP_DEFINE_OBJECT_WRAPPER_DEFAULTS(UnorderedSetObjectWrapper, TemplateObjectType, TemplateObjectClass)
 
   UnorderedSetObjectWrapper(std::initializer_list<T> ilist)
     : type::ObjectWrapper<TemplateObjectType, TemplateObjectClass>(std::make_shared<TemplateObjectType>(ilist))
-  {}
+  {
+  }
 
-  static UnorderedSetObjectWrapper createShared() {
+  static UnorderedSetObjectWrapper createShared()
+  {
     return std::make_shared<TemplateObjectType>();
   }
 
-  UnorderedSetObjectWrapper& operator = (std::initializer_list<T> ilist) {
+  UnorderedSetObjectWrapper& operator=(std::initializer_list<T> ilist)
+  {
     this->m_ptr = std::make_shared<TemplateObjectType>(ilist);
     return *this;
   }
 
-  bool operator[] (const T& key) const {
+  bool operator[](const T& key) const
+  {
     if(this->m_ptr) {
       auto it = this->m_ptr->find(key);
       return it != this->m_ptr->end();
@@ -100,10 +103,10 @@ public:
     return false;
   }
 
-  TemplateObjectType& operator*() const {
+  TemplateObjectType& operator*() const
+  {
     return this->m_ptr.operator*();
   }
-
 };
 
 /**
@@ -117,39 +120,37 @@ typedef UnorderedSetObjectWrapper<type::Void, __class::AbstractUnorderedSet> Abs
 namespace __class {
 
 template<class T>
-class UnorderedSet : public AbstractUnorderedSet {
+class UnorderedSet: public AbstractUnorderedSet {
 private:
-
-  class PolymorphicDispatcher : public AbstractPolymorphicDispatcher {
+  class PolymorphicDispatcher: public AbstractPolymorphicDispatcher {
   public:
-
-    void addPolymorphicItem(const type::Void& object, const type::Void& item) const override {
+    void addPolymorphicItem(const type::Void& object, const type::Void& item) const override
+    {
       const auto& set = object.staticCast<type::UnorderedSet<T>>();
       const auto& setItem = item.staticCast<T>();
       set->insert(setItem);
     }
-
   };
 
 private:
-
-  static type::Void creator() {
+  static type::Void creator()
+  {
     return type::Void(std::make_shared<std::unordered_set<T>>(), getType());
   }
 
-  static Type createType() {
+  static Type createType()
+  {
     Type type(__class::AbstractUnorderedSet::CLASS_ID, nullptr, &creator, nullptr, new PolymorphicDispatcher());
     type.params.push_back(T::Class::getType());
     return type;
   }
 
 public:
-
-  static Type* getType() {
+  static Type* getType()
+  {
     static Type type = createType();
     return &type;
   }
-
 };
 
 }

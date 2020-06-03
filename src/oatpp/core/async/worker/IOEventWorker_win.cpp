@@ -33,27 +33,33 @@
 
 namespace oatpp { namespace async { namespace worker {
 
-void IOEventWorker::initEventQueue() {
+void IOEventWorker::initEventQueue()
+{
   throw std::runtime_error("[IOEventWorker for Windows OS is NOT IMPLEMENTED! Use IOWorker instead.]");
 }
 
-void IOEventWorker::triggerWakeup() {
+void IOEventWorker::triggerWakeup()
+{
   throw std::runtime_error("[IOEventWorker for Windows OS is NOT IMPLEMENTED! Use IOWorker instead.]");
 }
 
-void IOEventWorker::setTriggerEvent(p_char8 eventPtr) {
+void IOEventWorker::setTriggerEvent(p_char8 eventPtr)
+{
   throw std::runtime_error("[IOEventWorker for Windows OS is NOT IMPLEMENTED! Use IOWorker instead.]");
 }
 
-void IOEventWorker::setCoroutineEvent(CoroutineHandle* coroutine, int operation, p_char8 eventPtr) {
+void IOEventWorker::setCoroutineEvent(CoroutineHandle* coroutine, int operation, p_char8 eventPtr)
+{
   throw std::runtime_error("[IOEventWorker for Windows OS is NOT IMPLEMENTED! Use IOWorker instead.]");
 }
 
-void IOEventWorker::consumeBacklog() {
+void IOEventWorker::consumeBacklog()
+{
   throw std::runtime_error("[IOEventWorker for Windows OS is NOT IMPLEMENTED! Use IOWorker instead.]");
 }
 
-void IOEventWorker::waitEvents() {
+void IOEventWorker::waitEvents()
+{
   throw std::runtime_error("[IOEventWorker for Windows OS is NOT IMPLEMENTED! Use IOWorker instead.]");
 }
 

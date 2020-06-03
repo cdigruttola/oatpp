@@ -80,7 +80,7 @@ public:
    */
   static v_int32 utf16SurrogatePairToCode(v_int16 high, v_int16 low);
 };
-  
+
 }}
 
 #endif /* oatpp_encoding_Unicode_hpp */

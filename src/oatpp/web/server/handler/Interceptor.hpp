@@ -25,9 +25,9 @@
 #ifndef oatpp_web_server_handler_Interceptor_hpp
 #define oatpp_web_server_handler_Interceptor_hpp
 
-#include "oatpp/web/protocol/http/outgoing/Response.hpp"
-#include "oatpp/web/protocol/http/incoming/Request.hpp"
 #include "oatpp/web/protocol/http/Http.hpp"
+#include "oatpp/web/protocol/http/incoming/Request.hpp"
+#include "oatpp/web/protocol/http/outgoing/Response.hpp"
 
 namespace oatpp { namespace web { namespace server { namespace handler {
 
@@ -45,8 +45,8 @@ public:
    * Convenience typedef for &id:oatpp::web::protocol::http::outgoing::Response;.
    */
   typedef oatpp::web::protocol::http::outgoing::Response OutgoingResponse;
+
 public:
-  
   /**
    *
    *  This method should not do any "heavy" nor I/O operations
@@ -60,9 +60,8 @@ public:
    *
    */
   virtual std::shared_ptr<OutgoingResponse> intercept(std::shared_ptr<IncomingRequest>& request) = 0;
-  
 };
-  
+
 }}}}
 
 #endif /* oatpp_web_server_handler_Interceptor_hpp */

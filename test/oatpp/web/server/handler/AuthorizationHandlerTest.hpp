@@ -26,14 +26,17 @@
 #ifndef oatpp_test_encoding_AuthorizationHandlerTest_hpp
 #define oatpp_test_encoding_AuthorizationHandlerTest_hpp
 
-#include <oatpp/web/server/handler/AuthorizationHandler.hpp>
 #include "oatpp-test/UnitTest.hpp"
+#include <oatpp/web/server/handler/AuthorizationHandler.hpp>
 
 namespace oatpp { namespace test { namespace web { namespace server { namespace handler {
 
-class AuthorizationHandlerTest : public UnitTest{
- public:
-  AuthorizationHandlerTest():UnitTest("TEST[web::server::handler::AuthorizationHandlerTest]"){}
+class AuthorizationHandlerTest: public UnitTest {
+public:
+  AuthorizationHandlerTest()
+    : UnitTest("TEST[web::server::handler::AuthorizationHandlerTest]")
+  {
+  }
   void onRun() override;
 };
 

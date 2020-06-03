@@ -29,9 +29,9 @@
 
 #include "oatpp/core/IODefinitions.hpp"
 
-#include "oatpp/core/collection/FastQueue.hpp"
-#include "oatpp/core/base/memory/MemoryPool.hpp"
 #include "oatpp/core/base/Environment.hpp"
+#include "oatpp/core/base/memory/MemoryPool.hpp"
+#include "oatpp/core/collection/FastQueue.hpp"
 
 #include "oatpp/core/Types.hpp"
 
@@ -40,14 +40,14 @@
 
 namespace oatpp { namespace async {
 
-class CoroutineHandle; // FWD
+class CoroutineHandle;   // FWD
 class AbstractCoroutine; // FWD
-class Processor; // FWD
-class CoroutineStarter; // FWD
+class Processor;         // FWD
+class CoroutineStarter;  // FWD
 class CoroutineWaitList; // FWD
 
 namespace worker {
-  class Worker; // FWD
+class Worker; // FWD
 }
 
 /**
@@ -59,10 +59,11 @@ class Action {
   friend AbstractCoroutine;
   friend CoroutineStarter;
   friend worker::Worker;
+
 public:
   typedef Action (AbstractCoroutine::*FunctionPtr)();
-public:
 
+public:
   /**
    * None - invalid Action.
    */
@@ -114,7 +115,6 @@ public:
   static constexpr const v_int32 TYPE_WAIT_LIST = 9;
 
 public:
-
   /**
    * Event type qualifier for Actions of type &l:Action::TYPE_IO_WAIT;, &l:Action::TYPE_IO_REPEAT;.
    */
@@ -147,7 +147,8 @@ public:
    * Convenience I/O Action Code.
    * This code is applicable for Action of type TYPE_IO_WAIT only.
    */
-  static constexpr const v_int32 CODE_IO_WAIT_RESCHEDULE = TYPE_IO_WAIT | IOEventType::IO_EVENT_READ | IOEventType::IO_EVENT_WRITE;
+  static constexpr const v_int32 CODE_IO_WAIT_RESCHEDULE =
+   TYPE_IO_WAIT | IOEventType::IO_EVENT_READ | IOEventType::IO_EVENT_WRITE;
 
   /**
    * Convenience I/O Action Code.
@@ -165,10 +166,10 @@ public:
    * Convenience I/O Action Code.
    * This code is applicable for Action of type TYPE_IO_REPEAT only.
    */
-  static constexpr const v_int32 CODE_IO_REPEAT_RESCHEDULE = TYPE_IO_REPEAT | IOEventType::IO_EVENT_READ | IOEventType::IO_EVENT_WRITE;
+  static constexpr const v_int32 CODE_IO_REPEAT_RESCHEDULE =
+   TYPE_IO_REPEAT | IOEventType::IO_EVENT_READ | IOEventType::IO_EVENT_WRITE;
 
 private:
-
   struct IOData {
     oatpp::v_io_handle ioHandle;
     IOEventType ioEventType;
@@ -183,19 +184,22 @@ private:
     v_int64 timePointMicroseconds;
     CoroutineWaitList* waitList;
   };
+
 private:
   mutable v_int32 m_type;
   Data m_data;
+
 private:
   void free();
+
 protected:
   /*
    * Create Action by type.
    * @param type - Action type.
    */
   Action(v_int32 type);
-public:
 
+public:
   /**
    * Default constructor.
    */
@@ -330,8 +334,6 @@ public:
    * @return - `getType() | getIOEventType()`.
    */
   v_int32 getIOEventCode() const;
-
-  
 };
 
 /**
@@ -341,8 +343,8 @@ class CoroutineStarter {
 private:
   AbstractCoroutine* m_first;
   AbstractCoroutine* m_last;
-public:
 
+public:
   /**
    * Constructor.
    * @param coroutine - coroutine.
@@ -388,29 +390,30 @@ public:
    * @return - this starter.
    */
   CoroutineStarter& next(CoroutineStarter&& starter);
-
 };
 
 /**
  * This class manages coroutines processing state and a chain of coroutine calls.
  */
-class CoroutineHandle : public oatpp::base::Countable {
+class CoroutineHandle: public oatpp::base::Countable {
   friend oatpp::collection::FastQueue<CoroutineHandle>;
   friend Processor;
   friend worker::Worker;
   friend CoroutineWaitList;
+
 public:
   typedef oatpp::async::Action Action;
   typedef oatpp::async::Error Error;
   typedef Action (AbstractCoroutine::*FunctionPtr)();
+
 private:
   Processor* _PP;
   AbstractCoroutine* _CP;
   FunctionPtr _FP;
   oatpp::async::Action _SCH_A;
   CoroutineHandle* _ref;
-public:
 
+public:
   CoroutineHandle(Processor* processor, AbstractCoroutine* rootCoroutine);
   ~CoroutineHandle();
 
@@ -419,15 +422,16 @@ public:
   Action iterateAndTakeAction();
 
   bool finished() const;
-
 };
 
 /**
- * Abstract Coroutine. Base class for Coroutines. It provides state management, coroutines stack management and error reporting functionality.
+ * Abstract Coroutine. Base class for Coroutines. It provides state management, coroutines stack management and error
+ * reporting functionality.
  */
-class AbstractCoroutine : public oatpp::base::Countable {
+class AbstractCoroutine: public oatpp::base::Countable {
   friend CoroutineStarter;
   friend CoroutineHandle;
+
 public:
   /**
    * Convenience typedef for Action
@@ -435,46 +439,50 @@ public:
   typedef oatpp::async::Action Action;
   typedef oatpp::async::Error Error;
   typedef Action (AbstractCoroutine::*FunctionPtr)();
-public:
 
-  template<typename ...Args>
+public:
+  template<typename... Args>
   class AbstractMemberCaller {
   public:
     virtual ~AbstractMemberCaller() = default;
     virtual Action call(AbstractCoroutine* coroutine, const Args&... args) = 0;
   };
 
-  template<typename T, typename ...Args>
-  class MemberCaller : public AbstractMemberCaller<Args...> {
+  template<typename T, typename... Args>
+  class MemberCaller: public AbstractMemberCaller<Args...> {
   public:
     typedef Action (T::*Func)(const Args&...);
+
   private:
     Func m_func;
-  public:
 
+  public:
     MemberCaller(Func func)
       : m_func(func)
-    {}
+    {
+    }
 
-    Action call(AbstractCoroutine* coroutine, const Args&... args) override {
+    Action call(AbstractCoroutine* coroutine, const Args&... args) override
+    {
       T* _this = static_cast<T*>(coroutine);
       return (_this->*m_func)(args...);
     }
-
   };
 
-  template<typename T, typename ...Args>
-  static std::unique_ptr<AbstractMemberCaller<Args...>> createMemberCaller(Action (T::*func)(Args...)) {
+  template<typename T, typename... Args>
+  static std::unique_ptr<AbstractMemberCaller<Args...>> createMemberCaller(Action (T::*func)(Args...))
+  {
     return std::unique_ptr<AbstractMemberCaller<Args...>>(new MemberCaller<T, Args...>(func));
   }
 
 private:
   AbstractCoroutine* m_parent;
+
 protected:
   Action m_parentReturnAction;
   FunctionPtr m_parentReturnFP;
-public:
 
+public:
   /**
    * Constructor.
    */
@@ -560,11 +568,11 @@ public:
    * @param args - actual error constructor arguments.
    * @return - error reporting &id:oatpp::async::Action;.
    */
-  template<class E, typename ... Args>
-  Action error(Args... args) {
+  template<class E, typename... Args>
+  Action error(Args... args)
+  {
     return error(new E(args...));
   }
-  
 };
 
 /**
@@ -574,30 +582,32 @@ public:
  * @tparam T - child class type
  */
 template<class T>
-class Coroutine : public AbstractCoroutine {
+class Coroutine: public AbstractCoroutine {
 public:
   typedef Action (T::*Function)();
-public:
 
-  static void* operator new(std::size_t sz) {
+public:
+  static void* operator new(std::size_t sz)
+  {
     return ::operator new(sz);
   }
 
-  static void operator delete(void* ptr, std::size_t sz) {
+  static void operator delete(void* ptr, std::size_t sz)
+  {
     (void)sz;
     ::operator delete(ptr);
   }
 
 public:
-
   /**
    * Create coroutine and return it's starter
    * @tparam ConstructorArgs - coroutine constructor arguments.
    * @param args - actual coroutine constructor arguments.
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  template<typename ...ConstructorArgs>
-  static CoroutineStarter start(ConstructorArgs... args) {
+  template<typename... ConstructorArgs>
+  static CoroutineStarter start(ConstructorArgs... args)
+  {
     return new T(args...);
   }
 
@@ -607,7 +617,8 @@ public:
    * @param ptr - pointer of the function to call.
    * @return - Action.
    */
-  Action call(const FunctionPtr& ptr) override {
+  Action call(const FunctionPtr& ptr) override
+  {
     Function f = static_cast<Function>(ptr);
     return (static_cast<T*>(this)->*f)();
   }
@@ -617,7 +628,8 @@ public:
    * @param function - pointer to function.
    * @return - yield Action.
    */
-  Action yieldTo(const Function& function) const {
+  Action yieldTo(const Function& function) const
+  {
     return Action(static_cast<FunctionPtr>(function));
   }
 
@@ -625,27 +637,28 @@ public:
    * Convenience method to generate Action of `type == Action::TYPE_FINISH`.
    * @return - finish Action.
    */
-  Action finish() const {
+  Action finish() const
+  {
     return Action::createActionByType(Action::TYPE_FINISH);
   }
-  
 };
 
 /**
  * Abstract coroutine with result.
  */
-template<typename ...Args>
-class AbstractCoroutineWithResult : public AbstractCoroutine {
+template<typename... Args>
+class AbstractCoroutineWithResult: public AbstractCoroutine {
 protected:
   std::unique_ptr<AbstractMemberCaller<Args...>> m_parentMemberCaller;
-public:
 
+public:
   /**
    * Class representing Coroutine call for result;
    */
   class StarterForResult {
   private:
     AbstractCoroutineWithResult* m_coroutine;
+
   public:
     /**
      * Constructor.
@@ -653,7 +666,8 @@ public:
      */
     StarterForResult(AbstractCoroutineWithResult* coroutine)
       : m_coroutine(coroutine)
-    {}
+    {
+    }
 
     /**
      * Deleted copy-constructor.
@@ -673,7 +687,8 @@ public:
     /**
      * Non-virtual destructor.
      */
-    ~StarterForResult() {
+    ~StarterForResult()
+    {
       delete m_coroutine;
     }
 
@@ -685,7 +700,8 @@ public:
     /*
      * Move assignment operator.
      */
-    StarterForResult& operator=(StarterForResult&& other) {
+    StarterForResult& operator=(StarterForResult&& other)
+    {
       m_coroutine = other.m_coroutine;
       other.m_coroutine = nullptr;
       return *this;
@@ -699,24 +715,22 @@ public:
      * @return - &id:oatpp::async::Action;.
      */
     template<typename C>
-    Action callbackTo(Action (C::*callback)(Args...)) {
+    Action callbackTo(Action (C::*callback)(Args...))
+    {
       if(m_coroutine == nullptr) {
-        throw std::runtime_error("[oatpp::async::AbstractCoroutineWithResult::StarterForResult::callbackTo()]: Error. Coroutine is null.");
+        throw std::runtime_error(
+         "[oatpp::async::AbstractCoroutineWithResult::StarterForResult::callbackTo()]: Error. Coroutine is null.");
       }
       m_coroutine->m_parentMemberCaller = createMemberCaller(callback);
       Action result = m_coroutine;
       m_coroutine = nullptr;
       return result;
-
     }
-
   };
-
 };
 
-template <typename ...Args>
-using
-CoroutineStarterForResult = typename AbstractCoroutineWithResult<Args...>::StarterForResult;
+template<typename... Args>
+using CoroutineStarterForResult = typename AbstractCoroutineWithResult<Args...>::StarterForResult;
 
 /**
  * Coroutine with result template. <br>
@@ -725,31 +739,35 @@ CoroutineStarterForResult = typename AbstractCoroutineWithResult<Args...>::Start
  * @tparam T - child class type.
  * @tparam Args - return argumet type.
  */
-template<class T, typename ...Args>
-class CoroutineWithResult : public AbstractCoroutineWithResult<Args...> {
+template<class T, typename... Args>
+class CoroutineWithResult: public AbstractCoroutineWithResult<Args...> {
   friend AbstractCoroutine;
+
 public:
   typedef Action (T::*Function)();
-public:
 
-  static void* operator new(std::size_t sz) {
+public:
+  static void* operator new(std::size_t sz)
+  {
     return ::operator new(sz);
   }
 
-  static void operator delete(void* ptr, std::size_t sz) {
+  static void operator delete(void* ptr, std::size_t sz)
+  {
     (void)sz;
     ::operator delete(ptr);
   }
-public:
 
+public:
   /**
    * Call coroutine for result.
    * @tparam ConstructorArgs - coroutine consrtructor arguments.
    * @param args - actual constructor arguments.
    * @return - &l:AbstractCoroutineWithResult::StarterForResult;.
    */
-  template<typename ...ConstructorArgs>
-  static CoroutineStarterForResult<Args...> startForResult(ConstructorArgs... args) {
+  template<typename... ConstructorArgs>
+  static CoroutineStarterForResult<Args...> startForResult(ConstructorArgs... args)
+  {
     return new T(args...);
   }
 
@@ -759,7 +777,8 @@ public:
    * @param ptr - pointer of the function to call.
    * @return - Action.
    */
-  virtual Action call(const AbstractCoroutine::FunctionPtr& ptr) override {
+  virtual Action call(const AbstractCoroutine::FunctionPtr& ptr) override
+  {
     Function f = static_cast<Function>(ptr);
     return (static_cast<T*>(this)->*f)();
   }
@@ -769,7 +788,8 @@ public:
    * @param function - pointer to function.
    * @return - yield Action.
    */
-  Action yieldTo(const Function& function) const {
+  Action yieldTo(const Function& function) const
+  {
     return Action(static_cast<AbstractCoroutine::FunctionPtr>(function));
   }
 
@@ -778,11 +798,11 @@ public:
    * @param args - argumets to be passed to callback.
    * @return - finish Action.
    */
-  Action _return(const Args&... args) {
+  Action _return(const Args&... args)
+  {
     this->m_parentReturnAction = this->m_parentMemberCaller->call(this->getParent(), args...);
     return Action::createActionByType(Action::TYPE_FINISH);
   }
-  
 };
 
 }}

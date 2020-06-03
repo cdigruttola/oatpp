@@ -26,9 +26,10 @@
 
 #include "oatpp/core/Types.hpp"
 
-namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace  type {
+namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace type {
 
-void VectorTest::onRun() {
+void VectorTest::onRun()
+{
 
   {
     OATPP_LOGI(TAG, "test default constructor...");
@@ -97,8 +98,8 @@ void VectorTest::onRun() {
     OATPP_ASSERT(vector1->size() == 1);
     OATPP_ASSERT(vector2->size() == 2);
 
-    OATPP_ASSERT(vector2[0] == "b");
-    OATPP_ASSERT(vector2[1] == "c");
+    OATPP_ASSERT(vector2 [ 0 ] == "b");
+    OATPP_ASSERT(vector2 [ 1 ] == "c");
     OATPP_LOGI(TAG, "OK");
   }
 
@@ -122,17 +123,17 @@ void VectorTest::onRun() {
     OATPP_ASSERT(vector != nullptr);
     OATPP_ASSERT(vector->size() == 3);
 
-    OATPP_ASSERT(vector[0] == "a");
-    OATPP_ASSERT(vector[1] == "b");
-    OATPP_ASSERT(vector[2] == "c");
+    OATPP_ASSERT(vector [ 0 ] == "a");
+    OATPP_ASSERT(vector [ 1 ] == "b");
+    OATPP_ASSERT(vector [ 2 ] == "c");
 
-    vector[1] = "Hello!";
+    vector [ 1 ] = "Hello!";
 
     OATPP_ASSERT(vector->size() == 3);
 
-    OATPP_ASSERT(vector[0] == "a");
-    OATPP_ASSERT(vector[1] == "Hello!");
-    OATPP_ASSERT(vector[2] == "c");
+    OATPP_ASSERT(vector [ 0 ] == "a");
+    OATPP_ASSERT(vector [ 1 ] == "Hello!");
+    OATPP_ASSERT(vector [ 2 ] == "c");
     OATPP_LOGI(TAG, "OK");
   }
 
@@ -140,21 +141,20 @@ void VectorTest::onRun() {
     OATPP_LOGI(TAG, "test polymorphicDispatcher...");
     oatpp::Vector<oatpp::String> vector = {"a", "b", "c"};
 
-    auto polymorphicDispatcher = static_cast<const typename oatpp::Vector<oatpp::String>::Class::AbstractPolymorphicDispatcher*>(
-      vector.valueType->polymorphicDispatcher
-    );
+    auto polymorphicDispatcher =
+     static_cast<const typename oatpp::Vector<oatpp::String>::Class::AbstractPolymorphicDispatcher*>(
+      vector.valueType->polymorphicDispatcher);
 
     polymorphicDispatcher->addPolymorphicItem(vector, oatpp::String("d"));
 
     OATPP_ASSERT(vector->size() == 4);
 
-    OATPP_ASSERT(vector[0] == "a");
-    OATPP_ASSERT(vector[1] == "b");
-    OATPP_ASSERT(vector[2] == "c");
-    OATPP_ASSERT(vector[3] == "d");
+    OATPP_ASSERT(vector [ 0 ] == "a");
+    OATPP_ASSERT(vector [ 1 ] == "b");
+    OATPP_ASSERT(vector [ 2 ] == "c");
+    OATPP_ASSERT(vector [ 3 ] == "d");
     OATPP_LOGI(TAG, "OK");
   }
-
 }
 
 }}}}}}

@@ -44,8 +44,8 @@ private:
   oatpp::String m_boundary;
   std::unordered_map<oatpp::String, std::shared_ptr<Part>> m_namedParts;
   std::list<std::shared_ptr<Part>> m_parts;
-public:
 
+public:
   /**
    * Constructor.
    * @param boundary - multipart boundary value.
@@ -102,7 +102,6 @@ public:
    * @return - parts count.
    */
   v_int64 count();
-
 };
 
 /**

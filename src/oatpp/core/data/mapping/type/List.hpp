@@ -27,41 +27,40 @@
 
 #include "./Type.hpp"
 
-#include <list>
 #include <initializer_list>
+#include <list>
 
 namespace oatpp { namespace data { namespace mapping { namespace type {
 
 namespace __class {
 
+/**
+ * Abstract list class.
+ */
+class AbstractList {
+public:
   /**
-   * Abstract list class.
+   * Class Id.
    */
-  class AbstractList {
+  static const ClassId CLASS_ID;
+
+public:
+  /**
+   * Polymorphic Dispatcher
+   */
+  class AbstractPolymorphicDispatcher {
   public:
     /**
-     * Class Id.
+     * Add item.
+     * @param object - List to add item to.
+     * @param item - Item to add.
      */
-    static const ClassId CLASS_ID;
-  public:
-
-    /**
-     * Polymorphic Dispatcher
-     */
-    class AbstractPolymorphicDispatcher {
-    public:
-      /**
-       * Add item.
-       * @param object - List to add item to.
-       * @param item - Item to add.
-       */
-      virtual void addPolymorphicItem(const type::Void& object, const type::Void& item) const = 0;
-    };
-
+    virtual void addPolymorphicItem(const type::Void& object, const type::Void& item) const = 0;
   };
+};
 
-  template<class T>
-  class List;
+template<class T>
+class List;
 
 }
 
@@ -71,37 +70,41 @@ namespace __class {
  * @tparam C - Class.
  */
 template<class T, class C>
-class ListObjectWrapper : public type::ObjectWrapper<std::list<T>, C> {
+class ListObjectWrapper: public type::ObjectWrapper<std::list<T>, C> {
 public:
   typedef std::list<T> TemplateObjectType;
   typedef C TemplateObjectClass;
-public:
 
+public:
   OATPP_DEFINE_OBJECT_WRAPPER_DEFAULTS(ListObjectWrapper, TemplateObjectType, TemplateObjectClass)
 
   ListObjectWrapper(std::initializer_list<T> ilist)
     : type::ObjectWrapper<TemplateObjectType, TemplateObjectClass>(std::make_shared<TemplateObjectType>(ilist))
-  {}
+  {
+  }
 
-  static ListObjectWrapper createShared() {
+  static ListObjectWrapper createShared()
+  {
     return std::make_shared<TemplateObjectType>();
   }
 
-  ListObjectWrapper& operator = (std::initializer_list<T> ilist) {
+  ListObjectWrapper& operator=(std::initializer_list<T> ilist)
+  {
     this->m_ptr = std::make_shared<TemplateObjectType>(ilist);
     return *this;
   }
 
-  T& operator[] (v_buff_usize index) const {
+  T& operator[](v_buff_usize index) const
+  {
     auto it = this->m_ptr->begin();
     std::advance(it, index);
     return *it;
   }
 
-  TemplateObjectType& operator*() const {
+  TemplateObjectType& operator*() const
+  {
     return this->m_ptr.operator*();
   }
-
 };
 
 /**
@@ -114,41 +117,39 @@ typedef ListObjectWrapper<type::Void, __class::AbstractList> AbstractList;
 
 namespace __class {
 
-  template<class T>
-  class List : public AbstractList {
-  private:
-
-    class PolymorphicDispatcher : public AbstractPolymorphicDispatcher {
-    public:
-
-      void addPolymorphicItem(const type::Void& object, const type::Void& item) const override {
-        const auto& list = object.staticCast<type::List<T>>();
-        const auto& listItem = item.staticCast<T>();
-        list->push_back(listItem);
-      }
-
-    };
-
-  private:
-
-    static type::Void creator() {
-      return type::Void(std::make_shared<std::list<T>>(), getType());
-    }
-
-    static Type createType() {
-      Type type(__class::AbstractList::CLASS_ID, nullptr, &creator, nullptr, new PolymorphicDispatcher());
-      type.params.push_back(T::Class::getType());
-      return type;
-    }
-
+template<class T>
+class List: public AbstractList {
+private:
+  class PolymorphicDispatcher: public AbstractPolymorphicDispatcher {
   public:
-
-    static Type* getType() {
-      static Type type = createType();
-      return &type;
+    void addPolymorphicItem(const type::Void& object, const type::Void& item) const override
+    {
+      const auto& list = object.staticCast<type::List<T>>();
+      const auto& listItem = item.staticCast<T>();
+      list->push_back(listItem);
     }
-
   };
+
+private:
+  static type::Void creator()
+  {
+    return type::Void(std::make_shared<std::list<T>>(), getType());
+  }
+
+  static Type createType()
+  {
+    Type type(__class::AbstractList::CLASS_ID, nullptr, &creator, nullptr, new PolymorphicDispatcher());
+    type.params.push_back(T::Class::getType());
+    return type;
+  }
+
+public:
+  static Type* getType()
+  {
+    static Type type = createType();
+    return &type;
+  }
+};
 
 }
 

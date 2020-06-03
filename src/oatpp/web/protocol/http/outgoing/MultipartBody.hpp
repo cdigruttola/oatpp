@@ -27,14 +27,15 @@
 
 #include "./Body.hpp"
 
-#include "oatpp/web/mime/multipart/Multipart.hpp"
 #include "oatpp/core/data/stream/BufferStream.hpp"
+#include "oatpp/web/mime/multipart/Multipart.hpp"
 
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace outgoing {
 
-class MultipartBody : public oatpp::base::Countable, public Body {
+class MultipartBody
+  : public oatpp::base::Countable
+  , public Body {
 public:
-
   /**
    * Convenience typedef for &id:oatpp::web::mime::multipart::Multipart;.
    */
@@ -44,15 +45,14 @@ public:
    * Convenience typedef for &id:oatpp::web::mime::multipart::Part;.
    */
   typedef oatpp::web::mime::multipart::Part Part;
-private:
 
+private:
   /*
    * Convenience typedef for &id:oatpp::data::stream::ReadCallback;.
    */
   typedef oatpp::data::stream::ReadCallback ReadCallback;
 
 private:
-
   static constexpr v_int32 STATE_BOUNDARY = 0;
   static constexpr v_int32 STATE_HEADERS = 1;
   static constexpr v_int32 STATE_BODY = 2;
@@ -61,27 +61,29 @@ private:
 
 private:
   static v_io_size readBoundary(const std::shared_ptr<Multipart>& multipart,
-                                      std::list<std::shared_ptr<Part>>::const_iterator& iterator,
-                                      data::stream::BufferInputStream& readStream,
-                                      void *buffer,
-                                      v_buff_size count);
+                                std::list<std::shared_ptr<Part>>::const_iterator& iterator,
+                                data::stream::BufferInputStream& readStream,
+                                void* buffer,
+                                v_buff_size count);
 
   static v_io_size readHeaders(const std::shared_ptr<Multipart>& multipart,
-                                     std::list<std::shared_ptr<Part>>::const_iterator& iterator,
-                                     data::stream::BufferInputStream& readStream,
-                                     void *buffer,
-                                     v_buff_size count);
+                               std::list<std::shared_ptr<Part>>::const_iterator& iterator,
+                               data::stream::BufferInputStream& readStream,
+                               void* buffer,
+                               v_buff_size count);
 
 private:
   std::shared_ptr<Multipart> m_multipart;
+
 private:
   std::list<std::shared_ptr<Part>>::const_iterator m_iterator;
   v_int32 m_state;
   oatpp::data::stream::BufferInputStream m_readStream;
-private:
-  v_io_size readBody(void *buffer, v_buff_size count, async::Action& action);
-public:
 
+private:
+  v_io_size readBody(void* buffer, v_buff_size count, async::Action& action);
+
+public:
   /**
    * Constructor.
    * @param multipart - multipart object.
@@ -96,7 +98,7 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual number of bytes written to buffer. 0 - to indicate end-of-file.
    */
-  v_io_size read(void *buffer, v_buff_size count, async::Action& action) override;
+  v_io_size read(void* buffer, v_buff_size count, async::Action& action) override;
 
   /**
    * Declare `Transfer-Encoding: chunked`, `Content-Type: multipart/<type>` header.
@@ -115,7 +117,6 @@ public:
    * @return - `-1`. `v_buff_size`.
    */
   v_buff_size getKnownSize() override;
-
 };
 
 }}}}}

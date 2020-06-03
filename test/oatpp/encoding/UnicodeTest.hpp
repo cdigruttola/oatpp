@@ -28,13 +28,16 @@
 #include "oatpp-test/UnitTest.hpp"
 
 namespace oatpp { namespace test { namespace encoding {
-  
-class UnicodeTest : public UnitTest{
+
+class UnicodeTest: public UnitTest {
 public:
-  UnicodeTest():UnitTest("TEST[encoding::UnicodeTest]"){}
+  UnicodeTest()
+    : UnitTest("TEST[encoding::UnicodeTest]")
+  {
+  }
   void onRun() override;
 };
-  
+
 }}}
 
 

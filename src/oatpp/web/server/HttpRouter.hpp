@@ -33,14 +33,14 @@ namespace oatpp { namespace web { namespace server {
 /**
  * HttpRouter is responsible for routing http requests by method and path-pattern.
  */
-class HttpRouter : public oatpp::base::Countable {
+class HttpRouter: public oatpp::base::Countable {
 private:
   /**
    * Convenience typedef for &id:oatpp::data::share::StringKeyLabel;.
    */
   typedef oatpp::data::share::StringKeyLabel StringKeyLabel;
-public:
 
+public:
   /**
    * &id:oatpp::web::url::mapping::Router; of &id:oatpp::web::server::HttpRequestHandler;.
    */
@@ -51,14 +51,14 @@ public:
    * Meaning that for each http method like ["GET", "POST", ...] there is a separate &l:HttpRouter::BranchRouter;.
    */
   typedef std::unordered_map<StringKeyLabel, std::shared_ptr<BranchRouter>> BranchMap;
+
 protected:
   BranchMap m_branchMap;
-protected:
-  
-  const std::shared_ptr<BranchRouter>& getBranch(const StringKeyLabel& name);
-  
-public:
 
+protected:
+  const std::shared_ptr<BranchRouter>& getBranch(const StringKeyLabel& name);
+
+public:
   /**
    * Constructor.
    */
@@ -76,7 +76,9 @@ public:
    * @param pathPattern - url path pattern. ex.: `"/path/to/resource/with/{param1}/{param2}"`.
    * @param handler - &id:oatpp::web::server::HttpRequestHandler;.
    */
-  void route(const oatpp::String& method, const oatpp::String& pathPattern, const std::shared_ptr<HttpRequestHandler>& handler);
+  void route(const oatpp::String& method,
+             const oatpp::String& pathPattern,
+             const std::shared_ptr<HttpRequestHandler>& handler);
 
   /**
    * Resolve http method and path to &id:oatpp::web::url::mapping::Router::Route;
@@ -90,9 +92,8 @@ public:
    * Print out all router mapping.
    */
   void logRouterMappings();
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_web_server_HttpRouter_hpp */

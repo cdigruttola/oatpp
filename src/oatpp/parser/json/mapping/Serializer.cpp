@@ -24,8 +24,8 @@
 
 #include "Serializer.hpp"
 
-#include "oatpp/parser/json/Utils.hpp"
 #include "oatpp/core/data/mapping/type/Any.hpp"
+#include "oatpp/parser/json/Utils.hpp"
 
 namespace oatpp { namespace parser { namespace json { namespace mapping {
 
@@ -57,25 +57,32 @@ Serializer::Serializer(const std::shared_ptr<Config>& config)
   setSerializerMethod(data::mapping::type::__class::AbstractObject::CLASS_ID, &Serializer::serializeObject);
   setSerializerMethod(data::mapping::type::__class::AbstractEnum::CLASS_ID, &Serializer::serializeEnum);
 
-  setSerializerMethod(data::mapping::type::__class::AbstractVector::CLASS_ID, &Serializer::serializeList<oatpp::AbstractVector>);
-  setSerializerMethod(data::mapping::type::__class::AbstractList::CLASS_ID, &Serializer::serializeList<oatpp::AbstractList>);
-  setSerializerMethod(data::mapping::type::__class::AbstractUnorderedSet::CLASS_ID, &Serializer::serializeList<oatpp::AbstractUnorderedSet>);
+  setSerializerMethod(data::mapping::type::__class::AbstractVector::CLASS_ID,
+                      &Serializer::serializeList<oatpp::AbstractVector>);
+  setSerializerMethod(data::mapping::type::__class::AbstractList::CLASS_ID,
+                      &Serializer::serializeList<oatpp::AbstractList>);
+  setSerializerMethod(data::mapping::type::__class::AbstractUnorderedSet::CLASS_ID,
+                      &Serializer::serializeList<oatpp::AbstractUnorderedSet>);
 
-  setSerializerMethod(data::mapping::type::__class::AbstractPairList::CLASS_ID, &Serializer::serializeKeyValue<oatpp::AbstractFields>);
-  setSerializerMethod(data::mapping::type::__class::AbstractUnorderedMap::CLASS_ID, &Serializer::serializeKeyValue<oatpp::AbstractUnorderedFields>);
-
+  setSerializerMethod(data::mapping::type::__class::AbstractPairList::CLASS_ID,
+                      &Serializer::serializeKeyValue<oatpp::AbstractFields>);
+  setSerializerMethod(data::mapping::type::__class::AbstractUnorderedMap::CLASS_ID,
+                      &Serializer::serializeKeyValue<oatpp::AbstractUnorderedFields>);
 }
 
-void Serializer::setSerializerMethod(const data::mapping::type::ClassId& classId, SerializerMethod method) {
+void Serializer::setSerializerMethod(const data::mapping::type::ClassId& classId, SerializerMethod method)
+{
   const v_uint32 id = classId.id;
   if(id < m_methods.size()) {
-    m_methods[id] = method;
+    m_methods [ id ] = method;
   } else {
-    throw std::runtime_error("[oatpp::parser::json::mapping::Serializer::setSerializerMethod()]: Error. Unknown classId");
+    throw std::runtime_error(
+     "[oatpp::parser::json::mapping::Serializer::setSerializerMethod()]: Error. Unknown classId");
   }
 }
 
-void Serializer::serializeString(data::stream::ConsistentOutputStream* stream, p_char8 data, v_buff_size size) {
+void Serializer::serializeString(data::stream::ConsistentOutputStream* stream, p_char8 data, v_buff_size size)
+{
   auto encodedValue = Utils::escapeString(data, size, false);
   stream->writeCharSimple('\"');
   stream->writeSimple(encodedValue);
@@ -83,11 +90,11 @@ void Serializer::serializeString(data::stream::ConsistentOutputStream* stream, p
 }
 
 void Serializer::serializeString(Serializer* serializer,
-                                  data::stream::ConsistentOutputStream* stream,
-                                  const oatpp::Void& polymorph)
+                                 data::stream::ConsistentOutputStream* stream,
+                                 const oatpp::Void& polymorph)
 {
 
-  (void) serializer;
+  (void)serializer;
 
   if(!polymorph) {
     stream->writeSimple("null", 4);
@@ -97,7 +104,6 @@ void Serializer::serializeString(Serializer* serializer,
   auto str = static_cast<oatpp::base::StrBuffer*>(polymorph.get());
 
   serializeString(stream, str->getData(), str->getSize());
-
 }
 
 void Serializer::serializeAny(Serializer* serializer,
@@ -112,16 +118,15 @@ void Serializer::serializeAny(Serializer* serializer,
 
   auto anyHandle = static_cast<data::mapping::type::AnyHandle*>(polymorph.get());
   serializer->serialize(stream, oatpp::Void(anyHandle->ptr, anyHandle->type));
-
 }
 
 void Serializer::serializeEnum(Serializer* serializer,
                                data::stream::ConsistentOutputStream* stream,
                                const oatpp::Void& polymorph)
 {
-  auto polymorphicDispatcher = static_cast<const data::mapping::type::__class::AbstractEnum::AbstractPolymorphicDispatcher*>(
-    polymorph.valueType->polymorphicDispatcher
-  );
+  auto polymorphicDispatcher =
+   static_cast<const data::mapping::type::__class::AbstractEnum::AbstractPolymorphicDispatcher*>(
+    polymorph.valueType->polymorphicDispatcher);
 
   data::mapping::type::EnumInterpreterError e = data::mapping::type::EnumInterpreterError::OK;
   serializer->serialize(stream, polymorphicDispatcher->toInterpretation(polymorph, e));
@@ -131,17 +136,18 @@ void Serializer::serializeEnum(Serializer* serializer,
   }
 
   switch(e) {
-    case data::mapping::type::EnumInterpreterError::CONSTRAINT_NOT_NULL:
-      throw std::runtime_error("[oatpp::parser::json::mapping::Serializer::serializeEnum()]: Error. Enum constraint violated - 'NotNull'.");
-    default:
-      throw std::runtime_error("[oatpp::parser::json::mapping::Serializer::serializeEnum()]: Error. Can't serialize Enum.");
+  case data::mapping::type::EnumInterpreterError::CONSTRAINT_NOT_NULL:
+    throw std::runtime_error(
+     "[oatpp::parser::json::mapping::Serializer::serializeEnum()]: Error. Enum constraint violated - 'NotNull'.");
+  default:
+    throw std::runtime_error(
+     "[oatpp::parser::json::mapping::Serializer::serializeEnum()]: Error. Can't serialize Enum.");
   }
-
 }
 
 void Serializer::serializeObject(Serializer* serializer,
-                                  data::stream::ConsistentOutputStream* stream,
-                                  const oatpp::Void& polymorph)
+                                 data::stream::ConsistentOutputStream* stream,
+                                 const oatpp::Void& polymorph)
 {
 
   if(!polymorph) {
@@ -155,7 +161,7 @@ void Serializer::serializeObject(Serializer* serializer,
   auto fields = polymorph.valueType->propertiesGetter()->getList();
   oatpp::DTO* object = static_cast<oatpp::DTO*>(polymorph.get());
 
-  for (auto const& field : fields) {
+  for(auto const& field: fields) {
 
     auto value = field->get(object);
     if(value || serializer->getConfig()->includeNullFields) {
@@ -164,28 +170,25 @@ void Serializer::serializeObject(Serializer* serializer,
       stream->writeSimple(":", 1);
       serializer->serialize(stream, value);
     }
-
   }
 
   stream->writeCharSimple('}');
-
 }
 
-void Serializer::serialize(data::stream::ConsistentOutputStream* stream,
-                            const oatpp::Void& polymorph)
+void Serializer::serialize(data::stream::ConsistentOutputStream* stream, const oatpp::Void& polymorph)
 {
   auto id = polymorph.valueType->classId.id;
-  auto& method = m_methods[id];
+  auto& method = m_methods [ id ];
   if(method) {
     (*method)(this, stream, polymorph);
   } else {
     throw std::runtime_error("[oatpp::parser::json::mapping::Serializer::serialize()]: "
-                             "Error. No serialize method for type '" + std::string(polymorph.valueType->classId.name) + "'");
+                             "Error. No serialize method for type '" +
+                             std::string(polymorph.valueType->classId.name) + "'");
   }
 }
 
-void Serializer::serializeToStream(data::stream::ConsistentOutputStream* stream,
-                                   const oatpp::Void& polymorph)
+void Serializer::serializeToStream(data::stream::ConsistentOutputStream* stream, const oatpp::Void& polymorph)
 {
   if(m_config->useBeautifier) {
     json::Beautifier beautifier(stream, "  ", "\n");
@@ -195,7 +198,8 @@ void Serializer::serializeToStream(data::stream::ConsistentOutputStream* stream,
   }
 }
 
-const std::shared_ptr<Serializer::Config>& Serializer::getConfig() {
+const std::shared_ptr<Serializer::Config>& Serializer::getConfig()
+{
   return m_config;
 }
 

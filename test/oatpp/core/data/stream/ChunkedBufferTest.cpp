@@ -29,15 +29,16 @@
 
 namespace oatpp { namespace test { namespace core { namespace data { namespace stream {
 
-void ChunkedBufferTest::onRun() {
+void ChunkedBufferTest::onRun()
+{
 
   typedef oatpp::data::stream::ChunkedBuffer ChunkedBuffer;
 
   {
     ChunkedBuffer stream;
 
-    stream  << "int=" << 1 << ", float=" << 1.1 << ", "
-            << "bool=" << true << " or " << false;
+    stream << "int=" << 1 << ", float=" << 1.1 << ", "
+           << "bool=" << true << " or " << false;
 
     OATPP_LOGV(TAG, "str='%s'", stream.toString()->c_str());
 
@@ -96,7 +97,6 @@ void ChunkedBufferTest::onRun() {
     stream.clear();
     stream << oatpp::Boolean(false);
     OATPP_ASSERT(stream.toString() == "false");
-
   }
 
   {
@@ -112,18 +112,17 @@ void ChunkedBufferTest::onRun() {
     OATPP_ASSERT(wholeText->getSize() == ChunkedBuffer::CHUNK_ENTRY_SIZE * 10 * 10);
 
     v_int32 substringSize = 10;
-    for(v_int32 i = 0; i < wholeText->getSize() - substringSize; i ++) {
-      OATPP_ASSERT(oatpp::String((const char*)&wholeText->getData()[i], substringSize, false) == stream.getSubstring(i, substringSize));
+    for(v_int32 i = 0; i < wholeText->getSize() - substringSize; i++) {
+      OATPP_ASSERT(oatpp::String((const char*)&wholeText->getData() [ i ], substringSize, false) ==
+                   stream.getSubstring(i, substringSize));
     }
 
-    substringSize = (v_int32) ChunkedBuffer::CHUNK_ENTRY_SIZE * 2;
-    for(v_int32 i = 0; i < wholeText->getSize() - substringSize; i ++) {
-      OATPP_ASSERT(oatpp::String((const char*)&wholeText->getData()[i], substringSize, false) == stream.getSubstring(i, substringSize));
+    substringSize = (v_int32)ChunkedBuffer::CHUNK_ENTRY_SIZE * 2;
+    for(v_int32 i = 0; i < wholeText->getSize() - substringSize; i++) {
+      OATPP_ASSERT(oatpp::String((const char*)&wholeText->getData() [ i ], substringSize, false) ==
+                   stream.getSubstring(i, substringSize));
     }
-
   }
-
-
 }
 
 }}}}}

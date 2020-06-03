@@ -27,9 +27,9 @@
 
 #include "RetryPolicy.hpp"
 
+#include "oatpp/web/protocol/http/Http.hpp"
 #include "oatpp/web/protocol/http/incoming/Response.hpp"
 #include "oatpp/web/protocol/http/outgoing/Body.hpp"
-#include "oatpp/web/protocol/http/Http.hpp"
 
 namespace oatpp { namespace web { namespace client {
 
@@ -48,6 +48,7 @@ public:
    * Convenience typedef for &id:oatpp::async::Action;.
    */
   typedef oatpp::async::Action Action;
+
 public:
   /**
    * Convenience typedef for &id:oatpp::web::protocol::http::Headers;.
@@ -63,8 +64,8 @@ public:
    * Convenience typedef for &id:oatpp::web::protocol::http::outgoing::Body;.
    */
   typedef oatpp::web::protocol::http::outgoing::Body Body;
+
 public:
-  
   /**
    * ConnectionHandle is always specific to a RequestExecutor.
    * You can't pass ConnectionHandle retrieved by one RequestExecutor implementation
@@ -72,18 +73,20 @@ public:
    */
   class ConnectionHandle {
   public:
-    virtual ~ConnectionHandle() {}
+    virtual ~ConnectionHandle()
+    {
+    }
   };
-  
+
 public:
   typedef Action (oatpp::async::AbstractCoroutine::*AsyncCallback)(const std::shared_ptr<Response>&);
   typedef Action (oatpp::async::AbstractCoroutine::*AsyncConnectionCallback)(const std::shared_ptr<ConnectionHandle>&);
-public:
 
+public:
   /**
    * Class representing Request Execution Error.
    */
-  class RequestExecutionError : public std::runtime_error {
+  class RequestExecutionError: public std::runtime_error {
   public:
     /**
      * Error code for "can't connect" error.
@@ -109,12 +112,13 @@ public:
      * Error code for "no response" error.
      */
     constexpr static const v_int32 ERROR_CODE_NO_RESPONSE = 5;
+
   private:
     v_int32 m_errorCode;
     const char* m_message;
     v_int32 m_readErrorCode;
-  public:
 
+  public:
     /**
      * Constructor.
      * @param errorCode - error code.
@@ -134,23 +138,21 @@ public:
      * @return - error message.
      */
     const char* getMessage() const;
-    
+
     /**
-     *  This value is valid if errorCode == &l:RequestExecutor::RequestExecutionError::ERROR_CODE_CANT_READ_RESPONSE; <br>
-     *  For more information about the read error you get check out:
-     *  <ul>
-     *    <li>&id:oatpp::data::stream::IOStream; for possible error codes.</li>
-     *    <li>Implementation-specific behaviour of corresponding Connection and ConnectionProvider.</li>
+     *  This value is valid if errorCode == &l:RequestExecutor::RequestExecutionError::ERROR_CODE_CANT_READ_RESPONSE;
+     * <br> For more information about the read error you get check out: <ul> <li>&id:oatpp::data::stream::IOStream; for
+     * possible error codes.</li> <li>Implementation-specific behaviour of corresponding Connection and
+     * ConnectionProvider.</li>
      *  </ul>
      */
     v_int32 getReadErrorCode() const;
-    
   };
 
 private:
   std::shared_ptr<RetryPolicy> m_retryPolicy;
-public:
 
+public:
   /**
    * Constructor.
    * @param retryPolicy - &id:oatpp::web::client::RetryPolicy;.
@@ -204,12 +206,12 @@ public:
    * @param connectionHandle - &l:RequestExecutor::ConnectionHandle;.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<Response>&>
-  executeOnceAsync(const String& method,
-                   const String& path,
-                   const Headers& headers,
-                   const std::shared_ptr<Body>& body,
-                   const std::shared_ptr<ConnectionHandle>& connectionHandle) = 0;
+  virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<Response>&> executeOnceAsync(
+   const String& method,
+   const String& path,
+   const Headers& headers,
+   const std::shared_ptr<Body>& body,
+   const std::shared_ptr<ConnectionHandle>& connectionHandle) = 0;
 
   /**
    * Execute request taking into account retry policy.
@@ -235,15 +237,14 @@ public:
    * @param connectionHandle - &l:RequestExecutor::ConnectionHandle;.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<Response>&>
-  virtual executeAsync(const String& method,
-                       const String& path,
-                       const Headers& headers,
-                       const std::shared_ptr<Body>& body,
-                       const std::shared_ptr<ConnectionHandle>& connectionHandle);
-
+  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<Response>&> virtual executeAsync(
+   const String& method,
+   const String& path,
+   const Headers& headers,
+   const std::shared_ptr<Body>& body,
+   const std::shared_ptr<ConnectionHandle>& connectionHandle);
 };
-  
+
 }}}
 
 #endif /* oatpp_web_client_RequestExecutor_hpp */

@@ -25,8 +25,8 @@
 #ifndef oatpp_web_server_handler_ErrorHandler_hpp
 #define oatpp_web_server_handler_ErrorHandler_hpp
 
-#include "oatpp/web/protocol/http/outgoing/Response.hpp"
 #include "oatpp/web/protocol/http/Http.hpp"
+#include "oatpp/web/protocol/http/outgoing/Response.hpp"
 
 namespace oatpp { namespace web { namespace server { namespace handler {
 
@@ -40,8 +40,8 @@ public:
    * See &id:oatpp::web::protocol::http::Headers;
    */
   typedef web::protocol::http::Headers Headers;
-public:
 
+public:
   /**
    * Implement this method!
    * @param status - &id:oatpp::web::protocol::http::Status;.
@@ -49,9 +49,9 @@ public:
    * @param Headers - &id:oatpp::web::protocol::http::Headers;
    * @return - std::shared_ptr to &id:oatpp::web::protocol::http::outgoing::Response;.
    */
-  virtual
-  std::shared_ptr<protocol::http::outgoing::Response>
-  handleError(const protocol::http::Status& status, const oatpp::String& message, const Headers& headers) = 0;
+  virtual std::shared_ptr<protocol::http::outgoing::Response> handleError(const protocol::http::Status& status,
+                                                                          const oatpp::String& message,
+                                                                          const Headers& headers) = 0;
 
   /**
    * Convenience method to call `handleError` method with no headers.
@@ -59,27 +59,31 @@ public:
    * @param message - &id:oatpp::String;.
    * @return - std::shared_ptr to &id:oatpp::web::protocol::http::outgoing::Response;.
    */
-  std::shared_ptr<protocol::http::outgoing::Response> handleError(const protocol::http::Status& status, const oatpp::String& message);
-  
+  std::shared_ptr<protocol::http::outgoing::Response> handleError(const protocol::http::Status& status,
+                                                                  const oatpp::String& message);
 };
 
 /**
  * Default Error Handler.
  */
-class DefaultErrorHandler : public oatpp::base::Countable, public ErrorHandler {
+class DefaultErrorHandler
+  : public oatpp::base::Countable
+  , public ErrorHandler {
 public:
   /**
    * Constructor.
    */
   DefaultErrorHandler()
-  {}
-public:
+  {
+  }
 
+public:
   /**
    * Create shared DefaultErrorHandler.
    * @return - `std::shared_ptr` to DefaultErrorHandler.
    */
-  static std::shared_ptr<DefaultErrorHandler> createShared() {
+  static std::shared_ptr<DefaultErrorHandler> createShared()
+  {
     return std::make_shared<DefaultErrorHandler>();
   }
 
@@ -89,11 +93,11 @@ public:
    * @param message - &id:oatpp::String;.
    * @return - &id:oatpp::web::protocol::http::outgoing::Response;.
    */
-  std::shared_ptr<protocol::http::outgoing::Response>
-  handleError(const protocol::http::Status& status, const oatpp::String& message, const Headers& headers) override;
-
+  std::shared_ptr<protocol::http::outgoing::Response> handleError(const protocol::http::Status& status,
+                                                                  const oatpp::String& message,
+                                                                  const Headers& headers) override;
 };
-  
+
 }}}}
 
 #endif /* oatpp_web_server_handler_ErrorHandler_hpp */

@@ -36,8 +36,8 @@ class PerformanceChecker {
 private:
   const char* m_tag;
   v_int64 m_ticks;
-public:
 
+public:
   /**
    * Constructor.
    * @param tag - log tag.
@@ -55,7 +55,6 @@ public:
    * @return - ticks in microseconds.
    */
   v_int64 getElapsedTicks();
-    
 };
 
 /**
@@ -70,12 +69,13 @@ private:
     v_int64 size;
     v_int64 objectsCount;
   };
+
 private:
   const char* m_tag;
   v_counter m_objectsCount;
   v_counter m_objectsCreated;
-public:
 
+public:
   /**
    * Constructor.
    * @param tag - log tag.
@@ -88,7 +88,7 @@ public:
    */
   ~ThreadLocalObjectsChecker();
 };
-  
+
 }}
 
 #endif /* Checker_hpp */

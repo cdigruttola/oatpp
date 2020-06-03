@@ -28,13 +28,14 @@
 
 #include <functional>
 
-namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace  type {
+namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace type {
 
-void StringTest::onRun() {
+void StringTest::onRun()
+{
 
   {
     oatpp::String s = "hello"; // check hash function exists
-    std::hash<oatpp::String>{}(s);
+    std::hash<oatpp::String> {}(s);
   }
 
   {
@@ -42,7 +43,7 @@ void StringTest::onRun() {
     oatpp::String s;
     OATPP_ASSERT(!s);
     OATPP_ASSERT(s == nullptr);
-    OATPP_ASSERT(s == (const char*) nullptr);
+    OATPP_ASSERT(s == (const char*)nullptr);
     OATPP_ASSERT(s.valueType == oatpp::String::Class::getType());
     OATPP_LOGI(TAG, "OK");
   }
@@ -52,7 +53,7 @@ void StringTest::onRun() {
     oatpp::String s("");
     OATPP_ASSERT(s);
     OATPP_ASSERT(s != nullptr);
-    OATPP_ASSERT(s != (const char*) nullptr)
+    OATPP_ASSERT(s != (const char*)nullptr)
     OATPP_ASSERT(s->getSize() == 0);
     OATPP_LOGI(TAG, "OK");
   }
@@ -62,7 +63,7 @@ void StringTest::onRun() {
     oatpp::String s = "";
     OATPP_ASSERT(s);
     OATPP_ASSERT(s != nullptr);
-    OATPP_ASSERT(s != (const char*) nullptr)
+    OATPP_ASSERT(s != (const char*)nullptr)
     OATPP_ASSERT(s->getSize() == 0);
     OATPP_LOGI(TAG, "OK");
   }
@@ -133,7 +134,6 @@ void StringTest::onRun() {
     OATPP_ASSERT(s1.get() != s2.get());
     OATPP_LOGI(TAG, "OK");
   }
-
 }
 
 }}}}}}

@@ -28,131 +28,130 @@
 
 #include "oatpp/core/data/stream/ChunkedBuffer.hpp"
 
-#include <thread>
 #include <list>
+#include <thread>
 
 namespace oatpp { namespace test { namespace network { namespace virtual_ {
-  
+
 namespace {
-  
-  typedef oatpp::network::virtual_::Interface Interface;
-  typedef oatpp::network::virtual_::Socket Socket;
-  typedef std::list<std::thread> ThreadList;
-  
-  class ClientTask : public oatpp::base::Countable {
-  private:
-    std::shared_ptr<Interface> m_interface;
-    oatpp::String m_dataSample;
-  public:
-    
-    ClientTask(const std::shared_ptr<Interface>& interface,
-               const oatpp::String& dataSample)
-      : m_interface(interface)
-      , m_dataSample(dataSample)
-    {}
-    
-    void run() {
-      auto submission = m_interface->connect();
-      auto socket = submission->getSocket();
-      
-      auto res = socket->writeExactSizeDataSimple(m_dataSample->getData(), m_dataSample->getSize());
-      OATPP_ASSERT(res == m_dataSample->getSize());
-      
-      v_char8 buffer[100];
-      oatpp::data::stream::ChunkedBuffer stream;
-      res = oatpp::data::stream::transfer(socket.get(), &stream, 2, buffer, 100);
-      
-      OATPP_ASSERT(res == 2);
-      OATPP_ASSERT(stream.getSize() == res);
-      OATPP_ASSERT(stream.toString() == "OK");
-      
-      //OATPP_LOGV("client", "finished - OK");
-      
+
+typedef oatpp::network::virtual_::Interface Interface;
+typedef oatpp::network::virtual_::Socket Socket;
+typedef std::list<std::thread> ThreadList;
+
+class ClientTask: public oatpp::base::Countable {
+private:
+  std::shared_ptr<Interface> m_interface;
+  oatpp::String m_dataSample;
+
+public:
+  ClientTask(const std::shared_ptr<Interface>& interface, const oatpp::String& dataSample)
+    : m_interface(interface)
+    , m_dataSample(dataSample)
+  {
+  }
+
+  void run()
+  {
+    auto submission = m_interface->connect();
+    auto socket = submission->getSocket();
+
+    auto res = socket->writeExactSizeDataSimple(m_dataSample->getData(), m_dataSample->getSize());
+    OATPP_ASSERT(res == m_dataSample->getSize());
+
+    v_char8 buffer [ 100 ];
+    oatpp::data::stream::ChunkedBuffer stream;
+    res = oatpp::data::stream::transfer(socket.get(), &stream, 2, buffer, 100);
+
+    OATPP_ASSERT(res == 2);
+    OATPP_ASSERT(stream.getSize() == res);
+    OATPP_ASSERT(stream.toString() == "OK");
+
+    // OATPP_LOGV("client", "finished - OK");
+  }
+};
+
+class ServerTask: public oatpp::base::Countable {
+private:
+  std::shared_ptr<Socket> m_socket;
+  oatpp::String m_dataSample;
+
+public:
+  ServerTask(const std::shared_ptr<Socket>& socket, const oatpp::String& dataSample)
+    : m_socket(socket)
+    , m_dataSample(dataSample)
+  {
+  }
+
+  void run()
+  {
+    v_char8 buffer [ 100 ];
+    oatpp::data::stream::ChunkedBuffer stream;
+    auto res = oatpp::data::stream::transfer(m_socket.get(), &stream, m_dataSample->getSize(), buffer, 100);
+
+    OATPP_ASSERT(res == m_dataSample->getSize());
+    OATPP_ASSERT(stream.getSize() == res);
+    OATPP_ASSERT(stream.toString() == m_dataSample);
+
+    res = m_socket->writeExactSizeDataSimple("OK", 2);
+
+    OATPP_ASSERT(res == 2);
+  }
+};
+
+class Server: public oatpp::base::Countable {
+private:
+  std::shared_ptr<Interface> m_interface;
+  oatpp::String m_dataSample;
+  v_int32 m_numTasks;
+
+public:
+  Server(const std::shared_ptr<Interface>& interface, const oatpp::String& dataSample, v_int32 numTasks)
+    : m_interface(interface)
+    , m_dataSample(dataSample)
+    , m_numTasks(numTasks)
+  {
+  }
+
+  void run()
+  {
+    ThreadList threadList;
+    for(v_int32 i = 0; i < m_numTasks; i++) {
+      auto socket = m_interface->accept();
+      threadList.push_back(std::thread(&ServerTask::run, ServerTask(socket, m_dataSample)));
     }
-    
-  };
-  
-  class ServerTask : public oatpp::base::Countable {
-  private:
-    std::shared_ptr<Socket> m_socket;
-    oatpp::String m_dataSample;
-  public:
-    
-    ServerTask(const std::shared_ptr<Socket>& socket,
-               const oatpp::String& dataSample)
-      : m_socket(socket)
-      , m_dataSample(dataSample)
-    {}
-    
-    void run() {
-      v_char8 buffer[100];
-      oatpp::data::stream::ChunkedBuffer stream;
-      auto res = oatpp::data::stream::transfer(m_socket.get(), &stream, m_dataSample->getSize(), buffer, 100);
-      
-      OATPP_ASSERT(res == m_dataSample->getSize());
-      OATPP_ASSERT(stream.getSize() == res);
-      OATPP_ASSERT(stream.toString() == m_dataSample);
-      
-      res = m_socket->writeExactSizeDataSimple("OK", 2);
-      
-      OATPP_ASSERT(res == 2);
+    for(auto& thread: threadList) {
+      thread.join();
     }
-    
-  };
-  
-  class Server : public oatpp::base::Countable {
-  private:
-    std::shared_ptr<Interface> m_interface;
-    oatpp::String m_dataSample;
-    v_int32 m_numTasks;
-  public:
-    
-    Server(const std::shared_ptr<Interface>& interface,
-           const oatpp::String& dataSample,
-           v_int32 numTasks)
-      : m_interface(interface)
-      , m_dataSample(dataSample)
-      , m_numTasks(numTasks)
-    {}
-    
-    void run() {
-      ThreadList threadList;
-      for(v_int32 i = 0; i < m_numTasks; i++) {
-        auto socket = m_interface->accept();
-        threadList.push_back(std::thread(&ServerTask::run, ServerTask(socket, m_dataSample)));
-      }
-      for(auto& thread : threadList) {
-        thread.join();
-      }
-    }
-    
-  };
-  
+  }
+};
+
 }
-  
-void InterfaceTest::onRun() {
-  
-  oatpp::String dataSample = "1234567890-=][poiuytrewqasdfghjkl;'/.,mnbvcxzzxcvbnm,./';lkjhgfdsaqwertyuiop][=-0987654321";
-  
+
+void InterfaceTest::onRun()
+{
+
+  oatpp::String dataSample =
+   "1234567890-=][poiuytrewqasdfghjkl;'/.,mnbvcxzzxcvbnm,./';lkjhgfdsaqwertyuiop][=-0987654321";
+
   auto interface = Interface::obtainShared("virtualhost");
   auto bindLock = interface->bind();
 
   v_int32 numTasks = 100;
-  
+
   ThreadList threadList;
-  
+
   std::thread server(&Server::run, Server(interface, dataSample, numTasks));
-  
+
   for(v_int32 i = 0; i < numTasks; i++) {
     threadList.push_back(std::thread(&ClientTask::run, ClientTask(interface, dataSample)));
   }
 
-  for(auto& thread : threadList) {
+  for(auto& thread: threadList) {
     thread.join();
   }
-  
-  server.join();
 
+  server.join();
 }
-  
+
 }}}}

@@ -25,16 +25,16 @@
 #ifndef oatpp_data_buffer_IOBuffer_hpp
 #define oatpp_data_buffer_IOBuffer_hpp
 
-#include "oatpp/core/base/memory/ObjectPool.hpp"
 #include "oatpp/core/base/Countable.hpp"
+#include "oatpp/core/base/memory/ObjectPool.hpp"
 
-namespace oatpp { namespace data{ namespace buffer {
+namespace oatpp { namespace data { namespace buffer {
 
 /**
  * Predefined buffer implementation for I/O operations.
  * Allocates buffer bytes using &id:oatpp::base::memory::ThreadDistributedMemoryPool;.
  */
-class IOBuffer : public oatpp::base::Countable {
+class IOBuffer: public oatpp::base::Countable {
 public:
   OBJECT_POOL(IOBuffer_Pool, IOBuffer, 32)
   SHARED_OBJECT_POOL(Shared_IOBuffer_Pool, IOBuffer, 32)
@@ -43,20 +43,24 @@ public:
    * Buffer size constant.
    */
   static constexpr v_buff_size BUFFER_SIZE = 4096;
+
 private:
-  static oatpp::base::memory::ThreadDistributedMemoryPool& getBufferPool(){
+  static oatpp::base::memory::ThreadDistributedMemoryPool& getBufferPool()
+  {
     static oatpp::base::memory::ThreadDistributedMemoryPool pool("IOBuffer_Buffer_Pool", BUFFER_SIZE, 16);
     return pool;
   }
+
 private:
   void* m_entry;
+
 public:
   /**
    * Constructor.
    */
   IOBuffer();
-public:
 
+public:
   /**
    * Create shared IOBuffer.
    * @return
@@ -79,9 +83,8 @@ public:
    * @return - should always return &l:IOBuffer::BUFFER_SIZE;.
    */
   v_buff_size getSize();
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_data_buffer_IOBuffer_hpp */

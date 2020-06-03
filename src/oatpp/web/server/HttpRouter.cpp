@@ -27,36 +27,42 @@
 namespace oatpp { namespace web { namespace server {
 
 HttpRouter::HttpRouter()
-{}
-
-const std::shared_ptr<HttpRouter::BranchRouter>& HttpRouter::getBranch(const StringKeyLabel& name){
-  auto it = m_branchMap.find(name);
-  if(it == m_branchMap.end()){
-    m_branchMap[name] = BranchRouter::createShared();
-  }
-  return m_branchMap[name];
+{
 }
 
-std::shared_ptr<HttpRouter> HttpRouter::createShared() {
+const std::shared_ptr<HttpRouter::BranchRouter>& HttpRouter::getBranch(const StringKeyLabel& name)
+{
+  auto it = m_branchMap.find(name);
+  if(it == m_branchMap.end()) {
+    m_branchMap [ name ] = BranchRouter::createShared();
+  }
+  return m_branchMap [ name ];
+}
+
+std::shared_ptr<HttpRouter> HttpRouter::createShared()
+{
   return std::make_shared<HttpRouter>();
 }
 
 void HttpRouter::route(const oatpp::String& method,
-                               const oatpp::String& pathPattern,
-                               const std::shared_ptr<HttpRequestHandler>& handler) {
+                       const oatpp::String& pathPattern,
+                       const std::shared_ptr<HttpRequestHandler>& handler)
+{
   getBranch(method)->route(pathPattern, handler);
 }
 
-HttpRouter::BranchRouter::Route HttpRouter::getRoute(const StringKeyLabel& method, const StringKeyLabel& path){
+HttpRouter::BranchRouter::Route HttpRouter::getRoute(const StringKeyLabel& method, const StringKeyLabel& path)
+{
   auto it = m_branchMap.find(method);
   if(it != m_branchMap.end()) {
-    return m_branchMap[method]->getRoute(path);
+    return m_branchMap [ method ]->getRoute(path);
   }
   return BranchRouter::Route();
 }
 
-void HttpRouter::logRouterMappings() {
-  for(auto it : m_branchMap) {
+void HttpRouter::logRouterMappings()
+{
+  for(auto it: m_branchMap) {
     it.second->logRouterMappings(it.first);
   }
 }

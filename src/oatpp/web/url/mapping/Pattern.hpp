@@ -34,89 +34,98 @@
 #include <unordered_map>
 
 namespace oatpp { namespace web { namespace url { namespace mapping {
-  
-class Pattern : public base::Countable{
+
+class Pattern: public base::Countable {
 private:
   typedef oatpp::data::share::StringKeyLabel StringKeyLabel;
+
 public:
-  
   class MatchMap {
     friend Pattern;
+
   public:
     typedef std::unordered_map<StringKeyLabel, StringKeyLabel> Variables;
+
   private:
     Variables m_variables;
     StringKeyLabel m_tail;
+
   public:
-    
-    MatchMap() {}
-    
+    MatchMap()
+    {
+    }
+
     MatchMap(const Variables& vars, const StringKeyLabel& urlTail)
       : m_variables(vars)
       , m_tail(urlTail)
-    {}
-    
-    oatpp::String getVariable(const StringKeyLabel& key) const {
+    {
+    }
+
+    oatpp::String getVariable(const StringKeyLabel& key) const
+    {
       auto it = m_variables.find(key);
       if(it != m_variables.end()) {
         return it->second.toString();
       }
       return nullptr;
     }
-    
-    oatpp::String getTail() const {
+
+    oatpp::String getTail() const
+    {
       return m_tail.toString();
     }
-    
   };
-  
+
 private:
-  
-  class Part : public base::Countable{
+  class Part: public base::Countable {
   public:
     Part(const char* pFunction, const oatpp::String& pText)
       : function(pFunction)
       , text(pText)
-    {}
+    {
+    }
+
   public:
-    
     static const char* FUNCTION_CONST;
     static const char* FUNCTION_VAR;
     static const char* FUNCTION_ANY_END;
-    
-    static std::shared_ptr<Part> createShared(const char* function, const oatpp::String& text){
+
+    static std::shared_ptr<Part> createShared(const char* function, const oatpp::String& text)
+    {
       return std::make_shared<Part>(function, text);
     }
-    
+
     const char* function;
     const oatpp::String text;
-    
   };
-  
+
 private:
   std::shared_ptr<oatpp::collection::LinkedList<std::shared_ptr<Part>>> m_parts;
+
 private:
   v_char8 findSysChar(oatpp::parser::Caret& caret);
+
 public:
   Pattern()
     : m_parts(oatpp::collection::LinkedList<std::shared_ptr<Part>>::createShared())
-  {}
+  {
+  }
+
 public:
-  
-  static std::shared_ptr<Pattern> createShared(){
+  static std::shared_ptr<Pattern> createShared()
+  {
     return std::make_shared<Pattern>();
   }
-  
+
   static std::shared_ptr<Pattern> parse(p_char8 data, v_buff_size size);
   static std::shared_ptr<Pattern> parse(const char* data);
   static std::shared_ptr<Pattern> parse(const oatpp::String& data);
-  
+
   bool match(const StringKeyLabel& url, MatchMap& matchMap);
-  
+
   oatpp::String toString();
-  
 };
-  
+
 }}}}
 
 #endif /* oatpp_web_url_mapping_Pattern_hpp */

@@ -29,68 +29,69 @@
 #include "oatpp/core/collection/LinkedList.hpp"
 #include "oatpp/core/concurrency/SpinLock.hpp"
 
-#include <thread>
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
+#include <thread>
 
 namespace oatpp { namespace async { namespace worker {
 
 /**
-* Naive implementation of IOWorker.
-* Polls all I/O handles in a loop. Reschedules long-waiting handles to Timer.
-*/
-class IOWorker : public Worker {
+ * Naive implementation of IOWorker.
+ * Polls all I/O handles in a loop. Reschedules long-waiting handles to Timer.
+ */
+class IOWorker: public Worker {
 private:
   bool m_running;
   oatpp::collection::FastQueue<CoroutineHandle> m_backlog;
   oatpp::collection::FastQueue<CoroutineHandle> m_queue;
   oatpp::concurrency::SpinLock m_backlogLock;
   std::condition_variable_any m_backlogCondition;
+
 private:
   std::thread m_thread;
+
 private:
   void consumeBacklog(bool blockToConsume);
-public:
 
+public:
   /**
-  * Constructor.
-  */
+   * Constructor.
+   */
   IOWorker();
 
   /**
-  * Push list of tasks to worker.
-  * @param tasks - &id:oatpp::collection::FastQueue; of &id:oatpp::async::CoroutineHandle;.
-  */
+   * Push list of tasks to worker.
+   * @param tasks - &id:oatpp::collection::FastQueue; of &id:oatpp::async::CoroutineHandle;.
+   */
   void pushTasks(oatpp::collection::FastQueue<CoroutineHandle>& tasks) override;
 
   /**
-  * Push one task to worker.
-  * @param task - &id:CoroutineHandle;.
-  */
+   * Push one task to worker.
+   * @param task - &id:CoroutineHandle;.
+   */
   void pushOneTask(CoroutineHandle* task) override;
 
   /**
-  * Run worker.
-  */
+   * Run worker.
+   */
   void run();
 
   /**
-  * Break run loop.
-  */
+   * Break run loop.
+   */
   void stop() override;
 
   /**
-  * Join all worker-threads.
-  */
+   * Join all worker-threads.
+   */
   void join() override;
 
   /**
-  * Detach all worker-threads.
-  */
+   * Detach all worker-threads.
+   */
   void detach() override;
-
 };
 
 }}}
 
-#endif //oatpp_async_worker_IOWorker_hpp
+#endif // oatpp_async_worker_IOWorker_hpp

@@ -25,39 +25,42 @@
 #ifndef oatpp_collection_FastQueue_hpp
 #define oatpp_collection_FastQueue_hpp
 
-#include "oatpp/core/concurrency/SpinLock.hpp"
 #include "oatpp/core/base/Environment.hpp"
+#include "oatpp/core/concurrency/SpinLock.hpp"
 
 namespace oatpp { namespace collection {
-  
+
 template<typename T>
 class FastQueue {
 public:
-  
   FastQueue()
     : first(nullptr)
     , last(nullptr)
     , count(0)
-  {}
-  
-  ~FastQueue(){
+  {
+  }
+
+  ~FastQueue()
+  {
     clear();
   }
-  
+
   T* first;
   T* last;
   v_int32 count;
-  
-  void pushFront(T* entry) {
+
+  void pushFront(T* entry)
+  {
     entry->_ref = first;
     first = entry;
     if(last == nullptr) {
       last = first;
     }
-    ++ count;
+    ++count;
   }
-  
-  void pushBack(T* entry) {
+
+  void pushBack(T* entry)
+  {
     entry->_ref = nullptr;
     if(last == nullptr) {
       first = entry;
@@ -66,10 +69,11 @@ public:
       last->_ref = entry;
       last = entry;
     }
-    ++ count;
+    ++count;
   }
-  
-  void round(){
+
+  void round()
+  {
     if(count > 1) {
       last->_ref = first;
       last = first;
@@ -77,32 +81,35 @@ public:
       last->_ref = nullptr;
     }
   }
-  
-  T* popFront() {
+
+  T* popFront()
+  {
     T* result = first;
     first = first->_ref;
     if(first == nullptr) {
       last = nullptr;
     }
-    -- count;
+    --count;
     return result;
   }
-  
-  void popFrontNoData() {
+
+  void popFrontNoData()
+  {
     T* result = first;
     first = first->_ref;
     if(first == nullptr) {
       last = nullptr;
     }
     delete result;
-    -- count;
+    --count;
   }
 
-  static void moveAll(FastQueue& fromQueue, FastQueue& toQueue) {
+  static void moveAll(FastQueue& fromQueue, FastQueue& toQueue)
+  {
 
     if(fromQueue.count > 0) {
 
-      if (toQueue.last == nullptr) {
+      if(toQueue.last == nullptr) {
         toQueue.first = fromQueue.first;
         toQueue.last = fromQueue.last;
       } else {
@@ -115,28 +122,27 @@ public:
 
       fromQueue.first = nullptr;
       fromQueue.last = nullptr;
-
     }
-
   }
 
-  void cutEntry(T* entry, T* prevEntry){
+  void cutEntry(T* entry, T* prevEntry)
+  {
 
     if(prevEntry == nullptr) {
       popFront();
     } else {
       prevEntry->_ref = entry->_ref;
-      -- count;
+      --count;
       if(prevEntry->_ref == nullptr) {
         last = prevEntry;
       }
     }
-
   }
-  
-  void clear() {
+
+  void clear()
+  {
     T* curr = first;
-    while (curr != nullptr) {
+    while(curr != nullptr) {
       T* next = curr->_ref;
       delete curr;
       curr = next;
@@ -145,9 +151,8 @@ public:
     last = nullptr;
     count = 0;
   }
-  
 };
-  
+
 }}
 
 #endif /* FastQueue_hpp */

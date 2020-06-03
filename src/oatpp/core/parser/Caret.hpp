@@ -25,8 +25,8 @@
 #ifndef oatpp_parser_Caret_hpp
 #define oatpp_parser_Caret_hpp
 
-#include "oatpp/core/collection/LinkedList.hpp"
 #include "oatpp/core/Types.hpp"
+#include "oatpp/core/collection/LinkedList.hpp"
 
 namespace oatpp { namespace parser {
 
@@ -41,8 +41,8 @@ public:
   static const char* const ERROR_NO_OPEN_TAG;
   static const char* const ERROR_NO_CLOSE_TAG;
   static const char* const ERROR_NAME_EXPECTED;
-public:
 
+public:
   /**
    * Class to label parsing data.
    */
@@ -51,8 +51,8 @@ public:
     Caret* m_caret;
     v_buff_size m_start;
     v_buff_size m_end;
-  public:
 
+  public:
     /**
      * Constructor.
      * @param caret.
@@ -83,7 +83,8 @@ public:
 
     /**
      * Create &id:oatpp::String; from labeled data.
-     * @param saveAsOwnData - `true` - allocate new memory block for string. `false` - string will point to the same data as label.
+     * @param saveAsOwnData - `true` - allocate new memory block for string. `false` - string will point to the same data
+     * as label.
      * @return - &id:oatpp::String;.
      */
     oatpp::String toString(bool saveAsOwnData);
@@ -101,7 +102,6 @@ public:
     std::string std_str();
 
     explicit operator bool() const;
-    
   };
 
   /**
@@ -113,8 +113,8 @@ public:
     v_buff_size m_savedPosition;
     const char* m_savedErrorMessage;
     v_int64 m_savedErrorCode;
-  public:
 
+  public:
     /**
      * Constructor.
      * @param caret.
@@ -143,7 +143,6 @@ public:
      * @return
      */
     v_int64 getSavedErrorCode();
-
   };
 
 private:
@@ -153,12 +152,13 @@ private:
   const char* m_errorMessage;
   v_int64 m_errorCode;
   std::shared_ptr<oatpp::base::StrBuffer> m_dataMemoryHandle;
+
 public:
   Caret(const char* text);
   Caret(p_char8 parseData, v_buff_size dataSize);
   Caret(const oatpp::String& str);
+
 public:
-  
   static std::shared_ptr<Caret> createShared(const char* text);
   static std::shared_ptr<Caret> createShared(p_char8 parseData, v_buff_size dataSize);
   static std::shared_ptr<Caret> createShared(const oatpp::String& str);
@@ -498,9 +498,8 @@ public:
    * @return
    */
   bool canContinue() const;
-
 };
-  
+
 }}
 
 

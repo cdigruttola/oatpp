@@ -28,9 +28,11 @@ namespace oatpp { namespace async {
 
 Error::Error(const char* what)
   : m_what(what)
-{}
+{
+}
 
-const char* Error::what() const {
+const char* Error::what() const
+{
   return m_what;
 }
 

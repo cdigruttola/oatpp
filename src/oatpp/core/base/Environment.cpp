@@ -24,19 +24,20 @@
 
 #include "Environment.hpp"
 
-#include <iomanip>
 #include <chrono>
-#include <iostream>
 #include <cstring>
 #include <ctime>
+#include <iomanip>
+#include <iostream>
 #include <stdarg.h>
 
 #if defined(WIN32) || defined(_WIN32)
 #include <WinSock2.h>
 
-struct tm* localtime_r(time_t *_clock, struct tm *_result) {
-    _localtime64_s(_result, _clock);
-    return _result;
+struct tm* localtime_r(time_t* _clock, struct tm* _result)
+{
+  _localtime64_s(_result, _clock);
+  return _result;
 }
 #endif
 
@@ -55,50 +56,52 @@ thread_local v_counter Environment::m_threadLocalObjectsCreated = 0;
 
 DefaultLogger::DefaultLogger(const Config& config)
   : m_config(config)
-{}
+{
+}
 
-void DefaultLogger::log(v_int32 priority, const std::string& tag, const std::string& message) {
+void DefaultLogger::log(v_int32 priority, const std::string& tag, const std::string& message)
+{
 
   bool indent = false;
   auto time = std::chrono::system_clock::now().time_since_epoch();
 
   std::lock_guard<std::mutex> lock(m_lock);
 
-  switch (priority) {
-    case PRIORITY_V:
-      std::cout << "\033[0;0m V \033[0m|";
-      break;
+  switch(priority) {
+  case PRIORITY_V:
+    std::cout << "\033[0;0m V \033[0m|";
+    break;
 
-    case PRIORITY_D:
-      std::cout << "\033[34;0m D \033[0m|";
-      break;
+  case PRIORITY_D:
+    std::cout << "\033[34;0m D \033[0m|";
+    break;
 
-    case PRIORITY_I:
-      std::cout << "\033[32;0m I \033[0m|";
-      break;
+  case PRIORITY_I:
+    std::cout << "\033[32;0m I \033[0m|";
+    break;
 
-    case PRIORITY_W:
-      std::cout << "\033[45;0m W \033[0m|";
-      break;
+  case PRIORITY_W:
+    std::cout << "\033[45;0m W \033[0m|";
+    break;
 
-    case PRIORITY_E:
-      std::cout << "\033[41;0m E \033[0m|";
-      break;
+  case PRIORITY_E:
+    std::cout << "\033[41;0m E \033[0m|";
+    break;
 
-    default:
-      std::cout << " " << priority << " |";
+  default:
+    std::cout << " " << priority << " |";
   }
 
   if(m_config.timeFormat) {
-	time_t seconds = std::chrono::duration_cast<std::chrono::seconds>(time).count();
+    time_t seconds = std::chrono::duration_cast<std::chrono::seconds>(time).count();
     struct tm now;
     localtime_r(&seconds, &now);
 #ifdef OATPP_DISABLE_STD_PUT_TIME
-	  char timeBuffer[50];
-      strftime(timeBuffer, sizeof(timeBuffer), m_config.timeFormat, &now);
-      std::cout << timeBuffer;
+    char timeBuffer [ 50 ];
+    strftime(timeBuffer, sizeof(timeBuffer), m_config.timeFormat, &now);
+    std::cout << timeBuffer;
 #else
-      std::cout << std::put_time(&now, m_config.timeFormat);
+    std::cout << std::put_time(&now, m_config.timeFormat);
 #endif
     indent = true;
   }
@@ -116,27 +119,28 @@ void DefaultLogger::log(v_int32 priority, const std::string& tag, const std::str
     std::cout << "|";
   }
   std::cout << " " << tag << ":" << message << std::endl;
-
 }
 
 
-void Environment::init() {
+void Environment::init()
+{
   init(std::make_shared<DefaultLogger>());
 }
 
-void Environment::init(const std::shared_ptr<Logger>& logger) {
+void Environment::init(const std::shared_ptr<Logger>& logger)
+{
 
   m_logger = logger;
 
 #if defined(WIN32) || defined(_WIN32)
-    // Initialize Winsock
-    WSADATA wsaData;
-    int iResult;
-    iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (iResult != 0) {
+  // Initialize Winsock
+  WSADATA wsaData;
+  int iResult;
+  iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+  if(iResult != 0) {
 
-        throw std::runtime_error("[oatpp::base::Environment::init()]: Error. WSAStartup failed");
-    }
+    throw std::runtime_error("[oatpp::base::Environment::init()]: Error. WSAStartup failed");
+  }
 #endif
 
   checkTypes();
@@ -150,23 +154,25 @@ void Environment::init(const std::shared_ptr<Logger>& logger) {
 #endif
 
   if(m_components.size() > 0) {
-    throw std::runtime_error("[oatpp::base::Environment::init()]: Error. Invalid state. Components were created before call to Environment::init()");
+    throw std::runtime_error("[oatpp::base::Environment::init()]: Error. Invalid state. Components were created before "
+                             "call to Environment::init()");
   }
-
 }
 
-void Environment::destroy(){
+void Environment::destroy()
+{
   if(m_components.size() > 0) {
     throw std::runtime_error("[oatpp::base::Environment::destroy()]: Error. Invalid state. Leaking components");
   }
   m_logger.reset();
 
 #if defined(WIN32) || defined(_WIN32)
-    WSACleanup();
+  WSACleanup();
 #endif
 }
 
-void Environment::checkTypes(){
+void Environment::checkTypes()
+{
 
   OATPP_ASSERT(sizeof(v_char8) == 1);
   OATPP_ASSERT(sizeof(v_int16) == 2);
@@ -186,40 +192,42 @@ void Environment::checkTypes(){
   OATPP_ASSERT(vInt64 < 0);
   OATPP_ASSERT(vUInt32 > 0);
   OATPP_ASSERT(vUInt64 > 0);
-
 }
 
-void Environment::incObjects(){
+void Environment::incObjects()
+{
 
-  m_objectsCount ++;
-  m_objectsCreated ++;
+  m_objectsCount++;
+  m_objectsCreated++;
 
 #ifndef OATPP_COMPAT_BUILD_NO_THREAD_LOCAL
-  m_threadLocalObjectsCount ++;
-  m_threadLocalObjectsCreated ++;
+  m_threadLocalObjectsCount++;
+  m_threadLocalObjectsCreated++;
 #endif
-
 }
 
-void Environment::decObjects(){
+void Environment::decObjects()
+{
 
-  m_objectsCount --;
+  m_objectsCount--;
 
 #ifndef OATPP_COMPAT_BUILD_NO_THREAD_LOCAL
-  m_threadLocalObjectsCount --;
+  m_threadLocalObjectsCount--;
 #endif
-
 }
 
-v_counter Environment::getObjectsCount(){
+v_counter Environment::getObjectsCount()
+{
   return m_objectsCount;
 }
 
-v_counter Environment::getObjectsCreated(){
+v_counter Environment::getObjectsCreated()
+{
   return m_objectsCreated;
 }
 
-v_counter Environment::getThreadLocalObjectsCount(){
+v_counter Environment::getThreadLocalObjectsCount()
+{
 #ifndef OATPP_COMPAT_BUILD_NO_THREAD_LOCAL
   return m_threadLocalObjectsCount;
 #else
@@ -227,7 +235,8 @@ v_counter Environment::getThreadLocalObjectsCount(){
 #endif
 }
 
-v_counter Environment::getThreadLocalObjectsCreated(){
+v_counter Environment::getThreadLocalObjectsCreated()
+{
 #ifndef OATPP_COMPAT_BUILD_NO_THREAD_LOCAL
   return m_threadLocalObjectsCreated;
 #else
@@ -235,11 +244,13 @@ v_counter Environment::getThreadLocalObjectsCreated(){
 #endif
 }
 
-void Environment::setLogger(const std::shared_ptr<Logger>& logger){
+void Environment::setLogger(const std::shared_ptr<Logger>& logger)
+{
   m_logger = logger;
 }
 
-void Environment::printCompilationConfig() {
+void Environment::printCompilationConfig()
+{
 
   OATPP_LOGD("oatpp-version", OATPP_VERSION);
 
@@ -259,46 +270,57 @@ void Environment::printCompilationConfig() {
   OATPP_LOGD("oatpp/Config", "OATPP_THREAD_HARDWARE_CONCURRENCY=%d", OATPP_THREAD_HARDWARE_CONCURRENCY);
 #endif
 
-  OATPP_LOGD("oatpp/Config", "OATPP_THREAD_DISTRIBUTED_MEM_POOL_SHARDS_COUNT=%d", OATPP_THREAD_DISTRIBUTED_MEM_POOL_SHARDS_COUNT);
-
+  OATPP_LOGD("oatpp/Config",
+             "OATPP_THREAD_DISTRIBUTED_MEM_POOL_SHARDS_COUNT=%d",
+             OATPP_THREAD_DISTRIBUTED_MEM_POOL_SHARDS_COUNT);
 }
 
-void Environment::log(v_int32 priority, const std::string& tag, const std::string& message) {
+void Environment::log(v_int32 priority, const std::string& tag, const std::string& message)
+{
   if(m_logger != nullptr) {
     m_logger->log(priority, tag, message);
   }
 }
 
-void Environment::logFormatted(v_int32 priority, const std::string& tag, const char* message, ...) {
+void Environment::logFormatted(v_int32 priority, const std::string& tag, const char* message, ...)
+{
   if(message == nullptr) {
     message = "[null]";
   }
-  char buffer[4097];
+  char buffer [ 4097 ];
   va_list args;
-  va_start (args, message);
+  va_start(args, message);
   vsnprintf(buffer, 4096, message, args);
   log(priority, tag, buffer);
   va_end(args);
 }
 
-void Environment::registerComponent(const std::string& typeName, const std::string& componentName, void* component) {
-  auto& bucket = m_components[typeName];
+void Environment::registerComponent(const std::string& typeName, const std::string& componentName, void* component)
+{
+  auto& bucket = m_components [ typeName ];
   auto it = bucket.find(componentName);
-  if(it != bucket.end()){
-    throw std::runtime_error("[oatpp::base::Environment::registerComponent()]: Error. Component with given name already exists: name='" + componentName + "'");
+  if(it != bucket.end()) {
+    throw std::runtime_error(
+     "[oatpp::base::Environment::registerComponent()]: Error. Component with given name already exists: name='" +
+     componentName + "'");
   }
-  bucket[componentName] = component;
+  bucket [ componentName ] = component;
 }
 
-void Environment::unregisterComponent(const std::string& typeName, const std::string& componentName) {
+void Environment::unregisterComponent(const std::string& typeName, const std::string& componentName)
+{
   auto bucketIt = m_components.find(typeName);
   if(bucketIt == m_components.end() || bucketIt->second.size() == 0) {
-    throw std::runtime_error("[oatpp::base::Environment::unregisterComponent()]: Error. Component of given type doesn't exist: type='" + typeName + "'");
+    throw std::runtime_error(
+     "[oatpp::base::Environment::unregisterComponent()]: Error. Component of given type doesn't exist: type='" +
+     typeName + "'");
   }
   auto& bucket = bucketIt->second;
   auto componentIt = bucket.find(componentName);
   if(componentIt == bucket.end()) {
-    throw std::runtime_error("[oatpp::base::Environment::unregisterComponent()]: Error. Component with given name doesn't exist: name='" + componentName + "'");
+    throw std::runtime_error(
+     "[oatpp::base::Environment::unregisterComponent()]: Error. Component with given name doesn't exist: name='" +
+     componentName + "'");
   }
   bucket.erase(componentIt);
   if(bucket.size() == 0) {
@@ -306,34 +328,45 @@ void Environment::unregisterComponent(const std::string& typeName, const std::st
   }
 }
 
-void* Environment::getComponent(const std::string& typeName) {
+void* Environment::getComponent(const std::string& typeName)
+{
   auto bucketIt = m_components.find(typeName);
   if(bucketIt == m_components.end() || bucketIt->second.size() == 0) {
-    throw std::runtime_error("[oatpp::base::Environment::getComponent()]: Error. Component of given type doesn't exist: type='" + typeName + "'");
+    throw std::runtime_error(
+     "[oatpp::base::Environment::getComponent()]: Error. Component of given type doesn't exist: type='" + typeName +
+     "'");
   }
   auto bucket = bucketIt->second;
-  if(bucket.size() > 1){
-    throw std::runtime_error("[oatpp::base::Environment::getComponent()]: Error. Ambiguous component reference. Multiple components exist for a given type: type='" + typeName + "'");
+  if(bucket.size() > 1) {
+    throw std::runtime_error("[oatpp::base::Environment::getComponent()]: Error. Ambiguous component reference. "
+                             "Multiple components exist for a given type: type='" +
+                             typeName + "'");
   }
   return bucket.begin()->second;
 }
 
-void* Environment::getComponent(const std::string& typeName, const std::string& componentName) {
+void* Environment::getComponent(const std::string& typeName, const std::string& componentName)
+{
   auto bucketIt = m_components.find(typeName);
   if(bucketIt == m_components.end() || bucketIt->second.size() == 0) {
-    throw std::runtime_error("[oatpp::base::Environment::getComponent()]: Error. Component of given type doesn't exist: type='" + typeName + "'");
+    throw std::runtime_error(
+     "[oatpp::base::Environment::getComponent()]: Error. Component of given type doesn't exist: type='" + typeName +
+     "'");
   }
   auto bucket = bucketIt->second;
   auto componentIt = bucket.find(componentName);
   if(componentIt == bucket.end()) {
-    throw std::runtime_error("[oatpp::base::Environment::getComponent()]: Error. Component with given name doesn't exist: name='" + componentName + "'");
+    throw std::runtime_error(
+     "[oatpp::base::Environment::getComponent()]: Error. Component with given name doesn't exist: name='" +
+     componentName + "'");
   }
   return componentIt->second;
 }
 
-v_int64 Environment::getMicroTickCount(){
-  std::chrono::microseconds ms = std::chrono::duration_cast<std::chrono::microseconds>
-  (std::chrono::system_clock::now().time_since_epoch());
+v_int64 Environment::getMicroTickCount()
+{
+  std::chrono::microseconds ms =
+   std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
   return ms.count();
 }
 

@@ -44,8 +44,8 @@ public:
    * Convenience typedef for accompanying parameters of connection handling.
    */
   typedef std::unordered_map<oatpp::String, oatpp::String> ParameterMap;
-public:
 
+public:
   /**
    * Virtual Destructor.
    */
@@ -56,14 +56,15 @@ public:
    * @param connection - see &id:oatpp::data::stream::IOStream;.
    * @param params - accompanying parameters.
    */
-  virtual void handleConnection(const std::shared_ptr<IOStream>& connection, const std::shared_ptr<const ParameterMap>& params) = 0;
+  virtual void handleConnection(const std::shared_ptr<IOStream>& connection,
+                                const std::shared_ptr<const ParameterMap>& params) = 0;
 
   /**
    * Stop all threads here
    */
   virtual void stop() = 0;
 };
-  
+
 }}}
 
 #endif /* network_server_ConnectionHandler_hpp */

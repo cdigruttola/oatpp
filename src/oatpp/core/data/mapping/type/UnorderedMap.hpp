@@ -27,43 +27,42 @@
 
 #include "./Type.hpp"
 
-#include <unordered_map>
 #include <initializer_list>
+#include <unordered_map>
 #include <utility>
 
 namespace oatpp { namespace data { namespace mapping { namespace type {
 
 namespace __class {
 
+/**
+ * Abstract Unordered Map class.
+ */
+class AbstractUnorderedMap {
+public:
   /**
-   * Abstract Unordered Map class.
+   * Class Id.
    */
-  class AbstractUnorderedMap {
+  static const ClassId CLASS_ID;
+
+public:
+  /**
+   * Polymorphic Dispatcher.
+   */
+  class AbstractPolymorphicDispatcher {
   public:
     /**
-     * Class Id.
+     * Add item.
+     * @param object - Unordered Map.
+     * @param key - Key.
+     * @param value - Value.
      */
-    static const ClassId CLASS_ID;
-  public:
-
-    /**
-     * Polymorphic Dispatcher.
-     */
-    class AbstractPolymorphicDispatcher {
-    public:
-      /**
-       * Add item.
-       * @param object - Unordered Map.
-       * @param key - Key.
-       * @param value - Value.
-       */
-      virtual void addPolymorphicItem(const type::Void& object, const type::Void& key, const type::Void& value) const = 0;
-    };
-
+    virtual void addPolymorphicItem(const type::Void& object, const type::Void& key, const type::Void& value) const = 0;
   };
+};
 
-  template<class Key, class Value>
-  class UnorderedMap;
+template<class Key, class Value>
+class UnorderedMap;
 
 }
 
@@ -74,35 +73,39 @@ namespace __class {
  * @tparam C - Class.
  */
 template<class Key, class Value, class C>
-class UnorderedMapObjectWrapper : public type::ObjectWrapper<std::unordered_map<Key, Value>, C> {
+class UnorderedMapObjectWrapper: public type::ObjectWrapper<std::unordered_map<Key, Value>, C> {
 public:
   typedef std::unordered_map<Key, Value> TemplateObjectType;
   typedef C TemplateObjectClass;
-public:
 
+public:
   OATPP_DEFINE_OBJECT_WRAPPER_DEFAULTS(UnorderedMapObjectWrapper, TemplateObjectType, TemplateObjectClass)
 
   UnorderedMapObjectWrapper(std::initializer_list<std::pair<const Key, Value>> ilist)
     : type::ObjectWrapper<TemplateObjectType, TemplateObjectClass>(std::make_shared<TemplateObjectType>(ilist))
-  {}
+  {
+  }
 
-  static UnorderedMapObjectWrapper createShared() {
+  static UnorderedMapObjectWrapper createShared()
+  {
     return std::make_shared<TemplateObjectType>();
   }
 
-  UnorderedMapObjectWrapper& operator = (std::initializer_list<std::pair<const Key, Value>> ilist) {
+  UnorderedMapObjectWrapper& operator=(std::initializer_list<std::pair<const Key, Value>> ilist)
+  {
     this->m_ptr = std::make_shared<TemplateObjectType>(ilist);
     return *this;
   }
 
-  Value& operator[] (const Key& key) const {
-    return this->m_ptr->operator [] (key);
+  Value& operator[](const Key& key) const
+  {
+    return this->m_ptr->operator[](key);
   }
 
-  TemplateObjectType& operator*() const {
+  TemplateObjectType& operator*() const
+  {
     return this->m_ptr.operator*();
   }
-
 };
 
 /**
@@ -113,43 +116,41 @@ using UnorderedMap = UnorderedMapObjectWrapper<Key, Value, __class::UnorderedMap
 
 namespace __class {
 
-  template<class Key, class Value>
-  class UnorderedMap : public AbstractUnorderedMap {
-  private:
-
-    class PolymorphicDispatcher : public AbstractPolymorphicDispatcher {
-    public:
-
-      void addPolymorphicItem(const type::Void& object, const type::Void& key, const type::Void& value) const override {
-        const auto& map = object.staticCast<type::UnorderedMap<Key, Value>>();
-        const auto& k = key.staticCast<Key>();
-        const auto& v = value.staticCast<Value>();
-        map[k] = v;
-      }
-
-    };
-
-  private:
-
-    static type::Void creator() {
-      return type::Void(std::make_shared<std::unordered_map<Key, Value>>(), getType());
-    }
-
-    static Type createType() {
-      Type type(__class::AbstractUnorderedMap::CLASS_ID, nullptr, &creator, nullptr, new PolymorphicDispatcher());
-      type.params.push_back(Key::Class::getType());
-      type.params.push_back(Value::Class::getType());
-      return type;
-    }
-
+template<class Key, class Value>
+class UnorderedMap: public AbstractUnorderedMap {
+private:
+  class PolymorphicDispatcher: public AbstractPolymorphicDispatcher {
   public:
-
-    static Type* getType() {
-      static Type type = createType();
-      return &type;
+    void addPolymorphicItem(const type::Void& object, const type::Void& key, const type::Void& value) const override
+    {
+      const auto& map = object.staticCast<type::UnorderedMap<Key, Value>>();
+      const auto& k = key.staticCast<Key>();
+      const auto& v = value.staticCast<Value>();
+      map [ k ] = v;
     }
-
   };
+
+private:
+  static type::Void creator()
+  {
+    return type::Void(std::make_shared<std::unordered_map<Key, Value>>(), getType());
+  }
+
+  static Type createType()
+  {
+    Type type(__class::AbstractUnorderedMap::CLASS_ID, nullptr, &creator, nullptr, new PolymorphicDispatcher());
+    type.params.push_back(Key::Class::getType());
+    type.params.push_back(Value::Class::getType());
+    return type;
+  }
+
+public:
+  static Type* getType()
+  {
+    static Type type = createType();
+    return &type;
+  }
+};
 
 }
 

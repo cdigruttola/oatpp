@@ -33,9 +33,9 @@
 
 #include "oatpp/core/collection/LinkedList.hpp"
 
-#include <tuple>
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
+#include <tuple>
 
 namespace oatpp { namespace async {
 
@@ -46,20 +46,23 @@ namespace oatpp { namespace async {
  */
 class Executor {
 private:
-  
-  class SubmissionProcessor : public worker::Worker {
+  class SubmissionProcessor: public worker::Worker {
   private:
     oatpp::async::Processor m_processor;
+
   private:
     std::atomic<bool> m_isRunning;
+
   private:
     std::thread m_thread;
+
   public:
     SubmissionProcessor();
-  public:
 
-    template<typename CoroutineType, typename ... Args>
-    void execute(Args... params) {
+  public:
+    template<typename CoroutineType, typename... Args>
+    void execute(Args... params)
+    {
       m_processor.execute<CoroutineType, Args...>(params...);
     }
 
@@ -76,7 +79,6 @@ private:
     void join() override;
 
     void detach() override;
-    
   };
 
 public:
@@ -84,8 +86,8 @@ public:
    * Special value to indicate that Executor should choose it's own the value of specified parameter.
    */
   static constexpr const v_int32 VALUE_SUGGESTED = -1000;
-public:
 
+public:
   /**
    * IO Worker type naive.
    */
@@ -95,19 +97,22 @@ public:
    * IO Worker type event.
    */
   static constexpr const v_int32 IO_WORKER_TYPE_EVENT = 1;
+
 private:
   std::atomic<v_uint32> m_balancer;
+
 private:
   std::vector<std::shared_ptr<SubmissionProcessor>> m_processorWorkers;
   std::vector<std::shared_ptr<worker::Worker>> m_allWorkers;
+
 private:
   static v_int32 chooseProcessorWorkersCount(v_int32 processorWorkersCount);
   static v_int32 chooseIOWorkersCount(v_int32 processorWorkersCount, v_int32 ioWorkersCount);
   static v_int32 chooseTimerWorkersCount(v_int32 timerWorkersCount);
   static v_int32 chooseIOWorkerType(v_int32 ioWorkerType);
   void linkWorkers(const std::vector<std::shared_ptr<worker::Worker>>& workers);
-public:
 
+public:
   /**
    * Constructor.
    * @param processorWorkersCount - number of data processing workers.
@@ -147,9 +152,10 @@ public:
    * @tparam Args - types of arguments to be passed to Coroutine constructor.
    * @param params - actual arguments to be passed to Coroutine constructor.
    */
-  template<typename CoroutineType, typename ... Args>
-  void execute(Args... params) {
-    auto& processor = m_processorWorkers[(++ m_balancer) % m_processorWorkers.size()];
+  template<typename CoroutineType, typename... Args>
+  void execute(Args... params)
+  {
+    auto& processor = m_processorWorkers [ (++m_balancer) % m_processorWorkers.size() ];
     processor->execute<CoroutineType, Args...>(params...);
   }
 
@@ -164,9 +170,8 @@ public:
    * @param timeout
    */
   void waitTasksFinished(const std::chrono::duration<v_int64, std::micro>& timeout = std::chrono::minutes(1));
-  
 };
-  
+
 }}
 
 #endif /* oatpp_async_Executor_hpp */

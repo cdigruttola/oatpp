@@ -25,46 +25,50 @@
 #include "Thread.hpp"
 
 #if defined(_GNU_SOURCE)
-  #include <pthread.h>
+#include <pthread.h>
 #endif
 
 namespace oatpp { namespace concurrency {
 
-v_int32 setThreadAffinityToOneCpu(std::thread::native_handle_type nativeHandle, v_int32 cpuIndex) {
+v_int32 setThreadAffinityToOneCpu(std::thread::native_handle_type nativeHandle, v_int32 cpuIndex)
+{
   return setThreadAffinityToCpuRange(nativeHandle, cpuIndex, cpuIndex);
 }
-  
-v_int32 setThreadAffinityToCpuRange(std::thread::native_handle_type nativeHandle, v_int32 firstCpuIndex, v_int32 lastCpuIndex) {
+
+v_int32 setThreadAffinityToCpuRange(std::thread::native_handle_type nativeHandle,
+                                    v_int32 firstCpuIndex,
+                                    v_int32 lastCpuIndex)
+{
 #if defined(_GNU_SOURCE)
 
   // NOTE:
 
   // The below line doesn't compile on Android.
-  //result = pthread_setaffinity_np(nativeHandle, sizeof(cpu_set_t), &cpuset);
+  // result = pthread_setaffinity_np(nativeHandle, sizeof(cpu_set_t), &cpuset);
 
   // The below line compiles on Android but has not been tested.
-  //result = sched_setaffinity(nativeHandle, sizeof(cpu_set_t), &cpuset);
+  // result = sched_setaffinity(nativeHandle, sizeof(cpu_set_t), &cpuset);
 
-  #ifndef __ANDROID__
+#ifndef __ANDROID__
 
-    cpu_set_t cpuset;
-    CPU_ZERO(&cpuset);
+  cpu_set_t cpuset;
+  CPU_ZERO(&cpuset);
 
-    for(v_int32 i = firstCpuIndex; i <= lastCpuIndex; i++) {
-      CPU_SET(i, &cpuset);
-    }
+  for(v_int32 i = firstCpuIndex; i <= lastCpuIndex; i++) {
+    CPU_SET(i, &cpuset);
+  }
 
-    v_int32 result = pthread_setaffinity_np(nativeHandle, sizeof(cpu_set_t), &cpuset);
+  v_int32 result = pthread_setaffinity_np(nativeHandle, sizeof(cpu_set_t), &cpuset);
 
-    if (result != 0) {
-      OATPP_LOGD("[oatpp::concurrency::Thread::assignThreadToCpu(...)]", "error code - %d", result);
-    }
+  if(result != 0) {
+    OATPP_LOGD("[oatpp::concurrency::Thread::assignThreadToCpu(...)]", "error code - %d", result);
+  }
 
-    return result;
+  return result;
 
-  #else
-    return -1;
-  #endif
+#else
+  return -1;
+#endif
 
 #else
   (void)nativeHandle;
@@ -73,12 +77,14 @@ v_int32 setThreadAffinityToCpuRange(std::thread::native_handle_type nativeHandle
   return -1;
 #endif
 }
-  
-v_int32 calcHardwareConcurrency() {
+
+v_int32 calcHardwareConcurrency()
+{
 #if !defined(OATPP_THREAD_HARDWARE_CONCURRENCY)
   v_int32 concurrency = std::thread::hardware_concurrency();
   if(concurrency == 0) {
-    OATPP_LOGD("[oatpp::concurrency:Thread::calcHardwareConcurrency()]", "Warning - failed to get hardware_concurrency. Setting hardware_concurrency=1");
+    OATPP_LOGD("[oatpp::concurrency:Thread::calcHardwareConcurrency()]",
+               "Warning - failed to get hardware_concurrency. Setting hardware_concurrency=1");
     concurrency = 1;
   }
   return concurrency;
@@ -86,11 +92,11 @@ v_int32 calcHardwareConcurrency() {
   return OATPP_THREAD_HARDWARE_CONCURRENCY;
 #endif
 }
-  
-v_int32 getHardwareConcurrency() {
+
+v_int32 getHardwareConcurrency()
+{
   static v_int32 concurrency = calcHardwareConcurrency();
   return concurrency;
 }
-  
-}}
 
+}}

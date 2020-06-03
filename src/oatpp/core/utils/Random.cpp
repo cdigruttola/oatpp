@@ -27,13 +27,14 @@
 namespace oatpp { namespace utils { namespace random {
 
 #ifndef OATPP_COMPAT_BUILD_NO_THREAD_LOCAL
-  thread_local std::mt19937 Random::RANDOM_GENERATOR(std::random_device{}());
+thread_local std::mt19937 Random::RANDOM_GENERATOR(std::random_device {}());
 #else
-  std::mt19937 Random::RANDOM_GENERATOR (std::random_device{}());
-  oatpp::concurrency::SpinLock Random::RANDOM_LOCK;
+std::mt19937 Random::RANDOM_GENERATOR(std::random_device {}());
+oatpp::concurrency::SpinLock Random::RANDOM_LOCK;
 #endif
 
-void Random::randomBytes(p_char8 buffer, v_buff_size bufferSize) {
+void Random::randomBytes(p_char8 buffer, v_buff_size bufferSize)
+{
 
 #if defined(OATPP_COMPAT_BUILD_NO_THREAD_LOCAL)
   std::lock_guard<oatpp::concurrency::SpinLock> randomLock(RANDOM_LOCK);
@@ -41,10 +42,9 @@ void Random::randomBytes(p_char8 buffer, v_buff_size bufferSize) {
 
   std::uniform_int_distribution<size_t> distribution(0, 255);
 
-  for(v_buff_size i = 0; i < bufferSize; i ++) {
-    buffer[i] = (v_char8) distribution(RANDOM_GENERATOR);
+  for(v_buff_size i = 0; i < bufferSize; i++) {
+    buffer [ i ] = (v_char8)distribution(RANDOM_GENERATOR);
   }
-
 }
 
 }}}

@@ -28,11 +28,12 @@
 
 namespace oatpp { namespace test { namespace parser {
 
-  namespace {
-    typedef oatpp::parser::Caret Caret;
-  }
+namespace {
+typedef oatpp::parser::Caret Caret;
+}
 
-void CaretTest::onRun() {
+void CaretTest::onRun()
+{
 
   {
     Caret caret(" \t\n\r\f \t\n\r\f \t\n\r\fhello!\t\n\r\f");
@@ -81,7 +82,6 @@ void CaretTest::onRun() {
     OATPP_ASSERT(caret.canContinue() == false);
     OATPP_ASSERT(caret.getPosition() == caret.getDataSize());
   }
-
 }
 
 }}}

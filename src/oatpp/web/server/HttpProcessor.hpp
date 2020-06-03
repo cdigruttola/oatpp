@@ -27,19 +27,19 @@
 
 #include "./HttpRouter.hpp"
 
-#include "./handler/Interceptor.hpp"
 #include "./handler/ErrorHandler.hpp"
+#include "./handler/Interceptor.hpp"
 
 #include "oatpp/web/protocol/http/encoding/ProviderCollection.hpp"
 
-#include "oatpp/web/protocol/http/incoming/RequestHeadersReader.hpp"
 #include "oatpp/web/protocol/http/incoming/Request.hpp"
+#include "oatpp/web/protocol/http/incoming/RequestHeadersReader.hpp"
 
 #include "oatpp/web/protocol/http/outgoing/Response.hpp"
 #include "oatpp/web/protocol/http/utils/CommunicationUtils.hpp"
 
-#include "oatpp/core/data/stream/StreamBufferedProxy.hpp"
 #include "oatpp/core/async/Processor.hpp"
+#include "oatpp/core/data/stream/StreamBufferedProxy.hpp"
 
 namespace oatpp { namespace web { namespace server {
 
@@ -48,10 +48,11 @@ namespace oatpp { namespace web { namespace server {
  */
 class HttpProcessor {
 public:
-  typedef oatpp::collection::LinkedList<std::shared_ptr<oatpp::web::server::handler::RequestInterceptor>> RequestInterceptors;
+  typedef oatpp::collection::LinkedList<std::shared_ptr<oatpp::web::server::handler::RequestInterceptor>>
+   RequestInterceptors;
   typedef oatpp::web::protocol::http::incoming::RequestHeadersReader RequestHeadersReader;
-public:
 
+public:
   /**
    * Resource config per connection.
    */
@@ -86,11 +87,9 @@ public:
      * Maximum allowed size of requests headers. The overall size of all headers in the request.
      */
     v_buff_size headersReaderMaxSize = 4096;
-
   };
 
 public:
-
   /**
    * Collection of components needed to serve http-connection.
    */
@@ -154,11 +153,9 @@ public:
      * Resource allocation config. &l:HttpProcessor::Config;.
      */
     std::shared_ptr<Config> config;
-
   };
 
 private:
-
   struct ProcessingResources {
 
     ProcessingResources(const std::shared_ptr<Components>& pComponents,
@@ -170,24 +167,22 @@ private:
     oatpp::data::stream::BufferOutputStream headersOutBuffer;
     RequestHeadersReader headersReader;
     std::shared_ptr<oatpp::data::stream::InputStreamBufferedProxy> inStream;
-
   };
 
   static bool processNextRequest(ProcessingResources& resources);
 
 public:
-
   /**
    * Connection serving task. <br>
    * Usege example: <br>
    * `std::thread thread(&HttpProcessor::Task::run, HttpProcessor::Task(components, connection));`
    */
-  class Task : public base::Countable {
+  class Task: public base::Countable {
   private:
     std::shared_ptr<Components> m_components;
     std::shared_ptr<oatpp::data::stream::IOStream> m_connection;
-  public:
 
+  public:
     /**
      * Constructor.
      * @param components - &l:HttpProcessor::Components;.
@@ -195,21 +190,19 @@ public:
      */
     Task(const std::shared_ptr<Components>& components,
          const std::shared_ptr<oatpp::data::stream::IOStream>& connection);
-  public:
 
+  public:
     /**
      * Run loop.
      */
     void run();
-
   };
-  
-public:
 
+public:
   /**
    * Connection serving coroutiner - &id:oatpp::async::Coroutine;.
    */
-  class Coroutine : public oatpp::async::Coroutine<HttpProcessor::Coroutine> {
+  class Coroutine: public oatpp::async::Coroutine<HttpProcessor::Coroutine> {
   private:
     std::shared_ptr<Components> m_components;
     std::shared_ptr<oatpp::data::stream::IOStream> m_connection;
@@ -218,13 +211,13 @@ public:
     std::shared_ptr<oatpp::data::stream::BufferOutputStream> m_headersOutBuffer;
     std::shared_ptr<oatpp::data::stream::InputStreamBufferedProxy> m_inStream;
     v_int32 m_connectionState;
+
   private:
     oatpp::web::server::HttpRouter::BranchRouter::Route m_currentRoute;
     std::shared_ptr<protocol::http::incoming::Request> m_currentRequest;
     std::shared_ptr<protocol::http::outgoing::Response> m_currentResponse;
+
   public:
-
-
     /**
      * Constructor.
      * @param components - &l:HttpProcessor::Components;.
@@ -232,24 +225,22 @@ public:
      */
     Coroutine(const std::shared_ptr<Components>& components,
               const std::shared_ptr<oatpp::data::stream::IOStream>& connection);
-    
+
     Action act() override;
 
     Action parseHeaders();
-    
+
     Action onHeadersParsed(const RequestHeadersReader::Result& headersReadResult);
-    
+
     Action onRequestFormed();
     Action onResponse(const std::shared_ptr<protocol::http::outgoing::Response>& response);
     Action onResponseFormed();
     Action onRequestDone();
-    
+
     Action handleError(Error* error) override;
-    
   };
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_web_server_HttpProcessor_hpp */

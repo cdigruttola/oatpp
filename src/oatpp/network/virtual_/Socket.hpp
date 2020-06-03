@@ -30,14 +30,17 @@
 namespace oatpp { namespace network { namespace virtual_ {
 
 /**
- * Virtual socket implementation. Can be used as a bidirectional data transfer between different threads of the same process. <br>
- * Under the hood it uses a pair of &id:oatpp::network::virtual_::Pipe;. One to write data to, and one to read data from.
- * Extends &id:oatpp::base::Countable; and &id:oatpp::data::stream::IOStream;.
+ * Virtual socket implementation. Can be used as a bidirectional data transfer between different threads of the same
+ * process. <br> Under the hood it uses a pair of &id:oatpp::network::virtual_::Pipe;. One to write data to, and one to
+ * read data from. Extends &id:oatpp::base::Countable; and &id:oatpp::data::stream::IOStream;.
  */
-class Socket : public oatpp::data::stream::IOStream, public oatpp::base::Countable {
+class Socket
+  : public oatpp::data::stream::IOStream
+  , public oatpp::base::Countable {
 private:
   std::shared_ptr<Pipe> m_pipeIn;
   std::shared_ptr<Pipe> m_pipeOut;
+
 public:
   /**
    * Constructor.
@@ -45,8 +48,8 @@ public:
    * @param pipeOut - pipe to write data to.
    */
   Socket(const std::shared_ptr<Pipe>& pipeIn, const std::shared_ptr<Pipe>& pipeOut);
-public:
 
+public:
   /**
    * Create shared socket.
    * @param pipeIn - pipe to read data from.
@@ -61,8 +64,8 @@ public:
   ~Socket();
 
   /**
-   * Limit the available amount of bytes to read from socket and limit the available amount of bytes to write to socket. <br>
-   * This method is used for testing purposes only.<br>
+   * Limit the available amount of bytes to read from socket and limit the available amount of bytes to write to socket.
+   * <br> This method is used for testing purposes only.<br>
    * @param maxToRead - maximum available amount of bytes to read.
    * @param maxToWrite - maximum available amount of bytes to write.
    */
@@ -76,7 +79,7 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual amount of data read from socket.
    */
-  v_io_size read(void *data, v_buff_size count, async::Action& action) override;
+  v_io_size read(void* data, v_buff_size count, async::Action& action) override;
 
   /**
    * Write data to socket.
@@ -86,7 +89,7 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual amount of data written to socket.
    */
-  v_io_size write(const void *data, v_buff_size count, async::Action& action) override;
+  v_io_size write(const void* data, v_buff_size count, async::Action& action) override;
 
   /**
    * Set OutputStream I/O mode.
@@ -128,9 +131,8 @@ public:
    * Close socket pipes.
    */
   void close();
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_network_virtual__Socket_hpp */

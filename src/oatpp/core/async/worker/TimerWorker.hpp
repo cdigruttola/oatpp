@@ -29,9 +29,9 @@
 #include "oatpp/core/collection/LinkedList.hpp"
 #include "oatpp/core/concurrency/SpinLock.hpp"
 
-#include <thread>
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
+#include <thread>
 
 namespace oatpp { namespace async { namespace worker {
 
@@ -39,21 +39,24 @@ namespace oatpp { namespace async { namespace worker {
  * Timer worker.
  * Used to wait for timer-scheduled coroutines.
  */
-class TimerWorker : public Worker {
+class TimerWorker: public Worker {
 private:
   std::atomic<bool> m_running;
   oatpp::collection::FastQueue<CoroutineHandle> m_backlog;
   oatpp::collection::FastQueue<CoroutineHandle> m_queue;
   oatpp::concurrency::SpinLock m_backlogLock;
   std::condition_variable_any m_backlogCondition;
+
 private:
   std::chrono::duration<v_int64, std::micro> m_granularity;
+
 private:
   std::thread m_thread;
+
 private:
   void consumeBacklog();
-public:
 
+public:
   /**
    * Constructor.
    * @param granularity - minimum possible time to wait.
@@ -91,9 +94,8 @@ public:
    * Detach all worker-threads.
    */
   void detach() override;
-
 };
 
 }}}
 
-#endif //oatpp_async_worker_TimerWorker_hpp
+#endif // oatpp_async_worker_TimerWorker_hpp

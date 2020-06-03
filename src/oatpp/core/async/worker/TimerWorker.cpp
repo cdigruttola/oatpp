@@ -38,7 +38,8 @@ TimerWorker::TimerWorker(const std::chrono::duration<v_int64, std::micro>& granu
   m_thread = std::thread(&TimerWorker::run, this);
 }
 
-void TimerWorker::pushTasks(oatpp::collection::FastQueue<CoroutineHandle>& tasks) {
+void TimerWorker::pushTasks(oatpp::collection::FastQueue<CoroutineHandle>& tasks)
+{
   {
     std::lock_guard<oatpp::concurrency::SpinLock> guard(m_backlogLock);
     oatpp::collection::FastQueue<CoroutineHandle>::moveAll(tasks, m_backlog);
@@ -46,17 +47,18 @@ void TimerWorker::pushTasks(oatpp::collection::FastQueue<CoroutineHandle>& tasks
   m_backlogCondition.notify_one();
 }
 
-void TimerWorker::consumeBacklog() {
+void TimerWorker::consumeBacklog()
+{
 
   std::unique_lock<oatpp::concurrency::SpinLock> lock(m_backlogLock);
-  while (m_backlog.first == nullptr && m_queue.first == nullptr && m_running) {
+  while(m_backlog.first == nullptr && m_queue.first == nullptr && m_running) {
     m_backlogCondition.wait(lock);
   }
   oatpp::collection::FastQueue<CoroutineHandle>::moveAll(m_backlog, m_queue);
-
 }
 
-void TimerWorker::pushOneTask(CoroutineHandle* task) {
+void TimerWorker::pushOneTask(CoroutineHandle* task)
+{
   {
     std::lock_guard<oatpp::concurrency::SpinLock> guard(m_backlogLock);
     m_backlog.pushBack(task);
@@ -64,7 +66,8 @@ void TimerWorker::pushOneTask(CoroutineHandle* task) {
   m_backlogCondition.notify_one();
 }
 
-void TimerWorker::run() {
+void TimerWorker::run()
+{
 
   while(m_running) {
 
@@ -88,23 +91,21 @@ void TimerWorker::run() {
 
         switch(action.getType()) {
 
-          case Action::TYPE_WAIT_REPEAT:
-            setCoroutineScheduledAction(curr, std::move(action));
-            break;
+        case Action::TYPE_WAIT_REPEAT:
+          setCoroutineScheduledAction(curr, std::move(action));
+          break;
 
-          case Action::TYPE_IO_WAIT:
-            setCoroutineScheduledAction(curr, oatpp::async::Action::createWaitRepeatAction(0));
-            break;
+        case Action::TYPE_IO_WAIT:
+          setCoroutineScheduledAction(curr, oatpp::async::Action::createWaitRepeatAction(0));
+          break;
 
-          default:
-            m_queue.cutEntry(curr, prev);
-            setCoroutineScheduledAction(curr, std::move(action));
-            getCoroutineProcessor(curr)->pushOneTask(curr);
-            curr = prev;
-            break;
-
+        default:
+          m_queue.cutEntry(curr, prev);
+          setCoroutineScheduledAction(curr, std::move(action));
+          getCoroutineProcessor(curr)->pushOneTask(curr);
+          curr = prev;
+          break;
         }
-
       }
 
       prev = curr;
@@ -115,12 +116,11 @@ void TimerWorker::run() {
     if(elapsed < m_granularity) {
       std::this_thread::sleep_for(m_granularity - elapsed);
     }
-
   }
-
 }
 
-void TimerWorker::stop() {
+void TimerWorker::stop()
+{
   {
     std::lock_guard<oatpp::concurrency::SpinLock> lock(m_backlogLock);
     m_running = false;
@@ -128,11 +128,13 @@ void TimerWorker::stop() {
   m_backlogCondition.notify_one();
 }
 
-void TimerWorker::join() {
+void TimerWorker::join()
+{
   m_thread.join();
 }
 
-void TimerWorker::detach() {
+void TimerWorker::detach()
+{
   m_thread.detach();
 }
 

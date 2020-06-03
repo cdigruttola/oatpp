@@ -25,8 +25,8 @@
 #ifndef oatpp_network_virtual__server_ConnectionProvider_hpp
 #define oatpp_network_virtual__server_ConnectionProvider_hpp
 
-#include "oatpp/network/virtual_/Interface.hpp"
 #include "oatpp/network/ConnectionProvider.hpp"
+#include "oatpp/network/virtual_/Interface.hpp"
 
 namespace oatpp { namespace network { namespace virtual_ { namespace server {
 
@@ -35,15 +35,15 @@ namespace oatpp { namespace network { namespace virtual_ { namespace server {
  * See &id:oatpp::network::virtual_::Interface;, &id:oatpp::network::virtual_::Socket; <br>
  * Extends &id:oatpp::network::ServerConnectionProvider;.
  */
-class ConnectionProvider : public oatpp::network::ServerConnectionProvider {
+class ConnectionProvider: public oatpp::network::ServerConnectionProvider {
 private:
   std::shared_ptr<virtual_::Interface> m_interface;
   std::shared_ptr<virtual_::Interface::ListenerLock> m_listenerLock;
   bool m_open;
   v_io_size m_maxAvailableToRead;
   v_io_size m_maxAvailableToWrite;
-public:
 
+public:
   /**
    * Constructor.
    * @param interface - &id:oatpp::network::virtual_::Interface;.
@@ -58,8 +58,8 @@ public:
   static std::shared_ptr<ConnectionProvider> createShared(const std::shared_ptr<virtual_::Interface>& interface);
 
   /**
-   * Limit the available amount of bytes to read from socket and limit the available amount of bytes to write to socket. <br>
-   * This method is used for testing purposes only.<br>
+   * Limit the available amount of bytes to read from socket and limit the available amount of bytes to write to socket.
+   * <br> This method is used for testing purposes only.<br>
    * @param maxToRead - maximum available amount of bytes to read.
    * @param maxToWrite - maximum available amount of bytes to write.
    */
@@ -85,7 +85,9 @@ public:
    * <br>
    * *It may be implemented later.*
    */
-  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::stream::IOStream>&> getConnectionAsync() override {
+  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::stream::IOStream>&> getConnectionAsync()
+   override
+  {
     /*
      *  No need to implement this.
      *  For Asynchronous IO in oatpp it is considered to be a good practice
@@ -94,20 +96,21 @@ public:
      *
      *  It may be implemented later
      */
-    throw std::runtime_error("[oatpp::network::virtual_::server::ConnectionProvider::getConnectionAsync()]: Error. Not implemented.");
+    throw std::runtime_error(
+     "[oatpp::network::virtual_::server::ConnectionProvider::getConnectionAsync()]: Error. Not implemented.");
   }
 
   /**
    * Does nothing.
    * @param connection
    */
-  void invalidateConnection(const std::shared_ptr<IOStream>& connection) override {
+  void invalidateConnection(const std::shared_ptr<IOStream>& connection) override
+  {
     (void)connection;
     // DO Nothing.
   }
-  
 };
-  
+
 }}}}
 
 #endif /* oatpp_network_virtual__server_ConnectionProvider_hpp */

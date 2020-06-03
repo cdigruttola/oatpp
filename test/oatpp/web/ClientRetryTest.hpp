@@ -29,18 +29,18 @@
 
 namespace oatpp { namespace test { namespace web {
 
-class ClientRetryTest : public UnitTest {
+class ClientRetryTest: public UnitTest {
 private:
   v_int32 m_port;
-public:
 
+public:
   ClientRetryTest(v_int32 port)
     : UnitTest("TEST[web::ClientRetryTest]")
     , m_port(port)
-  {}
+  {
+  }
 
   void onRun() override;
-
 };
 
 }}}

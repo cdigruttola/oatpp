@@ -34,7 +34,9 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
  * Implementation of &id:oatpp::web::protocol::http::outgoing::Body; class.
  * Implements functionality to use &id::oatpp::String; as data source for http body.
  */
-class BufferBody : public oatpp::base::Countable, public Body {
+class BufferBody
+  : public oatpp::base::Countable
+  , public Body {
 public:
   OBJECT_POOL(Http_Outgoing_BufferBody_Pool, BufferBody, 32)
   SHARED_OBJECT_POOL(Shared_Http_Outgoing_BufferBody_Pool, BufferBody, 32)
@@ -42,18 +44,19 @@ private:
   oatpp::String m_buffer;
   oatpp::data::share::StringKeyLabel m_contentType;
   data::buffer::InlineReadData m_inlineData;
+
 public:
   BufferBody(const oatpp::String& buffer, const data::share::StringKeyLabel& contentType);
-public:
 
+public:
   /**
    * Create shared BufferBody.
    * @param buffer - &id:oatpp::String;.
    * @param contentType - type of the content.
    * @return - `std::shared_ptr` to BufferBody.
    */
-  static std::shared_ptr<BufferBody> createShared(const oatpp::String& buffer,
-                                                  const data::share::StringKeyLabel& contentType = data::share::StringKeyLabel());
+  static std::shared_ptr<BufferBody> createShared(
+   const oatpp::String& buffer, const data::share::StringKeyLabel& contentType = data::share::StringKeyLabel());
 
   /**
    * Read operation callback.
@@ -63,7 +66,7 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual number of bytes written to buffer. 0 - to indicate end-of-file.
    */
-  v_io_size read(void *buffer, v_buff_size count, async::Action& action) override;
+  v_io_size read(void* buffer, v_buff_size count, async::Action& action) override;
 
   /**
    * Declare `Content-Length` header.
@@ -82,9 +85,8 @@ public:
    * @return - `v_buff_size`.
    */
   v_buff_size getKnownSize() override;
-  
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_outgoing_BufferBody_hpp */

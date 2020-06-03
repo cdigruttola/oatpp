@@ -25,8 +25,8 @@
 #ifndef oatpp_web_protocol_http_encoding_EncoderProvider_hpp
 #define oatpp_web_protocol_http_encoding_EncoderProvider_hpp
 
-#include "oatpp/core/data/buffer/Processor.hpp"
 #include "oatpp/core/Types.hpp"
+#include "oatpp/core/data/buffer/Processor.hpp"
 
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace encoding {
 
@@ -35,7 +35,6 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
  */
 class EncoderProvider {
 public:
-
   /**
    * Default virtual destructor.
    */
@@ -52,7 +51,6 @@ public:
    * @return - &id:oatpp::data::buffer::Processor;
    */
   virtual std::shared_ptr<data::buffer::Processor> getProcessor() = 0;
-
 };
 
 }}}}}

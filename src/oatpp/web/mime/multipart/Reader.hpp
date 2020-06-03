@@ -37,7 +37,6 @@ namespace oatpp { namespace web { namespace mime { namespace multipart {
  */
 class PartReader {
 public:
-
   /**
    * Default virtual destructor.
    */
@@ -57,7 +56,6 @@ public:
    * @param size - size of the buffer.
    */
   virtual void onPartData(const std::shared_ptr<Part>& part, p_char8 data, oatpp::v_io_size size) = 0;
-
 };
 
 /**
@@ -65,7 +63,6 @@ public:
  */
 class AsyncPartReader {
 public:
-
   /**
    * Default virtual destructor.
    */
@@ -86,8 +83,9 @@ public:
    * @param size - size of the buffer.
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  virtual async::CoroutineStarter onPartDataAsync(const std::shared_ptr<Part>& part, p_char8 data, oatpp::v_io_size size) = 0;
-
+  virtual async::CoroutineStarter onPartDataAsync(const std::shared_ptr<Part>& part,
+                                                  p_char8 data,
+                                                  oatpp::v_io_size size) = 0;
 };
 
 class Reader; // FWD
@@ -101,16 +99,17 @@ typedef std::unordered_map<oatpp::String, std::shared_ptr<PartReader>> PartReade
  * In memory multipart parser. <br>
  * Extends - &id:oatpp::web::mime::multipart::StatefulParser::Listener;.
  */
-class PartsParser : public StatefulParser::Listener {
+class PartsParser: public StatefulParser::Listener {
   friend Reader;
+
 private:
   PartReadersMap m_readers;
   std::shared_ptr<PartReader> m_defaultReader;
   std::shared_ptr<PartReader> m_currReader;
   Multipart* m_multipart;
   std::shared_ptr<Part> m_currPart;
-public:
 
+public:
   /**
    * Constructor.
    * @param multipart - pointer to &id:oatpp::web::mime::multipart::Multipart;.
@@ -126,7 +125,6 @@ public:
   void setPartReader(const oatpp::String& partName, const std::shared_ptr<PartReader>& reader);
 
   void setDefaultPartReader(const std::shared_ptr<PartReader>& reader);
-
 };
 
 class AsyncReader; // FWD
@@ -140,16 +138,17 @@ typedef std::unordered_map<oatpp::String, std::shared_ptr<AsyncPartReader>> Asyn
  * Async In memory multipart parser. <br>
  * Extends - &id:oatpp::web::mime::multipart::StatefulParser::AsyncListener;.
  */
-class AsyncPartsParser : public StatefulParser::AsyncListener {
+class AsyncPartsParser: public StatefulParser::AsyncListener {
   friend AsyncReader;
+
 private:
   AsyncPartReadersMap m_readers;
   std::shared_ptr<AsyncPartReader> m_defaultReader;
   std::shared_ptr<AsyncPartReader> m_currReader;
   Multipart* m_multipart;
   std::shared_ptr<Part> m_currPart;
-public:
 
+public:
   /**
    * Constructor.
    * @param multipart - pointer to &id:oatpp::web::mime::multipart::Multipart;.
@@ -165,26 +164,25 @@ public:
   void setPartReader(const oatpp::String& partName, const std::shared_ptr<AsyncPartReader>& reader);
 
   void setDefaultPartReader(const std::shared_ptr<AsyncPartReader>& reader);
-
 };
 
 /**
  * In memory Multipart reader.
  * Extends - &id:oatpp::data::stream::WriteCallback;.
  */
-class Reader : public oatpp::data::stream::WriteCallback {
+class Reader: public oatpp::data::stream::WriteCallback {
 private:
   std::shared_ptr<PartsParser> m_partsParser;
   StatefulParser m_parser;
-public:
 
+public:
   /**
    * Constructor.
    * @param multipart - Multipart object to save read data to.
    */
   Reader(Multipart* multipart);
 
-  v_io_size write(const void *data, v_buff_size count, async::Action& action) override;
+  v_io_size write(const void* data, v_buff_size count, async::Action& action) override;
 
   /**
    * Set named part reader. <br>
@@ -200,27 +198,26 @@ public:
    * @param reader
    */
   void setDefaultPartReader(const std::shared_ptr<PartReader>& reader);
-
 };
 
 /**
  * In memory Multipart reader.
  * Extends - &id:oatpp::data::stream::WriteCallback;.
  */
-class AsyncReader : public oatpp::data::stream::WriteCallback {
+class AsyncReader: public oatpp::data::stream::WriteCallback {
 private:
   std::shared_ptr<AsyncPartsParser> m_partsParser;
   StatefulParser m_parser;
   std::shared_ptr<Multipart> m_multipart;
-public:
 
+public:
   /**
    * Constructor.
    * @param multipart - Multipart object to save read data to.
    */
   AsyncReader(const std::shared_ptr<Multipart>& multipart);
 
-  v_io_size write(const void *data, v_buff_size count, async::Action& action) override;
+  v_io_size write(const void* data, v_buff_size count, async::Action& action) override;
 
   /**
    * Set named part reader. <br>
@@ -236,7 +233,6 @@ public:
    * @param reader
    */
   void setDefaultPartReader(const std::shared_ptr<AsyncPartReader>& reader);
-
 };
 
 }}}}

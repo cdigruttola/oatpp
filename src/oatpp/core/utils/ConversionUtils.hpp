@@ -25,8 +25,8 @@
 #ifndef oatpp_utils_ConversionUtils_hpp
 #define oatpp_utils_ConversionUtils_hpp
 
-#include "oatpp/core/data/mapping/type/Primitive.hpp"
 #include "oatpp/core/Types.hpp"
+#include "oatpp/core/data/mapping/type/Primitive.hpp"
 
 
 #include "oatpp/core/base/Countable.hpp"
@@ -36,266 +36,274 @@
 
 namespace oatpp { namespace utils { namespace conversion {
 
-  /**
-   * String to 32-bit integer.
-   * @param str - string as `const char*`.
-   * @return - 32-bit integer value.
-   */
-  v_int32 strToInt32(const char* str);
+/**
+ * String to 32-bit integer.
+ * @param str - string as `const char*`.
+ * @return - 32-bit integer value.
+ */
+v_int32 strToInt32(const char* str);
 
-  /**
-   * String to 32-bit integer.
-   * @param str - string as `oatpp::String`.
-   * @param success - out parameter. `true` if operation was successful. `false` otherwise.
-   * @return - 32-bit integer value.
-   */
-  v_int32 strToInt32(const oatpp::String& str, bool& success);
+/**
+ * String to 32-bit integer.
+ * @param str - string as `oatpp::String`.
+ * @param success - out parameter. `true` if operation was successful. `false` otherwise.
+ * @return - 32-bit integer value.
+ */
+v_int32 strToInt32(const oatpp::String& str, bool& success);
 
-  /**
-   * String to 32-bit unsigned integer.
-   * @param str - string as `const char*`.
-   * @return - 32-bit unsigned integer value.
-   */
-  v_uint32 strToUInt32(const char* str);
+/**
+ * String to 32-bit unsigned integer.
+ * @param str - string as `const char*`.
+ * @return - 32-bit unsigned integer value.
+ */
+v_uint32 strToUInt32(const char* str);
 
-  /**
-   * String to 32-bit unsigned integer.
-   * @param str - string as `oatpp::String`.
-   * @param success - out parameter. `true` if operation was successful. `false` otherwise.
-   * @return - 32-bit unsigned integer value.
-   */
-  v_uint32 strToUInt32(const oatpp::String& str, bool& success);
+/**
+ * String to 32-bit unsigned integer.
+ * @param str - string as `oatpp::String`.
+ * @param success - out parameter. `true` if operation was successful. `false` otherwise.
+ * @return - 32-bit unsigned integer value.
+ */
+v_uint32 strToUInt32(const oatpp::String& str, bool& success);
 
-  /**
-   * String to 64-bit integer.
-   * @param str - string as `const char*`.
-   * @return - 64-bit integer value.
-   */
-  v_int64 strToInt64(const char* str);
+/**
+ * String to 64-bit integer.
+ * @param str - string as `const char*`.
+ * @return - 64-bit integer value.
+ */
+v_int64 strToInt64(const char* str);
 
-  /**
-   * String to 64-bit integer.
-   * @param str - string as `oatpp::String`.
-   * @param success - out parameter. `true` if operation was successful. `false` otherwise.
-   * @return - 64-bit integer value.
-   */
-  v_int64 strToInt64(const oatpp::String& str, bool& success);
+/**
+ * String to 64-bit integer.
+ * @param str - string as `oatpp::String`.
+ * @param success - out parameter. `true` if operation was successful. `false` otherwise.
+ * @return - 64-bit integer value.
+ */
+v_int64 strToInt64(const oatpp::String& str, bool& success);
 
-  /**
-   * String to 64-bit unsigned integer.
-   * @param str - string as `const char*`.
-   * @return - 64-bit unsigned integer value.
-   */
-  v_uint64 strToUInt64(const char* str);
+/**
+ * String to 64-bit unsigned integer.
+ * @param str - string as `const char*`.
+ * @return - 64-bit unsigned integer value.
+ */
+v_uint64 strToUInt64(const char* str);
 
-  /**
-   * String to 64-bit unsigned integer.
-   * @param str - string as `oatpp::String`.
-   * @param success - out parameter. `true` if operation was successful. `false` otherwise.
-   * @return - 64-bit unsigned integer value.
-   */
-  v_uint64 strToUInt64(const oatpp::String& str, bool& success);
+/**
+ * String to 64-bit unsigned integer.
+ * @param str - string as `oatpp::String`.
+ * @param success - out parameter. `true` if operation was successful. `false` otherwise.
+ * @return - 64-bit unsigned integer value.
+ */
+v_uint64 strToUInt64(const oatpp::String& str, bool& success);
 
-  /**
-   * Convert 32-bit integer to it's string representation.
-   * @param value - 32-bit integer value.
-   * @param data - buffer to write data to.
-   * @param n - buffer size.
-   * @return - length of the resultant string.
-   */
-  v_buff_size int32ToCharSequence(v_int32 value, p_char8 data, v_buff_size n);
+/**
+ * Convert 32-bit integer to it's string representation.
+ * @param value - 32-bit integer value.
+ * @param data - buffer to write data to.
+ * @param n - buffer size.
+ * @return - length of the resultant string.
+ */
+v_buff_size int32ToCharSequence(v_int32 value, p_char8 data, v_buff_size n);
 
-  /**
-   * Convert 32-bit unsigned integer to it's string representation.
-   * @param value - 32-bit unsigned integer value.
-   * @param data - buffer to write data to.
-   * @param n - buffer size.
-   * @return - length of the resultant string.
-   */
-  v_buff_size uint32ToCharSequence(v_uint32 value, p_char8 data, v_buff_size n);
+/**
+ * Convert 32-bit unsigned integer to it's string representation.
+ * @param value - 32-bit unsigned integer value.
+ * @param data - buffer to write data to.
+ * @param n - buffer size.
+ * @return - length of the resultant string.
+ */
+v_buff_size uint32ToCharSequence(v_uint32 value, p_char8 data, v_buff_size n);
 
- /**
-  * Convert 64-bit integer to it's string representation.
-  * @param value - 64-bit integer value.
-  * @param data - buffer to write data to.
-  * @param n - buffer size.
-  * @return - length of the resultant string.
-  */
- v_buff_size int64ToCharSequence(v_int64 value, p_char8 data, v_buff_size n);
+/**
+ * Convert 64-bit integer to it's string representation.
+ * @param value - 64-bit integer value.
+ * @param data - buffer to write data to.
+ * @param n - buffer size.
+ * @return - length of the resultant string.
+ */
+v_buff_size int64ToCharSequence(v_int64 value, p_char8 data, v_buff_size n);
 
-  /**
-   * Convert 64-bit unsigned integer to it's string representation.
-   * @param value - 64-bit unsigned integer value.
-   * @param data - buffer to write data to.
-   * @param n - buffer size.
-   * @return - length of the resultant string.
-   */
-  v_buff_size uint64ToCharSequence(v_uint64 value, p_char8 data, v_buff_size n);
+/**
+ * Convert 64-bit unsigned integer to it's string representation.
+ * @param value - 64-bit unsigned integer value.
+ * @param data - buffer to write data to.
+ * @param n - buffer size.
+ * @return - length of the resultant string.
+ */
+v_buff_size uint64ToCharSequence(v_uint64 value, p_char8 data, v_buff_size n);
 
-  /**
-   * Convert 32-bit integer to it's string representation.
-   * @param value - 32-bit integer value.
-   * @return - value as `oatpp::String`
-   */
-  oatpp::String int32ToStr(v_int32 value);
+/**
+ * Convert 32-bit integer to it's string representation.
+ * @param value - 32-bit integer value.
+ * @return - value as `oatpp::String`
+ */
+oatpp::String int32ToStr(v_int32 value);
 
-  /**
-   * Convert 32-bit unsigned integer to it's string representation.
-   * @param value - 32-bit unsigned integer value.
-   * @return - value as `oatpp::String`
-   */
-  oatpp::String uint32ToStr(v_uint32 value);
+/**
+ * Convert 32-bit unsigned integer to it's string representation.
+ * @param value - 32-bit unsigned integer value.
+ * @return - value as `oatpp::String`
+ */
+oatpp::String uint32ToStr(v_uint32 value);
 
-  /**
-   * Convert 64-bit integer to it's string representation.
-   * @param value - 64-bit integer value.
-   * @return - value as `oatpp::String`
-   */
-  oatpp::String int64ToStr(v_int64 value);
+/**
+ * Convert 64-bit integer to it's string representation.
+ * @param value - 64-bit integer value.
+ * @return - value as `oatpp::String`
+ */
+oatpp::String int64ToStr(v_int64 value);
 
-  /**
-   * Convert 64-bit unsigned integer to it's string representation.
-   * @param value - 64-bit unsigned integer value.
-   * @return - value as `oatpp::String`
-   */
-  oatpp::String uint64ToStr(v_uint64 value);
+/**
+ * Convert 64-bit unsigned integer to it's string representation.
+ * @param value - 64-bit unsigned integer value.
+ * @return - value as `oatpp::String`
+ */
+oatpp::String uint64ToStr(v_uint64 value);
 
-  /**
-   * Convert 32-bit integer to it's string representation.
-   * @param value - 32-bit integer value.
-   * @return - value as `std::string`
-   */
-  std::string int32ToStdStr(v_int32 value);
+/**
+ * Convert 32-bit integer to it's string representation.
+ * @param value - 32-bit integer value.
+ * @return - value as `std::string`
+ */
+std::string int32ToStdStr(v_int32 value);
 
-  /**
-   * Convert 32-bit unsigned integer to it's string representation.
-   * @param value - 32-bit unsigned integer value.
-   * @return - value as `std::string`
-   */
-  std::string uint32ToStdStr(v_uint32 value);
+/**
+ * Convert 32-bit unsigned integer to it's string representation.
+ * @param value - 32-bit unsigned integer value.
+ * @return - value as `std::string`
+ */
+std::string uint32ToStdStr(v_uint32 value);
 
-  /**
-   * Convert 64-bit integer to it's string representation.
-   * @param value - 64-bit integer value.
-   * @return - value as `std::string`
-   */
-  std::string int64ToStdStr(v_int64 value);
+/**
+ * Convert 64-bit integer to it's string representation.
+ * @param value - 64-bit integer value.
+ * @return - value as `std::string`
+ */
+std::string int64ToStdStr(v_int64 value);
 
-  /**
-   * Convert 64-bit unsigned integer to it's string representation.
-   * @param value - 64-bit unsigned integer value.
-   * @return - value as `std::string`
-   */
-  std::string uint64ToStdStr(v_uint64 value);
+/**
+ * Convert 64-bit unsigned integer to it's string representation.
+ * @param value - 64-bit unsigned integer value.
+ * @return - value as `std::string`
+ */
+std::string uint64ToStdStr(v_uint64 value);
 
-  /**
-   * Write value of primitive type (int, float, etc.) as it's string representation with pattern.
-   * @tparam T - primitive value type (int, float, etc.).
-   * @param value - actual value.
-   * @param data - buffer to write data to.
-   * @param n - buffer size.
-   * @param pattern - pattern as for `snprintf`.
-   * @return - length of the resultant string.
-   */
-  template<typename T>
-  v_buff_size primitiveToCharSequence(T value, p_char8 data, v_buff_size n, const char *pattern) {
-    return snprintf((char*)data, n, pattern, value);
+/**
+ * Write value of primitive type (int, float, etc.) as it's string representation with pattern.
+ * @tparam T - primitive value type (int, float, etc.).
+ * @param value - actual value.
+ * @param data - buffer to write data to.
+ * @param n - buffer size.
+ * @param pattern - pattern as for `snprintf`.
+ * @return - length of the resultant string.
+ */
+template<typename T>
+v_buff_size primitiveToCharSequence(T value, p_char8 data, v_buff_size n, const char* pattern)
+{
+  return snprintf((char*)data, n, pattern, value);
+}
+
+/**
+ * Write value of primitive type (int, float, etc.) as it's string representation with pattern.
+ * @tparam T - primitive value type (int, float, etc.).
+ * @param value - actual value.
+ * @param pattern - pattern as for `sprintf`.
+ * @return - length of the resultant string.
+ */
+template<typename T>
+oatpp::String primitiveToStr(T value, const char* pattern)
+{
+  v_char8 buff [ 100 ];
+  auto size = primitiveToCharSequence(value, &buff [ 0 ], 100, pattern);
+  if(size > 0) {
+    return oatpp::String((const char*)&buff [ 0 ], size, true);
   }
+  return nullptr;
+}
 
-  /**
-   * Write value of primitive type (int, float, etc.) as it's string representation with pattern.
-   * @tparam T - primitive value type (int, float, etc.).
-   * @param value - actual value.
-   * @param pattern - pattern as for `sprintf`.
-   * @return - length of the resultant string.
-   */
-  template<typename T>
-  oatpp::String primitiveToStr(T value, const char* pattern){
-    v_char8 buff [100];
-    auto size = primitiveToCharSequence(value, &buff[0], 100, pattern);
-    if(size > 0){
-      return oatpp::String((const char*)&buff[0], size, true);
-    }
-    return nullptr;
-  }
+/**
+ * String to 32-bit float.
+ * @param str - string as `const char*`.
+ * @return - 32-bit float value.
+ */
+v_float32 strToFloat32(const char* str);
 
-  /**
-   * String to 32-bit float.
-   * @param str - string as `const char*`.
-   * @return - 32-bit float value.
-   */
-  v_float32 strToFloat32(const char* str);
+/**
+ * String to 32-bit float.
+ * @param str - string as `oatpp::String`.
+ * @param success - out parameter. `true` if operation was successful. `false` otherwise.
+ * @return - 32-bit float value.
+ */
+v_float32 strToFloat32(const oatpp::String& str, bool& success);
 
-  /**
-   * String to 32-bit float.
-   * @param str - string as `oatpp::String`.
-   * @param success - out parameter. `true` if operation was successful. `false` otherwise.
-   * @return - 32-bit float value.
-   */
-  v_float32 strToFloat32(const oatpp::String& str, bool& success);
+/**
+ * String to 64-bit float.
+ * @param str - string as `const char*`.
+ * @return - 64-bit float value.
+ */
+v_float64 strToFloat64(const char* str);
 
-  /**
-   * String to 64-bit float.
-   * @param str - string as `const char*`.
-   * @return - 64-bit float value.
-   */
-  v_float64 strToFloat64(const char* str);
+/**
+ * String to 64-bit float.
+ * @param str - string as `oatpp::String`.
+ * @param success - out parameter. `true` if operation was successful. `false` otherwise.
+ * @return - 64-bit float value.
+ */
+v_float64 strToFloat64(const oatpp::String& str, bool& success);
 
-  /**
-   * String to 64-bit float.
-   * @param str - string as `oatpp::String`.
-   * @param success - out parameter. `true` if operation was successful. `false` otherwise.
-   * @return - 64-bit float value.
-   */
-  v_float64 strToFloat64(const oatpp::String& str, bool& success);
+/**
+ * Convert 32-bit float to it's string representation.
+ * @param value - 32-bit float value.
+ * @param data - buffer to write data to.
+ * @param n - buffer size.
+ * @return - length of the resultant string.
+ */
+v_buff_size float32ToCharSequence(v_float32 value,
+                                  p_char8 data,
+                                  v_buff_size n,
+                                  const char* format = OATPP_FLOAT_STRING_FORMAT);
 
-  /**
-   * Convert 32-bit float to it's string representation.
-   * @param value - 32-bit float value.
-   * @param data - buffer to write data to.
-   * @param n - buffer size.
-   * @return - length of the resultant string.
-   */
-  v_buff_size float32ToCharSequence(v_float32 value, p_char8 data, v_buff_size n, const char* format = OATPP_FLOAT_STRING_FORMAT);
+/**
+ * Convert 64-bit float to it's string representation.
+ * @param value - 64-bit float value.
+ * @param data - buffer to write data to.
+ * @param n - buffer size.
+ * @return - length of the resultant string.
+ */
+v_buff_size float64ToCharSequence(v_float64 value,
+                                  p_char8 data,
+                                  v_buff_size n,
+                                  const char* format = OATPP_FLOAT_STRING_FORMAT);
 
-  /**
-   * Convert 64-bit float to it's string representation.
-   * @param value - 64-bit float value.
-   * @param data - buffer to write data to.
-   * @param n - buffer size.
-   * @return - length of the resultant string.
-   */
-  v_buff_size float64ToCharSequence(v_float64 value, p_char8 data, v_buff_size n, const char* format = OATPP_FLOAT_STRING_FORMAT);
+/**
+ * Convert 32-bit float to it's string representation.
+ * @param value - 32-bit float value.
+ * @return - value as `oatpp::String`
+ */
+oatpp::String float32ToStr(v_float32 value, const char* format = OATPP_FLOAT_STRING_FORMAT);
 
-  /**
-   * Convert 32-bit float to it's string representation.
-   * @param value - 32-bit float value.
-   * @return - value as `oatpp::String`
-   */
-  oatpp::String float32ToStr(v_float32 value, const char* format = OATPP_FLOAT_STRING_FORMAT);
+/**
+ * Convert 64-bit float to it's string representation.
+ * @param value - 64-bit float value.
+ * @return - value as `oatpp::String`
+ */
+oatpp::String float64ToStr(v_float64 value, const char* format = OATPP_FLOAT_STRING_FORMAT);
 
-  /**
-   * Convert 64-bit float to it's string representation.
-   * @param value - 64-bit float value.
-   * @return - value as `oatpp::String`
-   */
-  oatpp::String float64ToStr(v_float64 value, const char* format = OATPP_FLOAT_STRING_FORMAT);
+/**
+ * Convert boolean to it's string representation.
+ * @param value - boolean value.
+ * @return - value as `oatpp::String`;
+ */
+oatpp::String boolToStr(bool value);
 
-  /**
-   * Convert boolean to it's string representation.
-   * @param value - boolean value.
-   * @return - value as `oatpp::String`;
-   */
-  oatpp::String boolToStr(bool value);
+/**
+ * parse string to boolean value.
+ * @param str - string to parse.
+ * @param success - out parameter. `true` if operation was successful. `false` otherwise.
+ * @return - boolean value.
+ */
+bool strToBool(const oatpp::String& str, bool& success);
 
-  /**
-   * parse string to boolean value.
-   * @param str - string to parse.
-   * @param success - out parameter. `true` if operation was successful. `false` otherwise.
-   * @return - boolean value.
-   */
-  bool strToBool(const oatpp::String& str, bool& success);
-  
 }}}
 
 #endif /* oatpp_utils_ConversionUtils_hpp */

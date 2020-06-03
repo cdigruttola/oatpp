@@ -26,10 +26,10 @@
 
 #include "oatpp/web/app/Client.hpp"
 
-#include "oatpp/web/app/ControllerWithInterceptors.hpp"
-#include "oatpp/web/app/Controller.hpp"
 #include "oatpp/web/app/BasicAuthorizationController.hpp"
 #include "oatpp/web/app/BearerAuthorizationController.hpp"
+#include "oatpp/web/app/Controller.hpp"
+#include "oatpp/web/app/ControllerWithInterceptors.hpp"
 
 #include "oatpp/web/client/HttpRequestExecutor.hpp"
 
@@ -38,19 +38,19 @@
 
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 
-#include "oatpp/network/server/SimpleTCPConnectionProvider.hpp"
 #include "oatpp/network/client/SimpleTCPConnectionProvider.hpp"
+#include "oatpp/network/server/SimpleTCPConnectionProvider.hpp"
 
+#include "oatpp/network/virtual_/Interface.hpp"
 #include "oatpp/network/virtual_/client/ConnectionProvider.hpp"
 #include "oatpp/network/virtual_/server/ConnectionProvider.hpp"
-#include "oatpp/network/virtual_/Interface.hpp"
 
 #include "oatpp/network/ConnectionPool.hpp"
 
 #include "oatpp/core/macro/component.hpp"
 
-#include "oatpp-test/web/ClientServerTestRunner.hpp"
 #include "oatpp-test/Checker.hpp"
+#include "oatpp-test/web/ClientServerTestRunner.hpp"
 
 namespace oatpp { namespace test { namespace web {
 
@@ -61,69 +61,64 @@ typedef oatpp::web::server::api::ApiController ApiController;
 class TestServerComponent {
 private:
   v_int32 m_port;
-public:
 
+public:
   TestServerComponent(v_int32 port)
     : m_port(port)
-  {}
+  {
+  }
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ServerConnectionProvider>, serverConnectionProvider)([this] {
-
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ServerConnectionProvider>, serverConnectionProvider)
+  ([ this ] {
     if(m_port == 0) { // Use oatpp virtual interface
       auto interface = oatpp::network::virtual_::Interface::obtainShared("virtualhost");
       return std::static_pointer_cast<oatpp::network::ServerConnectionProvider>(
-        oatpp::network::virtual_::server::ConnectionProvider::createShared(interface)
-      );
+       oatpp::network::virtual_::server::ConnectionProvider::createShared(interface));
     }
 
     return std::static_pointer_cast<oatpp::network::ServerConnectionProvider>(
-      oatpp::network::server::SimpleTCPConnectionProvider::createShared(m_port)
-    );
-
+     oatpp::network::server::SimpleTCPConnectionProvider::createShared(m_port));
   }());
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, httpRouter)([] {
-    return oatpp::web::server::HttpRouter::createShared();
-  }());
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, httpRouter)
+  ([] { return oatpp::web::server::HttpRouter::createShared(); }());
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::server::ConnectionHandler>, serverConnectionHandler)([] {
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::server::ConnectionHandler>, serverConnectionHandler)
+  ([] {
     OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
     return oatpp::web::server::HttpConnectionHandler::createShared(router);
   }());
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, objectMapper)([] {
-    return oatpp::parser::json::mapping::ObjectMapper::createShared();
-  }());
-
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, objectMapper)
+  ([] { return oatpp::parser::json::mapping::ObjectMapper::createShared(); }());
 };
 
 class TestClientComponent {
 private:
   v_int32 m_port;
-public:
 
+public:
   TestClientComponent(v_int32 port)
     : m_port(port)
-  {}
+  {
+  }
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ClientConnectionProvider>, clientConnectionProvider)([this] {
-
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ClientConnectionProvider>, clientConnectionProvider)
+  ([ this ] {
     if(m_port == 0) {
       auto interface = oatpp::network::virtual_::Interface::obtainShared("virtualhost");
       return std::static_pointer_cast<oatpp::network::ClientConnectionProvider>(
-        oatpp::network::virtual_::client::ConnectionProvider::createShared(interface)
-      );
+       oatpp::network::virtual_::client::ConnectionProvider::createShared(interface));
     }
 
     return std::static_pointer_cast<oatpp::network::ClientConnectionProvider>(
-      oatpp::network::client::SimpleTCPConnectionProvider::createShared("127.0.0.1", m_port)
-    );
-
+     oatpp::network::client::SimpleTCPConnectionProvider::createShared("127.0.0.1", m_port));
   }());
-
 };
 
-void runServer(v_int32 port, v_int32 delaySeconds, v_int32 iterations, bool stable, const std::shared_ptr<app::Controller>& controller) {
+void runServer(
+ v_int32 port, v_int32 delaySeconds, v_int32 iterations, bool stable, const std::shared_ptr<app::Controller>& controller)
+{
 
   TestServerComponent component(port);
 
@@ -131,25 +126,25 @@ void runServer(v_int32 port, v_int32 delaySeconds, v_int32 iterations, bool stab
 
   runner.addController(controller);
 
-  runner.run([&runner, delaySeconds, iterations, stable, controller] {
-
-    for(v_int32 i = 0; i < iterations; i ++) {
-      std::this_thread::sleep_for(std::chrono::seconds(delaySeconds));
-      if(!stable) {
-        controller->available = !controller->available;
-        OATPP_LOGI("Server", "Available=%d", (v_int32)controller->available.load());
-      }
-    }
-
-  }, std::chrono::minutes(10));
+  runner.run(
+   [ &runner, delaySeconds, iterations, stable, controller ] {
+     for(v_int32 i = 0; i < iterations; i++) {
+       std::this_thread::sleep_for(std::chrono::seconds(delaySeconds));
+       if(!stable) {
+         controller->available = !controller->available;
+         OATPP_LOGI("Server", "Available=%d", (v_int32)controller->available.load());
+       }
+     }
+   },
+   std::chrono::minutes(10));
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
-
 }
 
 }
 
-void ClientRetryTest::onRun() {
+void ClientRetryTest::onRun()
+{
 
   TestClientComponent component(m_port);
 
@@ -188,9 +183,7 @@ void ClientRetryTest::onRun() {
       OATPP_ASSERT(ticks < 3 * 1000 * 1000 /* 3s */);
 
 #endif
-
     }
-
   }
 
   {
@@ -204,8 +197,8 @@ void ClientRetryTest::onRun() {
 
     std::list<std::thread> threads;
 
-    for(v_int32 i = 0; i < 100; i ++) {
-      threads.push_back(std::thread([client]{
+    for(v_int32 i = 0; i < 100; i++) {
+      threads.push_back(std::thread([ client ] {
         auto response = client->getRoot();
         OATPP_ASSERT(response);
         OATPP_ASSERT(response->getStatusCode() == 200);
@@ -219,13 +212,12 @@ void ClientRetryTest::onRun() {
 
     runServer(m_port, 1, 1, true, controller);
 
-    for(std::thread& thread : threads) {
+    for(std::thread& thread: threads) {
       thread.join();
     }
 
     auto ticks = checker.getElapsedTicks();
     OATPP_ASSERT(ticks < 10 * 1000 * 1000 /* 10s */);
-
   }
 
   {
@@ -233,14 +225,14 @@ void ClientRetryTest::onRun() {
     OATPP_LOGI(TAG, "Test: unstable server!");
 
     auto retryPolicy = std::make_shared<oatpp::web::client::SimpleRetryPolicy>(-1, std::chrono::seconds(1));
-    auto connectionPool = std::make_shared<oatpp::network::ClientConnectionPool>(connectionProvider, 10, std::chrono::seconds(1));
+    auto connectionPool =
+     std::make_shared<oatpp::network::ClientConnectionPool>(connectionProvider, 10, std::chrono::seconds(1));
     auto requestExecutor = oatpp::web::client::HttpRequestExecutor::createShared(connectionPool, retryPolicy);
     auto client = app::Client::createShared(requestExecutor, objectMapper);
 
     std::list<std::thread> threads;
 
-    std::thread clientThread([client]{
-
+    std::thread clientThread([ client ] {
       v_int64 counter = 0;
 
       v_int64 tick0 = oatpp::base::Environment::getMicroTickCount();
@@ -252,24 +244,20 @@ void ClientRetryTest::onRun() {
         OATPP_ASSERT(response->getStatusCode() == 200);
         auto data = response->readBodyToString();
         OATPP_ASSERT(data == "Hello World!!!");
-        counter ++;
+        counter++;
 
         if(counter % 1000 == 0) {
           OATPP_LOGD("client", "requests=%d", counter);
         }
-
       }
-
     });
 
     runServer(m_port, 2, 6, false, controller);
 
     clientThread.join();
-
   }
 
   std::this_thread::sleep_for(std::chrono::seconds(2)); // wait connection pool.
-
 }
 
 }}}

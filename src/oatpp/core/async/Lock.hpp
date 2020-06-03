@@ -34,15 +34,16 @@ namespace oatpp { namespace async {
  * - When called from a thread - must be used with `std::lock_guard`.
  * - When called from coroutine - must be used with &l:LockGuard;.
  */
-class Lock : private CoroutineWaitList::Listener {
+class Lock: private CoroutineWaitList::Listener {
 private:
   std::atomic<v_int32> m_counter;
   std::mutex m_mutex;
   CoroutineWaitList m_list;
+
 private:
   void onNewItem(CoroutineWaitList& list) override;
-public:
 
+public:
   /**
    * Constructor.
    */
@@ -69,7 +70,6 @@ public:
    * @return - `true` if the lock was acquired, `false` otherwise.
    */
   bool try_lock();
-
 };
 
 /**
@@ -82,14 +82,16 @@ public:
    * Convenince typedef for &id:oatpp::async::CoroutineStarter;.
    */
   typedef oatpp::async::CoroutineStarter CoroutineStarter;
+
 private:
   bool m_ownsLock;
   Lock* m_lock;
+
 public:
   LockGuard(const LockGuard&) = delete;
-  LockGuard& operator = (const LockGuard&) = delete;
-public:
+  LockGuard& operator=(const LockGuard&) = delete;
 
+public:
   /**
    * Default constructor.
    */
@@ -137,7 +139,6 @@ public:
    * Unlock guarded lock.
    */
   void unlock();
-
 };
 
 /**
@@ -146,7 +147,7 @@ public:
  * @param starter - Coroutine to execute in synchronized manner. &id:oatpp::async::CoroutineStarter;.
  * @return - starter of synchronization coroutine (wrapper coroutine). &id:oatpp::async::CoroutineStarter;.
  */
-CoroutineStarter synchronize(oatpp::async::Lock *lock, CoroutineStarter&& starter);
+CoroutineStarter synchronize(oatpp::async::Lock* lock, CoroutineStarter&& starter);
 
 }}
 

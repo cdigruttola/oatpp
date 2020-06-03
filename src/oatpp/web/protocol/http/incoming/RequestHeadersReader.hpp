@@ -25,10 +25,10 @@
 #ifndef oatpp_web_protocol_http_incoming_RequestHeadersReader_hpp
 #define oatpp_web_protocol_http_incoming_RequestHeadersReader_hpp
 
-#include "oatpp/web/protocol/http/Http.hpp"
 #include "oatpp/core/async/Coroutine.hpp"
-#include "oatpp/core/data/stream/StreamBufferedProxy.hpp"
 #include "oatpp/core/data/stream/BufferStream.hpp"
+#include "oatpp/core/data/stream/StreamBufferedProxy.hpp"
+#include "oatpp/web/protocol/http/Http.hpp"
 
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace incoming {
 
@@ -41,10 +41,11 @@ public:
    * Convenience typedef for &id:oatpp::async::Action;.
    */
   typedef oatpp::async::Action Action;
+
 private:
   static constexpr v_uint32 SECTION_END = ('\r' << 24) | ('\n' << 16) | ('\r' << 8) | ('\n');
-public:
 
+public:
   /**
    * Result of headers reading and parsing.
    */
@@ -58,11 +59,9 @@ public:
      * &id:oatpp::web::protocol::http::Headers;.
      */
     http::Headers headers;
-
   };
 
 private:
-
   struct ReadHeadersIteration {
     v_uint32 accumulator = 0;
     bool done = false;
@@ -70,14 +69,15 @@ private:
 
 private:
   v_io_size readHeadersSectionIterative(ReadHeadersIteration& iteration,
-                                              data::stream::InputStreamBufferedProxy* stream,
-                                              async::Action& action);
+                                        data::stream::InputStreamBufferedProxy* stream,
+                                        async::Action& action);
+
 private:
   oatpp::data::stream::BufferOutputStream* m_bufferStream;
   v_buff_size m_readChunkSize;
   v_buff_size m_maxHeadersSize;
-public:
 
+public:
   /**
    * Constructor.
    * @param readChunkSize
@@ -89,7 +89,8 @@ public:
     : m_bufferStream(bufferStream)
     , m_readChunkSize(readChunkSize)
     , m_maxHeadersSize(maxHeadersSize)
-  {}
+  {
+  }
 
   /**
    * Read and parse http headers from stream.
@@ -104,10 +105,10 @@ public:
    * @param stream - `std::shared_ptr` to &id:oatpp::data::stream::InputStreamBufferedProxy;.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  oatpp::async::CoroutineStarterForResult<const RequestHeadersReader::Result&> readHeadersAsync(const std::shared_ptr<data::stream::InputStreamBufferedProxy>& stream);
-  
+  oatpp::async::CoroutineStarterForResult<const RequestHeadersReader::Result&> readHeadersAsync(
+   const std::shared_ptr<data::stream::InputStreamBufferedProxy>& stream);
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_incoming_RequestHeadersReader_hpp */

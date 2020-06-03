@@ -38,24 +38,31 @@ AsyncHttpConnectionHandler::AsyncHttpConnectionHandler(const std::shared_ptr<Htt
                                                        const std::shared_ptr<oatpp::async::Executor>& executor)
   : m_executor(executor)
   , m_components(components)
-{}
+{
+}
 
-std::shared_ptr<AsyncHttpConnectionHandler> AsyncHttpConnectionHandler::createShared(const std::shared_ptr<HttpRouter>& router, v_int32 threadCount){
+std::shared_ptr<AsyncHttpConnectionHandler> AsyncHttpConnectionHandler::createShared(
+ const std::shared_ptr<HttpRouter>& router, v_int32 threadCount)
+{
   return std::make_shared<AsyncHttpConnectionHandler>(router, threadCount);
 }
 
-std::shared_ptr<AsyncHttpConnectionHandler> AsyncHttpConnectionHandler::createShared(const std::shared_ptr<HttpRouter>& router, const std::shared_ptr<oatpp::async::Executor>& executor){
+std::shared_ptr<AsyncHttpConnectionHandler> AsyncHttpConnectionHandler::createShared(
+ const std::shared_ptr<HttpRouter>& router, const std::shared_ptr<oatpp::async::Executor>& executor)
+{
   return std::make_shared<AsyncHttpConnectionHandler>(router, executor);
 }
 
-void AsyncHttpConnectionHandler::setErrorHandler(const std::shared_ptr<handler::ErrorHandler>& errorHandler){
+void AsyncHttpConnectionHandler::setErrorHandler(const std::shared_ptr<handler::ErrorHandler>& errorHandler)
+{
   m_components->errorHandler = errorHandler;
   if(!m_components->errorHandler) {
     m_components->errorHandler = handler::DefaultErrorHandler::createShared();
   }
 }
 
-void AsyncHttpConnectionHandler::addRequestInterceptor(const std::shared_ptr<handler::RequestInterceptor>& interceptor) {
+void AsyncHttpConnectionHandler::addRequestInterceptor(const std::shared_ptr<handler::RequestInterceptor>& interceptor)
+{
   m_components->requestInterceptors->pushBack(interceptor);
 }
 
@@ -69,11 +76,11 @@ void AsyncHttpConnectionHandler::handleConnection(const std::shared_ptr<IOStream
   connection->setInputStreamIOMode(oatpp::data::stream::IOMode::ASYNCHRONOUS);
 
   m_executor->execute<HttpProcessor::Coroutine>(m_components, connection);
-  
 }
 
-void AsyncHttpConnectionHandler::stop() {
+void AsyncHttpConnectionHandler::stop()
+{
   // DO NOTHING
 }
-  
+
 }}}

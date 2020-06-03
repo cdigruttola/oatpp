@@ -29,12 +29,13 @@
 
 namespace oatpp { namespace test { namespace network {
 
-class ConnectionPoolTest : public UnitTest {
+class ConnectionPoolTest: public UnitTest {
 public:
-
-  ConnectionPoolTest():UnitTest("TEST[network::ConnectionPoolTest]"){}
+  ConnectionPoolTest()
+    : UnitTest("TEST[network::ConnectionPoolTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}

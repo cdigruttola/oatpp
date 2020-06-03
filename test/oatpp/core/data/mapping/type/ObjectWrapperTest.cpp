@@ -25,16 +25,17 @@
 #include "ObjectWrapperTest.hpp"
 #include "oatpp/core/Types.hpp"
 
-namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace  type {
+namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace type {
 
 namespace {
 
-  template<class T, class Clazz = oatpp::data::mapping::type::__class::Void>
-  using ObjectWrapper = oatpp::data::mapping::type::ObjectWrapper<T, Clazz>;
+template<class T, class Clazz = oatpp::data::mapping::type::__class::Void>
+using ObjectWrapper = oatpp::data::mapping::type::ObjectWrapper<T, Clazz>;
 
 }
 
-void ObjectWrapperTest::onRun() {
+void ObjectWrapperTest::onRun()
+{
 
   {
     OATPP_LOGI(TAG, "Check default valueType is assigned (default tparam Clazz)...");
@@ -124,12 +125,14 @@ void ObjectWrapperTest::onRun() {
 
   {
     OATPP_LOGI(TAG, "Check != operator...");
-    ObjectWrapper<base::StrBuffer, oatpp::data::mapping::type::__class::String> pw1(base::StrBuffer::createShared("Hello!"));
+    ObjectWrapper<base::StrBuffer, oatpp::data::mapping::type::__class::String> pw1(
+     base::StrBuffer::createShared("Hello!"));
     OATPP_ASSERT(pw1);
     OATPP_ASSERT(pw1 != nullptr);
     OATPP_ASSERT(pw1.valueType == oatpp::data::mapping::type::__class::String::getType());
 
-    ObjectWrapper<base::StrBuffer, oatpp::data::mapping::type::__class::String> pw2(base::StrBuffer::createShared("Hello!"));
+    ObjectWrapper<base::StrBuffer, oatpp::data::mapping::type::__class::String> pw2(
+     base::StrBuffer::createShared("Hello!"));
     OATPP_ASSERT(pw2);
     OATPP_ASSERT(pw2 != nullptr);
     OATPP_ASSERT(pw2.valueType == oatpp::data::mapping::type::__class::String::getType());
@@ -163,7 +166,6 @@ void ObjectWrapperTest::onRun() {
     OATPP_ASSERT(pw1.get() != pw2.get());
     OATPP_LOGI(TAG, "OK");
   }
-
 }
 
 }}}}}}

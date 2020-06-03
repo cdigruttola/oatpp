@@ -24,55 +24,66 @@
 
 #include "./Response.hpp"
 
-#include "oatpp/web/protocol/http/encoding/Chunked.hpp"
 #include "oatpp/core/utils/ConversionUtils.hpp"
+#include "oatpp/web/protocol/http/encoding/Chunked.hpp"
 
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace outgoing {
 
-Response::Response(const Status& status,
-                   const std::shared_ptr<Body>& body)
+Response::Response(const Status& status, const std::shared_ptr<Body>& body)
   : m_status(status)
   , m_body(body)
-{}
+{
+}
 
-std::shared_ptr<Response> Response::createShared(const Status& status,
-                                                 const std::shared_ptr<Body>& body) {
+std::shared_ptr<Response> Response::createShared(const Status& status, const std::shared_ptr<Body>& body)
+{
   return Shared_Outgoing_Response_Pool::allocateShared(status, body);
 }
 
-const Status& Response::getStatus() const {
+const Status& Response::getStatus() const
+{
   return m_status;
 }
 
-protocol::http::Headers& Response::getHeaders() {
+protocol::http::Headers& Response::getHeaders()
+{
   return m_headers;
 }
 
-void Response::putHeader(const oatpp::data::share::StringKeyLabelCI_FAST& key, const oatpp::data::share::StringKeyLabel& value) {
+void Response::putHeader(const oatpp::data::share::StringKeyLabelCI_FAST& key,
+                         const oatpp::data::share::StringKeyLabel& value)
+{
   m_headers.put(key, value);
 }
 
-bool Response::putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key, const oatpp::data::share::StringKeyLabel& value) {
+bool Response::putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key,
+                                    const oatpp::data::share::StringKeyLabel& value)
+{
   return m_headers.putIfNotExists(key, value);
 }
 
-oatpp::String Response::getHeader(const oatpp::data::share::StringKeyLabelCI_FAST& headerName) const {
+oatpp::String Response::getHeader(const oatpp::data::share::StringKeyLabelCI_FAST& headerName) const
+{
   return m_headers.get(headerName);
 }
 
-void Response::setConnectionUpgradeHandler(const std::shared_ptr<oatpp::network::server::ConnectionHandler>& handler) {
+void Response::setConnectionUpgradeHandler(const std::shared_ptr<oatpp::network::server::ConnectionHandler>& handler)
+{
   m_connectionUpgradeHandler = handler;
 }
 
-std::shared_ptr<oatpp::network::server::ConnectionHandler> Response::getConnectionUpgradeHandler() {
+std::shared_ptr<oatpp::network::server::ConnectionHandler> Response::getConnectionUpgradeHandler()
+{
   return m_connectionUpgradeHandler;
 }
 
-void Response::setConnectionUpgradeParameters(const std::shared_ptr<const ConnectionHandler::ParameterMap>& parameters) {
+void Response::setConnectionUpgradeParameters(const std::shared_ptr<const ConnectionHandler::ParameterMap>& parameters)
+{
   m_connectionUpgradeParameters = parameters;
 }
 
-std::shared_ptr<const Response::ConnectionHandler::ParameterMap> Response::getConnectionUpgradeParameters() {
+std::shared_ptr<const Response::ConnectionHandler::ParameterMap> Response::getConnectionUpgradeParameters()
+{
   return m_connectionUpgradeParameters;
 }
 
@@ -83,7 +94,7 @@ void Response::send(data::stream::OutputStream* stream,
 
   v_buff_size bodySize = -1;
 
-  if(m_body){
+  if(m_body) {
 
     m_body->declareHeaders(m_headers);
 
@@ -91,7 +102,7 @@ void Response::send(data::stream::OutputStream* stream,
 
       bodySize = m_body->getKnownSize();
 
-      if (bodySize >= 0) {
+      if(bodySize >= 0) {
         m_headers.put_LockFree(Header::CONTENT_LENGTH, utils::conversion::int64ToStr(bodySize));
       } else {
         m_headers.put_LockFree(Header::TRANSFER_ENCODING, Header::Value::TRANSFER_ENCODING_CHUNKED);
@@ -122,9 +133,9 @@ void Response::send(data::stream::OutputStream* stream,
 
     if(contentEncoderProvider == nullptr) {
 
-      if (bodySize >= 0) {
+      if(bodySize >= 0) {
 
-        if (bodySize + headersWriteBuffer->getCurrentPosition() < headersWriteBuffer->getCapacity()) {
+        if(bodySize + headersWriteBuffer->getCurrentPosition() < headersWriteBuffer->getCapacity()) {
           headersWriteBuffer->writeSimple(m_body->getKnownData(), bodySize);
           headersWriteBuffer->flushToStream(stream);
         } else {
@@ -139,8 +150,12 @@ void Response::send(data::stream::OutputStream* stream,
         http::encoding::EncoderChunked chunkedEncoder;
 
         /* Reuse headers buffer */
-        data::stream::transfer(m_body, stream, 0, headersWriteBuffer->getData(), headersWriteBuffer->getCapacity(), &chunkedEncoder);
-
+        data::stream::transfer(m_body,
+                               stream,
+                               0,
+                               headersWriteBuffer->getData(),
+                               headersWriteBuffer->getCapacity(),
+                               &chunkedEncoder);
       }
 
     } else {
@@ -150,36 +165,37 @@ void Response::send(data::stream::OutputStream* stream,
       http::encoding::EncoderChunked chunkedEncoder;
       auto contentEncoder = contentEncoderProvider->getProcessor();
 
-      data::buffer::ProcessingPipeline pipeline({
-        contentEncoder,
-        &chunkedEncoder
-      });
+      data::buffer::ProcessingPipeline pipeline({contentEncoder, &chunkedEncoder});
 
       /* Reuse headers buffer */
-      data::stream::transfer(m_body, stream, 0, headersWriteBuffer->getData(), headersWriteBuffer->getCapacity(), &pipeline);
-
+      data::stream::transfer(m_body,
+                             stream,
+                             0,
+                             headersWriteBuffer->getData(),
+                             headersWriteBuffer->getCapacity(),
+                             &pipeline);
     }
 
   } else {
     headersWriteBuffer->flushToStream(stream);
   }
-
 }
 
-oatpp::async::CoroutineStarter Response::sendAsync(const std::shared_ptr<Response>& _this,
-                                                   const std::shared_ptr<data::stream::OutputStream>& stream,
-                                                   const std::shared_ptr<oatpp::data::stream::BufferOutputStream>& headersWriteBuffer,
-                                                   const std::shared_ptr<http::encoding::EncoderProvider>& contentEncoder)
+oatpp::async::CoroutineStarter Response::sendAsync(
+ const std::shared_ptr<Response>& _this,
+ const std::shared_ptr<data::stream::OutputStream>& stream,
+ const std::shared_ptr<oatpp::data::stream::BufferOutputStream>& headersWriteBuffer,
+ const std::shared_ptr<http::encoding::EncoderProvider>& contentEncoder)
 {
 
-  class SendAsyncCoroutine : public oatpp::async::Coroutine<SendAsyncCoroutine> {
+  class SendAsyncCoroutine: public oatpp::async::Coroutine<SendAsyncCoroutine> {
   private:
     std::shared_ptr<Response> m_this;
     std::shared_ptr<data::stream::OutputStream> m_stream;
     std::shared_ptr<oatpp::data::stream::BufferOutputStream> m_headersWriteBuffer;
     std::shared_ptr<http::encoding::EncoderProvider> m_contentEncoderProvider;
-  public:
 
+  public:
     SendAsyncCoroutine(const std::shared_ptr<Response>& _this,
                        const std::shared_ptr<data::stream::OutputStream>& stream,
                        const std::shared_ptr<oatpp::data::stream::BufferOutputStream>& headersWriteBuffer,
@@ -188,13 +204,15 @@ oatpp::async::CoroutineStarter Response::sendAsync(const std::shared_ptr<Respons
       , m_stream(stream)
       , m_headersWriteBuffer(headersWriteBuffer)
       , m_contentEncoderProvider(contentEncoderProvider)
-    {}
+    {
+    }
 
-    Action act() override {
+    Action act() override
+    {
 
       v_buff_size bodySize = -1;
 
-      if(m_this->m_body){
+      if(m_this->m_body) {
 
         m_this->m_body->declareHeaders(m_this->m_headers);
 
@@ -202,7 +220,7 @@ oatpp::async::CoroutineStarter Response::sendAsync(const std::shared_ptr<Respons
 
           bodySize = m_this->m_body->getKnownSize();
 
-          if (bodySize >= 0) {
+          if(bodySize >= 0) {
             m_this->m_headers.put_LockFree(Header::CONTENT_LENGTH, utils::conversion::int64ToStr(bodySize));
           } else {
             m_this->m_headers.put_LockFree(Header::TRANSFER_ENCODING, Header::Value::TRANSFER_ENCODING_CHUNKED);
@@ -233,28 +251,31 @@ oatpp::async::CoroutineStarter Response::sendAsync(const std::shared_ptr<Respons
 
         if(!m_contentEncoderProvider) {
 
-          if (bodySize >= 0) {
+          if(bodySize >= 0) {
 
-            if (bodySize + m_headersWriteBuffer->getCurrentPosition() < m_headersWriteBuffer->getCapacity()) {
+            if(bodySize + m_headersWriteBuffer->getCurrentPosition() < m_headersWriteBuffer->getCapacity()) {
 
               m_headersWriteBuffer->writeSimple(m_this->m_body->getKnownData(), bodySize);
               return oatpp::data::stream::BufferOutputStream::flushToStreamAsync(m_headersWriteBuffer, m_stream)
-                .next(finish());
+               .next(finish());
 
             } else {
 
               return oatpp::data::stream::BufferOutputStream::flushToStreamAsync(m_headersWriteBuffer, m_stream)
-                .next(m_stream->writeExactSizeDataAsync(m_this->m_body->getKnownData(), bodySize))
-                .next(finish());
+               .next(m_stream->writeExactSizeDataAsync(m_this->m_body->getKnownData(), bodySize))
+               .next(finish());
             }
 
           } else {
 
             auto chunkedEncoder = std::make_shared<http::encoding::EncoderChunked>();
             return oatpp::data::stream::BufferOutputStream::flushToStreamAsync(m_headersWriteBuffer, m_stream)
-              .next(data::stream::transferAsync(m_this->m_body, m_stream, 0, data::buffer::IOBuffer::createShared(), chunkedEncoder))
-              .next(finish());
-
+             .next(data::stream::transferAsync(m_this->m_body,
+                                               m_stream,
+                                               0,
+                                               data::buffer::IOBuffer::createShared(),
+                                               chunkedEncoder))
+             .next(finish());
           }
 
         } else {
@@ -262,29 +283,24 @@ oatpp::async::CoroutineStarter Response::sendAsync(const std::shared_ptr<Respons
           auto chunkedEncoder = std::make_shared<http::encoding::EncoderChunked>();
           auto contentEncoder = m_contentEncoderProvider->getProcessor();
 
-          auto pipeline = std::shared_ptr<data::buffer::ProcessingPipeline>(new data::buffer::ProcessingPipeline({
-            contentEncoder,
-            chunkedEncoder
-          }));
+          auto pipeline = std::shared_ptr<data::buffer::ProcessingPipeline>(
+           new data::buffer::ProcessingPipeline({contentEncoder, chunkedEncoder}));
 
           return oatpp::data::stream::BufferOutputStream::flushToStreamAsync(m_headersWriteBuffer, m_stream)
-            .next(data::stream::transferAsync(m_this->m_body, m_stream, 0, data::buffer::IOBuffer::createShared(), pipeline)
-            . next(finish()));
-
+           .next(
+            data::stream::transferAsync(m_this->m_body, m_stream, 0, data::buffer::IOBuffer::createShared(), pipeline)
+             .next(finish()));
         }
 
       } else {
 
         return oatpp::data::stream::BufferOutputStream::flushToStreamAsync(m_headersWriteBuffer, m_stream)
-          .next(finish());
+         .next(finish());
       }
-
     }
-
   };
 
   return SendAsyncCoroutine::start(_this, stream, headersWriteBuffer, contentEncoder);
-
 }
 
 }}}}}

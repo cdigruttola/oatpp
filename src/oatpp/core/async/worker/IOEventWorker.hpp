@@ -28,30 +28,30 @@
 #include "./Worker.hpp"
 #include "oatpp/core/concurrency/SpinLock.hpp"
 
-#include <thread>
 #include <mutex>
+#include <thread>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if !defined(OATPP_IO_EVENT_INTERFACE)
 
-  #if defined(__linux__) || defined(linux) || defined(__linux)
+#if defined(__linux__) || defined(linux) || defined(__linux)
 
-    #define OATPP_IO_EVENT_INTERFACE "epoll"
-    #define OATPP_IO_EVENT_INTERFACE_EPOLL
+#define OATPP_IO_EVENT_INTERFACE "epoll"
+#define OATPP_IO_EVENT_INTERFACE_EPOLL
 
-  #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || \
-        defined(__bsdi__) || defined(__DragonFly__)|| defined(__APPLE__)
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || \
+ defined(__DragonFly__) || defined(__APPLE__)
 
-    #define OATPP_IO_EVENT_INTERFACE "kqueue"
-    #define OATPP_IO_EVENT_INTERFACE_KQUEUE
+#define OATPP_IO_EVENT_INTERFACE "kqueue"
+#define OATPP_IO_EVENT_INTERFACE_KQUEUE
 
-  #elif defined(WIN32) || defined(_WIN32)
+#elif defined(WIN32) || defined(_WIN32)
 
-    #define OATPP_IO_EVENT_INTERFACE "not-implementer(windows)"
-    #define OATPP_IO_EVENT_INTERFACE_WIN
+#define OATPP_IO_EVENT_INTERFACE "not-implementer(windows)"
+#define OATPP_IO_EVENT_INTERFACE_WIN
 
-  #endif
+#endif
 
 #endif
 
@@ -68,34 +68,39 @@ class IOEventWorkerForeman; // FWD
  *   <li>`epoll` based implementation - for Linux systems</li>
  * </ul>
  */
-class IOEventWorker : public Worker {
+class IOEventWorker: public Worker {
 private:
   static constexpr const v_int32 MAX_EVENTS = 10000;
+
 private:
   IOEventWorkerForeman* m_foreman;
   Action::IOEventType m_specialization;
   std::atomic<bool> m_running;
   oatpp::collection::FastQueue<CoroutineHandle> m_backlog;
   oatpp::concurrency::SpinLock m_backlogLock;
+
 private:
   oatpp::v_io_handle m_eventQueueHandle;
   oatpp::v_io_handle m_wakeupTrigger;
-  std::unique_ptr<v_char8[]> m_inEvents;
+  std::unique_ptr<v_char8 []> m_inEvents;
   v_int32 m_inEventsCount;
   v_int32 m_inEventsCapacity;
-  std::unique_ptr<v_char8[]> m_outEvents;
+  std::unique_ptr<v_char8 []> m_outEvents;
+
 private:
   std::thread m_thread;
+
 private:
   void consumeBacklog();
   void waitEvents();
+
 private:
   void initEventQueue();
   void triggerWakeup();
   void setTriggerEvent(p_char8 eventPtr);
   void setCoroutineEvent(CoroutineHandle* coroutine, int operation, p_char8 eventPtr);
-public:
 
+public:
   /**
    * Constructor.
    */
@@ -137,19 +142,18 @@ public:
    * Detach all worker-threads.
    */
   void detach() override;
-
 };
 
 /**
  * Class responsible to assign I/O tasks to specific &l:IOEventWorker; according to worker's "specialization". <br>
  * Needed in order to support full-duplex I/O mode without duplicating file-descriptors.
  */
-class IOEventWorkerForeman : public Worker {
+class IOEventWorkerForeman: public Worker {
 private:
   IOEventWorker m_reader;
   IOEventWorker m_writer;
-public:
 
+public:
   /**
    * Constructor.
    */
@@ -173,8 +177,8 @@ public:
   void pushOneTask(CoroutineHandle* task) override;
 
   /**
- * Break run loop.
- */
+   * Break run loop.
+   */
   void stop() override;
 
   /**
@@ -186,9 +190,8 @@ public:
    * Detach all worker-threads.
    */
   void detach() override;
-
 };
 
 }}}
 
-#endif //oatpp_async_worker_IOEventWorker_hpp
+#endif // oatpp_async_worker_IOEventWorker_hpp

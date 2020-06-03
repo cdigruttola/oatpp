@@ -29,12 +29,13 @@
 
 namespace oatpp { namespace test { namespace async {
 
-class LockTest : public UnitTest{
+class LockTest: public UnitTest {
 public:
-
-  LockTest():UnitTest("TEST[async::LockTest]"){}
+  LockTest()
+    : UnitTest("TEST[async::LockTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}

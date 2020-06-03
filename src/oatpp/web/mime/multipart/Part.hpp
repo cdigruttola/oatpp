@@ -40,6 +40,7 @@ public:
    * For more info see &id:oatpp::data::share::LazyStringMap;.
    */
   typedef oatpp::data::share::LazyStringMap<oatpp::data::share::StringKeyLabelCI_FAST> Headers;
+
 private:
   oatpp::String m_name;
   oatpp::String m_filename;
@@ -47,16 +48,18 @@ private:
   std::shared_ptr<data::stream::InputStream> m_inputStream;
   oatpp::String m_inMemoryData;
   v_int64 m_knownSize;
+
 private:
   const char* m_tagName;
   std::shared_ptr<oatpp::base::Countable> m_tagObject;
-public:
 
+public:
   /**
    * Constructor.
    * @param headers - headers of the part.
    * @param inputStream - input stream of the part data.
-   * @param inMemoryData - possible in-memory data of the part. Same data as the referred by input stream. For convenience purposes.
+   * @param inMemoryData - possible in-memory data of the part. Same data as the referred by input stream. For
+   * convenience purposes.
    * @param knownSize - known size of the data in the input stream. Pass `-1` value if size is unknown.
    */
   Part(const Headers& headers,
@@ -73,7 +76,8 @@ public:
   /**
    * Set part data info.
    * @param inputStream - input stream of the part data.
-   * @param inMemoryData - possible in-memory data of the part. Same data as the referred by input stream. For convenience purposes.
+   * @param inMemoryData - possible in-memory data of the part. Same data as the referred by input stream. For
+   * convenience purposes.
    * @param knownSize - known size of the data in the input stream. Pass `-1` value if size is unknown.
    */
   void setDataInfo(const std::shared_ptr<data::stream::InputStream>& inputStream,
@@ -124,7 +128,8 @@ public:
    * @param value - &id:oatpp::data::share::StringKeyLabel;.
    * @return - `true` if header was added.
    */
-  bool putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key, const oatpp::data::share::StringKeyLabel& value);
+  bool putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key,
+                            const oatpp::data::share::StringKeyLabel& value);
 
   /**
    * Get input stream of the part data.
@@ -171,7 +176,6 @@ public:
    * Clear the tag.
    */
   void clearTag();
-
 };
 
 }}}}

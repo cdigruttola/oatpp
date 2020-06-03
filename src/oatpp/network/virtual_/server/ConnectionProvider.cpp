@@ -37,22 +37,27 @@ ConnectionProvider::ConnectionProvider(const std::shared_ptr<virtual_::Interface
   setProperty(PROPERTY_PORT, "0");
 }
 
-std::shared_ptr<ConnectionProvider> ConnectionProvider::createShared(const std::shared_ptr<virtual_::Interface>& interface) {
+std::shared_ptr<ConnectionProvider> ConnectionProvider::createShared(
+ const std::shared_ptr<virtual_::Interface>& interface)
+{
   return std::make_shared<ConnectionProvider>(interface);
 }
 
-void ConnectionProvider::setSocketMaxAvailableToReadWrtie(v_io_size maxToRead, v_io_size maxToWrite) {
+void ConnectionProvider::setSocketMaxAvailableToReadWrtie(v_io_size maxToRead, v_io_size maxToWrite)
+{
   m_maxAvailableToRead = maxToRead;
   m_maxAvailableToWrite = maxToWrite;
 }
 
-void ConnectionProvider::close() {
+void ConnectionProvider::close()
+{
   m_open = false;
   m_listenerLock.reset();
   m_interface->notifyAcceptors();
 }
 
-std::shared_ptr<ConnectionProvider::IOStream> ConnectionProvider::getConnection() {
+std::shared_ptr<ConnectionProvider::IOStream> ConnectionProvider::getConnection()
+{
   auto socket = m_interface->accept(m_open);
   if(socket) {
     socket->setMaxAvailableToReadWrtie(m_maxAvailableToRead, m_maxAvailableToWrite);

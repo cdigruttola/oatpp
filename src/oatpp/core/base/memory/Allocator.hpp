@@ -38,7 +38,8 @@ public:
   /**
    * Constructor.
    * @param pPoolName - memory pool name.
-   * @param pPoolChunkSize - memory pool chunk size. For more about chunk size see &id:oatpp::base::memory::MemoryPool::MemoryPool;.
+   * @param pPoolChunkSize - memory pool chunk size. For more about chunk size see
+   * &id:oatpp::base::memory::MemoryPool::MemoryPool;.
    */
   AllocatorPoolInfo(const char* pPoolName, v_buff_size pPoolChunkSize);
 
@@ -63,42 +64,49 @@ template<class T>
 class PoolSharedObjectAllocator {
 public:
   typedef T value_type;
+
 public:
   const AllocatorPoolInfo& m_poolInfo;
+
 public:
-  static oatpp::base::memory::ThreadDistributedMemoryPool& getPool(const AllocatorPoolInfo& info){
+  static oatpp::base::memory::ThreadDistributedMemoryPool& getPool(const AllocatorPoolInfo& info)
+  {
     static oatpp::base::memory::ThreadDistributedMemoryPool pool(info.poolName, sizeof(T), info.poolChunkSize);
     return pool;
   }
+
 public:
   PoolSharedObjectAllocator(const AllocatorPoolInfo& info)
-    : m_poolInfo(info)
-  {};
+    : m_poolInfo(info) {};
 
   template<typename U>
   PoolSharedObjectAllocator(const PoolSharedObjectAllocator<U>& other)
     : m_poolInfo(other.m_poolInfo)
-  {}
+  {
+  }
 
-  T* allocate(std::size_t n) {
+  T* allocate(std::size_t n)
+  {
     (void)n;
     return static_cast<T*>(getPool(m_poolInfo).obtain());
   }
 
-  void deallocate(T* ptr, size_t n) {
+  void deallocate(T* ptr, size_t n)
+  {
     (void)n;
     oatpp::base::memory::MemoryPool::free(ptr);
   }
-
 };
 
-template <typename T, typename U>
-inline bool operator == (const PoolSharedObjectAllocator<T>&, const PoolSharedObjectAllocator<U>&) {
+template<typename T, typename U>
+inline bool operator==(const PoolSharedObjectAllocator<T>&, const PoolSharedObjectAllocator<U>&)
+{
   return true;
 }
 
-template <typename T, typename U>
-inline bool operator != (const PoolSharedObjectAllocator<T>& a, const PoolSharedObjectAllocator<U>& b) {
+template<typename T, typename U>
+inline bool operator!=(const PoolSharedObjectAllocator<T>& a, const PoolSharedObjectAllocator<U>& b)
+{
   return !(a == b);
 }
 
@@ -111,10 +119,13 @@ template<class T>
 class ThreadLocalPoolSharedObjectAllocator {
 public:
   typedef T value_type;
+
 public:
   const AllocatorPoolInfo& m_poolInfo;
+
 public:
-  static oatpp::base::memory::MemoryPool& getPool(const AllocatorPoolInfo& info){
+  static oatpp::base::memory::MemoryPool& getPool(const AllocatorPoolInfo& info)
+  {
 #ifndef OATPP_COMPAT_BUILD_NO_THREAD_LOCAL
     static thread_local oatpp::base::memory::MemoryPool pool(info.poolName, sizeof(T), info.poolChunkSize);
 #else
@@ -122,35 +133,40 @@ public:
 #endif
     return pool;
   }
+
 public:
   ThreadLocalPoolSharedObjectAllocator(const AllocatorPoolInfo& info)
-    : m_poolInfo(info)
-  {};
+    : m_poolInfo(info) {};
 
   template<typename U>
   ThreadLocalPoolSharedObjectAllocator(const ThreadLocalPoolSharedObjectAllocator<U>& other)
     : m_poolInfo(other.m_poolInfo)
-  {}
+  {
+  }
 
-  T* allocate(std::size_t n) {
+  T* allocate(std::size_t n)
+  {
     (void)n;
     return static_cast<T*>(getPool(m_poolInfo).obtain());
   }
 
-  void deallocate(T* ptr, size_t n) {
+  void deallocate(T* ptr, size_t n)
+  {
     (void)n;
     oatpp::base::memory::MemoryPool::free(ptr);
   }
-
 };
 
-template <typename T, typename U>
-inline bool operator == (const ThreadLocalPoolSharedObjectAllocator<T>&, const ThreadLocalPoolSharedObjectAllocator<U>&) {
+template<typename T, typename U>
+inline bool operator==(const ThreadLocalPoolSharedObjectAllocator<T>&, const ThreadLocalPoolSharedObjectAllocator<U>&)
+{
   return true;
 }
 
-template <typename T, typename U>
-inline bool operator != (const ThreadLocalPoolSharedObjectAllocator<T>& a, const ThreadLocalPoolSharedObjectAllocator<U>& b) {
+template<typename T, typename U>
+inline bool operator!=(const ThreadLocalPoolSharedObjectAllocator<T>& a,
+                       const ThreadLocalPoolSharedObjectAllocator<U>& b)
+{
   return !(a == b);
 }
 
@@ -162,7 +178,8 @@ class AllocationExtras {
 public:
   AllocationExtras(v_buff_size pExtraWanted)
     : extraWanted(pExtraWanted)
-  {}
+  {
+  }
   const v_buff_size extraWanted;
   void* extraPtr;
   v_buff_size baseSize;
@@ -177,32 +194,34 @@ template<class T>
 class SharedObjectAllocator {
 public:
   typedef T value_type;
+
 public:
   AllocationExtras& m_info;
-public:
 
+public:
   SharedObjectAllocator(AllocationExtras& info)
-    : m_info(info)
-  {};
+    : m_info(info) {};
 
   template<typename U>
   SharedObjectAllocator(const SharedObjectAllocator<U>& other)
     : m_info(other.m_info)
-  {}
+  {
+  }
 
-  T* allocate(std::size_t n) {
+  T* allocate(std::size_t n)
+  {
     (void)n;
     void* mem = ::operator new(sizeof(T) + m_info.extraWanted);
     m_info.baseSize = sizeof(T);
-    m_info.extraPtr = &((p_char8) mem)[sizeof(T)];
+    m_info.extraPtr = &((p_char8)mem) [ sizeof(T) ];
     return static_cast<T*>(mem);
   }
 
-  void deallocate(T* ptr, size_t n) {
+  void deallocate(T* ptr, size_t n)
+  {
     (void)n;
     ::operator delete(ptr);
   }
-
 };
 
 /**
@@ -214,56 +233,62 @@ template<class T, class P>
 class CustomPoolSharedObjectAllocator {
 public:
   typedef T value_type;
+
 public:
   AllocationExtras& m_info;
   P& m_pool;
-public:
 
+public:
   CustomPoolSharedObjectAllocator(AllocationExtras& info, P& pool)
     : m_info(info)
-    , m_pool(pool)
-  {};
+    , m_pool(pool) {};
 
   template<typename U>
   CustomPoolSharedObjectAllocator(const CustomPoolSharedObjectAllocator<U, P>& other)
     : m_info(other.m_info)
     , m_pool(other.m_pool)
-  {}
+  {
+  }
 
-  T* allocate(std::size_t n) {
+  T* allocate(std::size_t n)
+  {
     (void)n;
     void* mem = m_pool.obtain();
     m_info.baseSize = sizeof(T);
-    m_info.extraPtr = &((p_char8) mem)[sizeof(T)];
+    m_info.extraPtr = &((p_char8)mem) [ sizeof(T) ];
     return static_cast<T*>(mem);
   }
 
-  void deallocate(T* ptr, size_t n) {
+  void deallocate(T* ptr, size_t n)
+  {
     (void)n;
     oatpp::base::memory::MemoryPool::free(ptr);
   }
-
 };
 
-template <typename T, typename U>
-inline bool operator == (const SharedObjectAllocator<T>&, const SharedObjectAllocator<U>&) {
+template<typename T, typename U>
+inline bool operator==(const SharedObjectAllocator<T>&, const SharedObjectAllocator<U>&)
+{
   return true;
 }
 
-template <typename T, typename U>
-inline bool operator != (const SharedObjectAllocator<T>& a, const SharedObjectAllocator<U>& b) {
+template<typename T, typename U>
+inline bool operator!=(const SharedObjectAllocator<T>& a, const SharedObjectAllocator<U>& b)
+{
   return !(a == b);
 }
 
-template<typename T, typename ... Args>
-static std::shared_ptr<T> allocateSharedWithExtras(AllocationExtras& extras, Args... args){
+template<typename T, typename... Args>
+static std::shared_ptr<T> allocateSharedWithExtras(AllocationExtras& extras, Args... args)
+{
   typedef SharedObjectAllocator<T> _Allocator;
   _Allocator allocator(extras);
   return std::allocate_shared<T, _Allocator>(allocator, args...);
 }
 
-template<typename T, typename P, typename ... Args>
-static std::shared_ptr<T> customPoolAllocateSharedWithExtras(AllocationExtras& extras, P& pool, Args... args){
+template<typename T, typename P, typename... Args>
+static std::shared_ptr<T> customPoolAllocateSharedWithExtras(AllocationExtras& extras, P& pool, Args... args)
+{
   typedef CustomPoolSharedObjectAllocator<T, P> _Allocator;
   _Allocator allocator(extras, pool);
   return std::allocate_shared<T, _Allocator>(allocator, args...);

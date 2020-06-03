@@ -34,36 +34,41 @@ class ObjectHandle {
 private:
   T* m_object;
   std::shared_ptr<T> m_ptr;
-public:
 
+public:
   ObjectHandle(T* object)
     : m_object(object)
-  {}
+  {
+  }
 
   template<class Q>
   ObjectHandle(const std::shared_ptr<Q>& sharedObject)
     : m_object(sharedObject.get())
     , m_ptr(sharedObject)
-  {}
+  {
+  }
 
-  std::shared_ptr<T> getPtr() const {
+  std::shared_ptr<T> getPtr() const
+  {
     return m_ptr;
   }
 
-  T* get() const {
+  T* get() const
+  {
     return m_object;
   }
 
-  T* operator->() const {
+  T* operator->() const
+  {
     return m_object;
   }
 
-  explicit operator bool() const {
+  explicit operator bool() const
+  {
     return m_object != nullptr;
   }
-
 };
 
 }}
 
-#endif //oatpp_base_ObjectHandle_hpp
+#endif // oatpp_base_ObjectHandle_hpp

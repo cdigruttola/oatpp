@@ -25,10 +25,10 @@
 #ifndef oatpp_network_Url_hpp
 #define oatpp_network_Url_hpp
 
+#include "oatpp/core/Types.hpp"
+#include "oatpp/core/collection/ListMap.hpp"
 #include "oatpp/core/data/share/LazyStringMap.hpp"
 #include "oatpp/core/parser/Caret.hpp"
-#include "oatpp/core/collection/ListMap.hpp"
-#include "oatpp/core/Types.hpp"
 
 namespace oatpp { namespace network {
 
@@ -42,6 +42,7 @@ public:
    * Convenience typedef for &id:oatpp::data::share::StringKeyLabel;.
    */
   typedef oatpp::data::share::StringKeyLabel StringKeyLabel;
+
 public:
   /**
    * Parameters - map string to string.
@@ -49,7 +50,6 @@ public:
   typedef oatpp::data::share::LazyStringMap<oatpp::data::share::StringKeyLabel> Parameters;
 
 public:
-
   /**
    * Structure representing URL Authority information.
    */
@@ -69,15 +69,13 @@ public:
      */
     v_int32 port = -1;
   };
-  
-public:
 
+public:
   /**
    * Url parser.
    */
   class Parser {
   public:
-    
     /**
      * parse `<scheme>`:
      * example "http", "https", "ftp"
@@ -85,7 +83,7 @@ public:
      * caret should be at the first char of the scheme
      */
     static oatpp::String parseScheme(oatpp::parser::Caret& caret);
-    
+
     /**
      * parse url authority components.
      * userinfo is not parsed into login and password separately as
@@ -93,30 +91,30 @@ public:
      * caret should be at the first char of the authority (not at "//")
      */
     static Url::Authority parseAuthority(oatpp::parser::Caret& caret);
-    
+
     /**
      * parse path of the url
      * caret should be at the first char of the path
      */
     static oatpp::String parsePath(oatpp::parser::Caret& caret);
-    
+
     /**
      * parse query params in form of `"?<paramName>=<paramValue>&<paramName>=<paramValue>..."` referred by ParsingCaret
      * and put that params to Parameters map
      */
     static void parseQueryParams(Url::Parameters& params, oatpp::parser::Caret& caret);
-    
+
     /**
      * parse query params in form of `"?<paramName>=<paramValue>&<paramName>=<paramValue>..."` referred by str
      * and put that params to Parameters map
      */
     static void parseQueryParams(Url::Parameters& params, const oatpp::String& str);
-    
+
     /**
      * parse query params in form of `"?<paramName>=<paramValue>&<paramName>=<paramValue>..."` referred by ParsingCaret
      */
     static Url::Parameters parseQueryParams(oatpp::parser::Caret& caret);
-    
+
     /**
      * parse query params in form of `"?<paramName>=<paramValue>&<paramName>=<paramValue>..."` referred by str
      */
@@ -135,11 +133,9 @@ public:
      * @return parsed URL structure
      */
     static Url parseUrl(const oatpp::String& str);
-    
   };
-  
-public:
 
+public:
   /**
    * Url scheme. Ex.: [http, https, ftp, etc.]
    */
@@ -159,9 +155,8 @@ public:
    * Query params.
    */
   Parameters queryParams;
-  
 };
-  
+
 }}
 
 #endif /* oatpp_network_url_Url_hpp */

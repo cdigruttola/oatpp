@@ -33,7 +33,7 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
 /**
  * Class http::incoming::Response AKA IncomingResponse represents server's incoming response
  */
-class Response : public oatpp::base::Countable {
+class Response: public oatpp::base::Countable {
 public:
   OBJECT_POOL(Incoming_Response_Pool, Response, 32)
   SHARED_OBJECT_POOL(Shared_Incoming_Response_Pool, Response, 32)
@@ -42,16 +42,16 @@ private:
   oatpp::String m_statusDescription;
   http::Headers m_headers;
   std::shared_ptr<oatpp::data::stream::InputStream> m_bodyStream;
-  
+
   /*
    * Response should be preconfigured with default BodyDecoder.
    * Entity that created response object is responsible for providing correct BodyDecoder.
    * Custom BodyDecoder can be set on demand
    */
   std::shared_ptr<const http::incoming::BodyDecoder> m_bodyDecoder;
-  
+
   std::shared_ptr<oatpp::data::stream::IOStream> m_connection;
-  
+
 public:
   /**
    * Constructor.
@@ -66,8 +66,8 @@ public:
            const http::Headers& headers,
            const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
            const std::shared_ptr<const http::incoming::BodyDecoder>& bodyDecoder);
-public:
 
+public:
   /**
    * Create shared Response.
    * @param statusCode - http status code.
@@ -141,16 +141,18 @@ public:
   oatpp::String readBodyToString() const;
 
   /**
-   * Read body stream, decode, and deserialize it as DTO Object (see [Data Transfer Object (DTO)](https://oatpp.io/docs/components/dto/)).
+   * Read body stream, decode, and deserialize it as DTO Object (see [Data Transfer Object
+   * (DTO)](https://oatpp.io/docs/components/dto/)).
    * @tparam Wrapper - ObjectWrapper type.
    * @param objectMapper - `std::shared_ptr` to &id:oatpp::data::mapping::ObjectMapper;.
    * @return - deserialized DTO object.
    */
   template<class Wrapper>
-  Wrapper readBodyToDto(oatpp::data::mapping::ObjectMapper* objectMapper) const {
+  Wrapper readBodyToDto(oatpp::data::mapping::ObjectMapper* objectMapper) const
+  {
     return m_bodyDecoder->decodeToDto<Wrapper>(m_headers, m_bodyStream.get(), objectMapper);
   }
-  
+
   // Async
 
   /**
@@ -167,13 +169,15 @@ public:
    * @param toStream - `std::shared_ptr` to &id:oatpp::data::stream::OutputStream;.
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  oatpp::async::CoroutineStarter transferBodyToStreamAsync(const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const;
+  oatpp::async::CoroutineStarter transferBodyToStreamAsync(
+   const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const;
 
   /**
    * Same as &l:Response::readBodyToString (); but Async.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  oatpp::async::CoroutineStarterForResult<const oatpp::String&> readBodyToStringAsync() const {
+  oatpp::async::CoroutineStarterForResult<const oatpp::String&> readBodyToStringAsync() const
+  {
     return m_bodyDecoder->decodeToStringAsync(m_headers, m_bodyStream);
   }
 
@@ -184,13 +188,13 @@ public:
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
   template<class Wrapper>
-  oatpp::async::CoroutineStarterForResult<const Wrapper&>
-  readBodyToDtoAsync(const std::shared_ptr<oatpp::data::mapping::ObjectMapper>& objectMapper) const {
+  oatpp::async::CoroutineStarterForResult<const Wrapper&> readBodyToDtoAsync(
+   const std::shared_ptr<oatpp::data::mapping::ObjectMapper>& objectMapper) const
+  {
     return m_bodyDecoder->decodeToDtoAsync<Wrapper>(m_headers, m_bodyStream, objectMapper);
   }
-  
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_incoming_Response_hpp */

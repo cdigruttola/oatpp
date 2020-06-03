@@ -37,15 +37,16 @@ namespace oatpp { namespace encoding {
  */
 class Hex {
 public:
-  static const v_char8 A_D[];
-  static const v_uint16 A_W16[];
+  static const v_char8 A_D [];
+  static const v_uint16 A_W16 [];
+
 public:
   /**
    * Unknown symbol error.
    */
   static constexpr v_int32 ERROR_UNKNOWN_SYMBOL = 1;
-public:
 
+public:
   /**
    * Write value as hex string to buffer.
    * @param value - value to write.
@@ -75,9 +76,8 @@ public:
    * @return - 0 on success. Negative value on failure.
    */
   static v_int32 readUInt32(p_char8 buffer, v_uint32& value);
-  
 };
-  
+
 }}
 
 #endif /* oatpp_encoding_Hex_hpp */

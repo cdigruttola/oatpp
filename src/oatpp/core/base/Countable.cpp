@@ -24,25 +24,28 @@
 
 #include "Countable.hpp"
 
-namespace oatpp { namespace base{
-  
-Countable::Countable() {
+namespace oatpp { namespace base {
+
+Countable::Countable()
+{
 #ifndef OATPP_DISABLE_ENV_OBJECT_COUNTERS
   Environment::incObjects();
 #endif
 }
 
-Countable::Countable(const Countable& other) {
+Countable::Countable(const Countable& other)
+{
   (void)other;
 #ifndef OATPP_DISABLE_ENV_OBJECT_COUNTERS
   Environment::incObjects();
 #endif
 }
 
-Countable::~Countable(){
+Countable::~Countable()
+{
 #ifndef OATPP_DISABLE_ENV_OBJECT_COUNTERS
   Environment::decObjects();
 #endif
 }
-  
+
 }}

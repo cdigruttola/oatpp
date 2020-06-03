@@ -29,12 +29,13 @@
 
 namespace oatpp { namespace test { namespace web { namespace protocol { namespace http { namespace encoding {
 
-class ChunkedTest : public UnitTest {
+class ChunkedTest: public UnitTest {
 public:
-
-  ChunkedTest():UnitTest("TEST[web::protocol::http::encoding::ChunkedTest]"){}
+  ChunkedTest()
+    : UnitTest("TEST[web::protocol::http::encoding::ChunkedTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}}}}

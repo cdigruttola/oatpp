@@ -36,8 +36,8 @@ namespace oatpp { namespace concurrency {
 class SpinLock {
 protected:
   std::atomic<bool> m_atom;
-public:
 
+public:
   /**
    * Constructor.
    */
@@ -58,9 +58,8 @@ public:
    * @return - `true` if the lock was acquired, `false` otherwise.
    */
   bool try_lock();
-
 };
-  
+
 }}
 
 #endif /* oatpp_concurrency_SpinLock_hpp */

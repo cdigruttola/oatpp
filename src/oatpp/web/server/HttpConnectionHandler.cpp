@@ -24,8 +24,8 @@
 
 #include "./HttpConnectionHandler.hpp"
 
-#include "oatpp/web/protocol/http/incoming/Request.hpp"
 #include "oatpp/web/protocol/http/Http.hpp"
+#include "oatpp/web/protocol/http/incoming/Request.hpp"
 
 #include "oatpp/core/concurrency/Thread.hpp"
 
@@ -39,23 +39,27 @@ namespace oatpp { namespace web { namespace server {
 
 HttpConnectionHandler::HttpConnectionHandler(const std::shared_ptr<HttpProcessor::Components>& components)
   : m_components(components)
-{}
+{
+}
 
-std::shared_ptr<HttpConnectionHandler> HttpConnectionHandler::createShared(const std::shared_ptr<HttpRouter>& router){
+std::shared_ptr<HttpConnectionHandler> HttpConnectionHandler::createShared(const std::shared_ptr<HttpRouter>& router)
+{
   return std::make_shared<HttpConnectionHandler>(router);
 }
 
-void HttpConnectionHandler::setErrorHandler(const std::shared_ptr<handler::ErrorHandler>& errorHandler){
+void HttpConnectionHandler::setErrorHandler(const std::shared_ptr<handler::ErrorHandler>& errorHandler)
+{
   m_components->errorHandler = errorHandler;
   if(!m_components->errorHandler) {
     m_components->errorHandler = handler::DefaultErrorHandler::createShared();
   }
 }
 
-void HttpConnectionHandler::addRequestInterceptor(const std::shared_ptr<handler::RequestInterceptor>& interceptor) {
+void HttpConnectionHandler::addRequestInterceptor(const std::shared_ptr<handler::RequestInterceptor>& interceptor)
+{
   m_components->requestInterceptors->pushBack(interceptor);
 }
-  
+
 void HttpConnectionHandler::handleConnection(const std::shared_ptr<oatpp::data::stream::IOStream>& connection,
                                              const std::shared_ptr<const ParameterMap>& params)
 {
@@ -67,21 +71,23 @@ void HttpConnectionHandler::handleConnection(const std::shared_ptr<oatpp::data::
 
   /* Create working thread */
   std::thread thread(&HttpProcessor::Task::run, HttpProcessor::Task(m_components, connection));
-  
+
   /* Get hardware concurrency -1 in order to have 1cpu free of workers. */
   v_int32 concurrency = oatpp::concurrency::getHardwareConcurrency();
   if(concurrency > 1) {
     concurrency -= 1;
   }
-  
-  /* Set thread affinity group CPUs [0..cpu_count - 1]. Leave one cpu free of workers */
-  oatpp::concurrency::setThreadAffinityToCpuRange(thread.native_handle(), 0, concurrency - 1 /* -1 because 0-based index */);
-  
-  thread.detach();
 
+  /* Set thread affinity group CPUs [0..cpu_count - 1]. Leave one cpu free of workers */
+  oatpp::concurrency::setThreadAffinityToCpuRange(thread.native_handle(),
+                                                  0,
+                                                  concurrency - 1 /* -1 because 0-based index */);
+
+  thread.detach();
 }
 
-void HttpConnectionHandler::stop() {
+void HttpConnectionHandler::stop()
+{
   // DO NOTHING
 }
 

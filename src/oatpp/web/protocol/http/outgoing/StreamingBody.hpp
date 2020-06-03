@@ -32,11 +32,11 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
 /**
  * Abstract body for streaming data.
  */
-class StreamingBody : public Body {
+class StreamingBody: public Body {
 private:
   std::shared_ptr<data::stream::ReadCallback> m_readCallback;
-public:
 
+public:
   /**
    * Constructor.
    * @param readCallback
@@ -51,7 +51,7 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual number of bytes written to buffer. 0 - to indicate end-of-file.
    */
-  v_io_size read(void *buffer, v_buff_size count, async::Action& action) override;
+  v_io_size read(void* buffer, v_buff_size count, async::Action& action) override;
 
   /**
    * Override this method to declare additional headers.
@@ -70,7 +70,6 @@ public:
    * @return - `-1`.
    */
   v_buff_size getKnownSize() override;
-
 };
 
 }}}}}

@@ -28,56 +28,61 @@
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace outgoing {
 
 
-v_io_size MultipartBody::readBody(void *buffer, v_buff_size count, async::Action& action) {
+v_io_size MultipartBody::readBody(void* buffer, v_buff_size count, async::Action& action)
+{
   auto& part = *m_iterator;
   const auto& stream = part->getInputStream();
   if(!stream) {
-    OATPP_LOGW("[oatpp::web::protocol::http::outgoing::MultipartBody::MultipartReadCallback::readBody()]", "Warning. Part has no input stream", m_state);
-    m_iterator ++;
+    OATPP_LOGW("[oatpp::web::protocol::http::outgoing::MultipartBody::MultipartReadCallback::readBody()]",
+               "Warning. Part has no input stream",
+               m_state);
+    m_iterator++;
     return 0;
   }
   auto res = stream->read(buffer, count, action);
   if(res == 0) {
-    m_iterator ++;
+    m_iterator++;
   }
   return res;
 }
 
-v_io_size MultipartBody::read(void *buffer, v_buff_size count, async::Action& action) {
+v_io_size MultipartBody::read(void* buffer, v_buff_size count, async::Action& action)
+{
 
   if(m_state == STATE_FINISHED) {
     return 0;
   }
 
-  p_char8 currBufferPtr = (p_char8) buffer;
+  p_char8 currBufferPtr = (p_char8)buffer;
   v_io_size bytesLeft = count;
 
   v_io_size res = 0;
 
   while(bytesLeft > 0 && action.isNone()) {
 
-    switch (m_state) {
+    switch(m_state) {
 
-      case STATE_BOUNDARY:
-        res = readBoundary(m_multipart, m_iterator, m_readStream, currBufferPtr, bytesLeft);
-        break;
+    case STATE_BOUNDARY:
+      res = readBoundary(m_multipart, m_iterator, m_readStream, currBufferPtr, bytesLeft);
+      break;
 
-      case STATE_HEADERS:
-        res = readHeaders(m_multipart, m_iterator, m_readStream, currBufferPtr, bytesLeft);
-        break;
+    case STATE_HEADERS:
+      res = readHeaders(m_multipart, m_iterator, m_readStream, currBufferPtr, bytesLeft);
+      break;
 
-      case STATE_BODY:
-        res = readBody(currBufferPtr, bytesLeft, action);
-        break;
+    case STATE_BODY:
+      res = readBody(currBufferPtr, bytesLeft, action);
+      break;
 
-      default:
-        OATPP_LOGE("[oatpp::web::protocol::http::outgoing::MultipartBody::MultipartReadCallback::read()]", "Error. Invalid state %d", m_state);
-        return 0;
-
+    default:
+      OATPP_LOGE("[oatpp::web::protocol::http::outgoing::MultipartBody::MultipartReadCallback::read()]",
+                 "Error. Invalid state %d",
+                 m_state);
+      return 0;
     }
 
     if(res > 0) {
-      currBufferPtr = &currBufferPtr[res];
+      currBufferPtr = &currBufferPtr [ res ];
       bytesLeft -= res;
     } else if(res == 0) {
 
@@ -92,35 +97,36 @@ v_io_size MultipartBody::read(void *buffer, v_buff_size count, async::Action& ac
       }
 
     } else if(action.isNone()) {
-      OATPP_LOGE("[oatpp::web::protocol::http::outgoing::MultipartBody::MultipartReadCallback::read()]", "Error. Invalid read result %d. State=%d", res, m_state);
+      OATPP_LOGE("[oatpp::web::protocol::http::outgoing::MultipartBody::MultipartReadCallback::read()]",
+                 "Error. Invalid read result %d. State=%d",
+                 res,
+                 m_state);
       return 0;
     }
-
   }
 
   return count - bytesLeft;
 }
 
 v_io_size MultipartBody::readBoundary(const std::shared_ptr<Multipart>& multipart,
-                                            std::list<std::shared_ptr<Part>>::const_iterator& iterator,
-                                            data::stream::BufferInputStream& readStream,
-                                            void *buffer,
-                                            v_buff_size count)
+                                      std::list<std::shared_ptr<Part>>::const_iterator& iterator,
+                                      data::stream::BufferInputStream& readStream,
+                                      void* buffer,
+                                      v_buff_size count)
 {
-  if (!readStream.getDataMemoryHandle()) {
+  if(!readStream.getDataMemoryHandle()) {
 
     oatpp::String boundary;
 
-    if (iterator == multipart->getAllParts().end()) {
+    if(iterator == multipart->getAllParts().end()) {
       boundary = "\r\n--" + multipart->getBoundary() + "--\r\n";
-    } else if (iterator == multipart->getAllParts().begin()) {
+    } else if(iterator == multipart->getAllParts().begin()) {
       boundary = "--" + multipart->getBoundary() + "\r\n";
     } else {
       boundary = "\r\n--" + multipart->getBoundary() + "\r\n";
     }
 
     readStream.reset(boundary.getPtr(), boundary->getData(), boundary->getSize());
-
   }
 
   auto res = readStream.readSimple(buffer, count);
@@ -132,14 +138,14 @@ v_io_size MultipartBody::readBoundary(const std::shared_ptr<Multipart>& multipar
 }
 
 v_io_size MultipartBody::readHeaders(const std::shared_ptr<Multipart>& multipart,
-                                           std::list<std::shared_ptr<Part>>::const_iterator& iterator,
-                                           data::stream::BufferInputStream& readStream,
-                                           void *buffer,
-                                           v_buff_size count)
+                                     std::list<std::shared_ptr<Part>>::const_iterator& iterator,
+                                     data::stream::BufferInputStream& readStream,
+                                     void* buffer,
+                                     v_buff_size count)
 {
-  (void) multipart;
+  (void)multipart;
 
-  if (!readStream.getDataMemoryHandle()) {
+  if(!readStream.getDataMemoryHandle()) {
 
     oatpp::data::stream::BufferOutputStream stream;
     auto& part = *iterator;
@@ -147,7 +153,6 @@ v_io_size MultipartBody::readHeaders(const std::shared_ptr<Multipart>& multipart
     stream.writeSimple("\r\n", 2);
     auto str = stream.toString();
     readStream.reset(str.getPtr(), str->getData(), str->getSize());
-
   }
 
   auto res = readStream.readSimple(buffer, count);
@@ -163,21 +168,26 @@ MultipartBody::MultipartBody(const std::shared_ptr<Multipart>& multipart)
   , m_iterator(multipart->getAllParts().begin())
   , m_state(STATE_BOUNDARY)
   , m_readStream(nullptr, nullptr, 0)
-{}
+{
+}
 
-void MultipartBody::declareHeaders(Headers& headers) {
+void MultipartBody::declareHeaders(Headers& headers)
+{
   if(m_multipart->getAllParts().empty()) {
     return;
   }
-  headers.put_LockFree(oatpp::web::protocol::http::Header::CONTENT_TYPE, "multipart/form-data; boundary=" + m_multipart->getBoundary());
+  headers.put_LockFree(oatpp::web::protocol::http::Header::CONTENT_TYPE,
+                       "multipart/form-data; boundary=" + m_multipart->getBoundary());
 }
 
-p_char8 MultipartBody::getKnownData() {
+p_char8 MultipartBody::getKnownData()
+{
   return nullptr;
 }
 
-v_buff_size MultipartBody::getKnownSize() {
- return -1;
+v_buff_size MultipartBody::getKnownSize()
+{
+  return -1;
 }
 
 }}}}}

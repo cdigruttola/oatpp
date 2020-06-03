@@ -28,18 +28,19 @@
 #include "oatpp-test/UnitTest.hpp"
 
 namespace oatpp { namespace test { namespace base {
-  
+
 /**
  * Test command line arguments parsing.
  */
-class CommandLineArgumentsTest : public UnitTest{
+class CommandLineArgumentsTest: public UnitTest {
 public:
-  
-  CommandLineArgumentsTest():UnitTest("TEST[base::CommandLineArgumentsTest]"){}
+  CommandLineArgumentsTest()
+    : UnitTest("TEST[base::CommandLineArgumentsTest]")
+  {
+  }
   void onRun() override;
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_test_core_base_CommandLineArgumentsTest_hpp */

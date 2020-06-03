@@ -25,9 +25,9 @@
 #ifndef oatpp_web_server_HttpRequestHandler_hpp
 #define oatpp_web_server_HttpRequestHandler_hpp
 
-#include "oatpp/web/protocol/http/outgoing/ResponseFactory.hpp"
-#include "oatpp/web/protocol/http/outgoing/Response.hpp"
 #include "oatpp/web/protocol/http/incoming/Request.hpp"
+#include "oatpp/web/protocol/http/outgoing/Response.hpp"
+#include "oatpp/web/protocol/http/outgoing/ResponseFactory.hpp"
 
 namespace oatpp { namespace web { namespace server {
 
@@ -36,7 +36,6 @@ namespace oatpp { namespace web { namespace server {
  */
 class HttpRequestHandler {
 public:
-
   /**
    * Convenience typedef for &id:oatpp::web::protocol::http::Status;.
    */
@@ -78,14 +77,14 @@ public:
   typedef oatpp::web::protocol::http::HttpError HttpError;
 
 public:
-
   /**
    * Handle incoming http request. <br>
    * *Implement this method.*
    * @param request - incoming http request. &id:oatpp::web::protocol::http::incoming::Request;.
    * @return - outgoing http response. &id:oatpp::web::protocol::http::outgoing::Response;.
    */
-  virtual std::shared_ptr<OutgoingResponse> handle(const std::shared_ptr<IncomingRequest>& request) {
+  virtual std::shared_ptr<OutgoingResponse> handle(const std::shared_ptr<IncomingRequest>& request)
+  {
     (void)request;
     throw HttpError(Status::CODE_501, "Endpoint not implemented.");
   }
@@ -96,8 +95,9 @@ public:
    * @param request - &id:oatpp::web::protocol::http::incoming::Request;.
    * @return - &id:oatpp::async::CoroutineStarterForResult; of &id:oatpp::web::protocol::http::outgoing::Response;.
    */
-  virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<OutgoingResponse>&>
-  handleAsync(const std::shared_ptr<IncomingRequest>& request) {
+  virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<OutgoingResponse>&> handleAsync(
+   const std::shared_ptr<IncomingRequest>& request)
+  {
     (void)request;
     throw HttpError(Status::CODE_501, "Asynchronous endpoint not implemented.");
   }

@@ -39,46 +39,56 @@ Executor::SubmissionProcessor::SubmissionProcessor()
   m_thread = std::thread(&Executor::SubmissionProcessor::run, this);
 }
 
-oatpp::async::Processor& Executor::SubmissionProcessor::getProcessor() {
+oatpp::async::Processor& Executor::SubmissionProcessor::getProcessor()
+{
   return m_processor;
 }
 
-void Executor::SubmissionProcessor::run() {
-  
+void Executor::SubmissionProcessor::run()
+{
+
   while(m_isRunning) {
     m_processor.waitForTasks();
-    while (m_processor.iterate(100)) {}
+    while(m_processor.iterate(100)) {
+    }
   }
-  
 }
 
-void Executor::SubmissionProcessor::pushTasks(oatpp::collection::FastQueue<CoroutineHandle>& tasks) {
+void Executor::SubmissionProcessor::pushTasks(oatpp::collection::FastQueue<CoroutineHandle>& tasks)
+{
   (void)tasks;
   std::runtime_error("[oatpp::async::Executor::SubmissionProcessor::pushTasks]: Error. This method does nothing.");
 }
 
-void Executor::SubmissionProcessor::pushOneTask(CoroutineHandle* task) {
+void Executor::SubmissionProcessor::pushOneTask(CoroutineHandle* task)
+{
   (void)task;
   std::runtime_error("[oatpp::async::Executor::SubmissionProcessor::pushOneTask]: Error. This method does nothing.");
 }
 
-void Executor::SubmissionProcessor::stop() {
+void Executor::SubmissionProcessor::stop()
+{
   m_isRunning = false;
   m_processor.stop();
 }
 
-void Executor::SubmissionProcessor::join() {
+void Executor::SubmissionProcessor::join()
+{
   m_thread.join();
 }
 
-void Executor::SubmissionProcessor::detach() {
+void Executor::SubmissionProcessor::detach()
+{
   m_thread.detach();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Executor
 
-Executor::Executor(v_int32 processorWorkersCount, v_int32 ioWorkersCount, v_int32 timerWorkersCount, v_int32 ioWorkerType)
+Executor::Executor(v_int32 processorWorkersCount,
+                   v_int32 ioWorkersCount,
+                   v_int32 timerWorkersCount,
+                   v_int32 ioWorkerType)
   : m_balancer(0)
 {
 
@@ -87,7 +97,7 @@ Executor::Executor(v_int32 processorWorkersCount, v_int32 ioWorkersCount, v_int3
   timerWorkersCount = chooseTimerWorkersCount(timerWorkersCount);
   ioWorkerType = chooseIOWorkerType(ioWorkerType);
 
-  for(v_int32 i = 0; i < processorWorkersCount; i ++) {
+  for(v_int32 i = 0; i < processorWorkersCount; i++) {
     m_processorWorkers.push_back(std::make_shared<SubmissionProcessor>());
   }
 
@@ -97,23 +107,22 @@ Executor::Executor(v_int32 processorWorkersCount, v_int32 ioWorkersCount, v_int3
 
   switch(ioWorkerType) {
 
-    case IO_WORKER_TYPE_NAIVE: {
-      for (v_int32 i = 0; i < ioWorkersCount; i++) {
-        ioWorkers.push_back(std::make_shared<worker::IOWorker>());
-      }
-      break;
+  case IO_WORKER_TYPE_NAIVE: {
+    for(v_int32 i = 0; i < ioWorkersCount; i++) {
+      ioWorkers.push_back(std::make_shared<worker::IOWorker>());
     }
+    break;
+  }
 
-    case IO_WORKER_TYPE_EVENT: {
-      for (v_int32 i = 0; i < ioWorkersCount; i++) {
-        ioWorkers.push_back(std::make_shared<worker::IOEventWorkerForeman>());
-      }
-      break;
+  case IO_WORKER_TYPE_EVENT: {
+    for(v_int32 i = 0; i < ioWorkersCount; i++) {
+      ioWorkers.push_back(std::make_shared<worker::IOEventWorkerForeman>());
     }
+    break;
+  }
 
-    default:
-      throw std::runtime_error("[oatpp::async::Executor::Executor()]: Error. Unknown IO worker type.");
-
+  default:
+    throw std::runtime_error("[oatpp::async::Executor::Executor()]: Error. Unknown IO worker type.");
   }
 
   linkWorkers(ioWorkers);
@@ -124,20 +133,22 @@ Executor::Executor(v_int32 processorWorkersCount, v_int32 ioWorkersCount, v_int3
   }
 
   linkWorkers(timerWorkers);
-
 }
 
-v_int32 Executor::chooseProcessorWorkersCount(v_int32 processorWorkersCount) {
+v_int32 Executor::chooseProcessorWorkersCount(v_int32 processorWorkersCount)
+{
   if(processorWorkersCount >= 1) {
     return processorWorkersCount;
   }
   if(processorWorkersCount == VALUE_SUGGESTED) {
     return oatpp::concurrency::getHardwareConcurrency();
   }
-  throw std::runtime_error("[oatpp::async::Executor::chooseProcessorWorkersCount()]: Error. Invalid processor workers count specified.");
+  throw std::runtime_error(
+   "[oatpp::async::Executor::chooseProcessorWorkersCount()]: Error. Invalid processor workers count specified.");
 }
 
-v_int32 Executor::chooseIOWorkersCount(v_int32 processorWorkersCount, v_int32 ioWorkersCount) {
+v_int32 Executor::chooseIOWorkersCount(v_int32 processorWorkersCount, v_int32 ioWorkersCount)
+{
   if(ioWorkersCount >= 1) {
     return ioWorkersCount;
   }
@@ -148,20 +159,24 @@ v_int32 Executor::chooseIOWorkersCount(v_int32 processorWorkersCount, v_int32 io
     }
     return count;
   }
-  throw std::runtime_error("[oatpp::async::Executor::chooseIOWorkersCount()]: Error. Invalid I/O workers count specified.");
+  throw std::runtime_error(
+   "[oatpp::async::Executor::chooseIOWorkersCount()]: Error. Invalid I/O workers count specified.");
 }
 
-v_int32 Executor::chooseTimerWorkersCount(v_int32 timerWorkersCount) {
+v_int32 Executor::chooseTimerWorkersCount(v_int32 timerWorkersCount)
+{
   if(timerWorkersCount >= 1) {
     return timerWorkersCount;
   }
   if(timerWorkersCount == VALUE_SUGGESTED) {
     return 1;
   }
-  throw std::runtime_error("[oatpp::async::Executor::chooseTimerWorkersCount()]: Error. Invalid timer workers count specified.");
+  throw std::runtime_error(
+   "[oatpp::async::Executor::chooseTimerWorkersCount()]: Error. Invalid timer workers count specified.");
 }
 
-v_int32 Executor::chooseIOWorkerType(v_int32 ioWorkerType) {
+v_int32 Executor::chooseIOWorkerType(v_int32 ioWorkerType)
+{
 
   if(ioWorkerType == VALUE_SUGGESTED) {
 #if defined(WIN32) || defined(_WIN32)
@@ -172,31 +187,31 @@ v_int32 Executor::chooseIOWorkerType(v_int32 ioWorkerType) {
   }
 
   return ioWorkerType;
-
 }
 
-void Executor::linkWorkers(const std::vector<std::shared_ptr<worker::Worker>>& workers) {
+void Executor::linkWorkers(const std::vector<std::shared_ptr<worker::Worker>>& workers)
+{
 
   m_allWorkers.insert(m_allWorkers.end(), workers.begin(), workers.end());
 
   if(m_processorWorkers.size() > workers.size() && (m_processorWorkers.size() % workers.size()) == 0) {
 
     size_t wi = 0;
-    for(auto & p : m_processorWorkers) {
-      p->getProcessor().addWorker(workers[wi]);
-      wi ++;
+    for(auto& p: m_processorWorkers) {
+      p->getProcessor().addWorker(workers [ wi ]);
+      wi++;
       if(wi == workers.size()) {
         wi = 0;
       }
     }
 
-  } else if ((workers.size() % m_processorWorkers.size()) == 0) {
+  } else if((workers.size() % m_processorWorkers.size()) == 0) {
 
     size_t pi = 0;
-    for(const auto & worker : workers) {
-      auto& p = m_processorWorkers[pi];
+    for(const auto& worker: workers) {
+      auto& p = m_processorWorkers [ pi ];
       p->getProcessor().addWorker(worker);
-      pi ++;
+      pi++;
       if(pi == m_processorWorkers.size()) {
         pi = 0;
       }
@@ -204,47 +219,49 @@ void Executor::linkWorkers(const std::vector<std::shared_ptr<worker::Worker>>& w
 
   } else {
 
-    for(auto & p : m_processorWorkers) {
-      for(auto& w : workers) {
+    for(auto& p: m_processorWorkers) {
+      for(auto& w: workers) {
         p->getProcessor().addWorker(w);
       }
     }
-
   }
-
 }
 
-void Executor::join() {
-  for(auto& worker : m_allWorkers) {
+void Executor::join()
+{
+  for(auto& worker: m_allWorkers) {
     worker->join();
   }
 }
 
-void Executor::detach() {
-  for(auto& worker : m_allWorkers) {
+void Executor::detach()
+{
+  for(auto& worker: m_allWorkers) {
     worker->detach();
   }
 }
 
-void Executor::stop() {
-  for(auto& worker : m_allWorkers) {
+void Executor::stop()
+{
+  for(auto& worker: m_allWorkers) {
     worker->stop();
   }
 }
 
-v_int32 Executor::getTasksCount() {
+v_int32 Executor::getTasksCount()
+{
 
   v_int32 result = 0;
 
-  for(auto procWorker : m_processorWorkers) {
+  for(auto procWorker: m_processorWorkers) {
     result += procWorker->getProcessor().getTasksCount();
   }
 
   return result;
-
 }
 
-void Executor::waitTasksFinished(const std::chrono::duration<v_int64, std::micro>& timeout) {
+void Executor::waitTasksFinished(const std::chrono::duration<v_int64, std::micro>& timeout)
+{
 
   auto startTime = std::chrono::system_clock::now();
 
@@ -256,7 +273,6 @@ void Executor::waitTasksFinished(const std::chrono::duration<v_int64, std::micro
       break;
     }
   }
-
 }
-  
+
 }}

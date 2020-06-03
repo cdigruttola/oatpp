@@ -25,191 +25,204 @@
 #ifndef oatpp_collection_ListMap_hpp
 #define oatpp_collection_ListMap_hpp
 
-#include "oatpp/core/base/memory/ObjectPool.hpp"
 #include "oatpp/core/base/Countable.hpp"
+#include "oatpp/core/base/memory/ObjectPool.hpp"
 
 namespace oatpp { namespace collection {
-  
+
 template<class K, class V>
-class ListMap : public oatpp::base::Countable {
+class ListMap: public oatpp::base::Countable {
 public:
   OBJECT_POOL(ListMap_Pool, ListMap, 32)
   SHARED_OBJECT_POOL(Shared_ListMap_Pool, ListMap, 32)
 public:
-  
   //--------------------------------------------------------------------------------------
   // Entry
-  
-  class Entry{
+
+  class Entry {
     friend ListMap;
+
   public:
     OBJECT_POOL_THREAD_LOCAL(ListMap_Entry_Pool, Entry, 64)
   private:
-    K           key;
-    V           value;
-    Entry*      next;
+    K key;
+    V value;
+    Entry* next;
+
   protected:
     Entry(const K& pKey, const V& pValue, Entry* pNext)
       : key(pKey)
       , value(pValue)
       , next(pNext)
-    {}
-    
-    ~Entry(){
+    {
     }
+
+    ~Entry()
+    {
+    }
+
   public:
-    
-    const K& getKey() const{
+    const K& getKey() const
+    {
       return key;
     }
-    
-    const V& getValue() const{
+
+    const V& getValue() const
+    {
       return value;
     }
-    
-    Entry* getNext() const{
+
+    Entry* getNext() const
+    {
       return next;
     }
-    
   };
-  
+
 private:
-  
   Entry* m_first;
   Entry* m_last;
   v_int32 m_count;
-  
+
   oatpp::base::memory::MemoryPool& m_itemMemoryPool;
-  
+
 private:
-  
-  Entry* createEntry(const K& pKey, const V& pValue, Entry* pNext){
-    return new (m_itemMemoryPool.obtain()) Entry(pKey, pValue, pNext);
+  Entry* createEntry(const K& pKey, const V& pValue, Entry* pNext)
+  {
+    return new(m_itemMemoryPool.obtain()) Entry(pKey, pValue, pNext);
   }
-  
-  void destroyEntry(Entry* entry){
+
+  void destroyEntry(Entry* entry)
+  {
     entry->~Entry();
     oatpp::base::memory::MemoryPool::free(entry);
   }
-  
+
 private:
-  
   template<class Key>
-  Entry* getEntryByKey(const Key& key) const{
-    
+  Entry* getEntryByKey(const Key& key) const
+  {
+
     Entry* curr = m_first;
-    
-    while(curr != nullptr){
-      if(key == curr->key){
+
+    while(curr != nullptr) {
+      if(key == curr->key) {
         return curr;
       }
       curr = curr->next;
     }
-    
+
     return nullptr;
-    
   }
-  
-  void addOneEntry(Entry* entry){
-    
-    if(m_last == nullptr){
+
+  void addOneEntry(Entry* entry)
+  {
+
+    if(m_last == nullptr) {
       m_first = entry;
       m_last = entry;
-    }else{
+    } else {
       m_last->next = entry;
       m_last = entry;
     }
-    
+
     m_count++;
   }
-  
+
 public:
   ListMap()
     : m_first(nullptr)
     , m_last(nullptr)
     , m_count(0)
     , m_itemMemoryPool(Entry::ListMap_Entry_Pool::getPool())
-  {}
+  {
+  }
+
 public:
-  
-  static std::shared_ptr<ListMap> createShared(){
+  static std::shared_ptr<ListMap> createShared()
+  {
     return Shared_ListMap_Pool::allocateShared();
   }
-  
-  ~ListMap() override {
+
+  ~ListMap() override
+  {
     clear();
   }
-  
-  Entry* put(const K& key, const V& value){
+
+  Entry* put(const K& key, const V& value)
+  {
     Entry* entry = getEntryByKey(key);
-    if(entry != nullptr){
-      if(entry->value != value){
+    if(entry != nullptr) {
+      if(entry->value != value) {
         entry->value = value;
       }
-    }else{
+    } else {
       entry = createEntry(key, value, nullptr);
       addOneEntry(entry);
     }
     return entry;
   }
-  
-  bool putIfNotExists(const K& key, const V& value){
+
+  bool putIfNotExists(const K& key, const V& value)
+  {
     Entry* entry = getEntryByKey(key);
-    if(entry == nullptr){
+    if(entry == nullptr) {
       entry = createEntry(key, value, nullptr);
       addOneEntry(entry);
       return true;
     }
     return false;
   }
-  
-  const Entry* find(const K& key) const{
+
+  const Entry* find(const K& key) const
+  {
     Entry* entry = getEntryByKey<K>(key);
-    if(entry != nullptr){
+    if(entry != nullptr) {
       return entry;
     }
     return nullptr;
   }
-  
-  const V& get(const K& key, const V& defaultValue) const {
+
+  const V& get(const K& key, const V& defaultValue) const
+  {
     Entry* entry = getEntryByKey<K>(key);
-    if(entry != nullptr){
+    if(entry != nullptr) {
       return entry->getValue();
     }
     return defaultValue;
   }
-  
+
   /*
   template <class Key>
   const Entry* getByKeyTemplate(const Key& key) const{
-    
+
     Entry* entry = getEntryByKey(key);
     if(entry != nullptr){
       return entry;
     }
-    
+
     return nullptr;
-    
+
   }
   */
-   
-  V remove(const K& key){
-    
-    if(m_first != nullptr){
-      
-      if(m_first->key->equals(key)){
+
+  V remove(const K& key)
+  {
+
+    if(m_first != nullptr) {
+
+      if(m_first->key->equals(key)) {
         Entry* next = m_first->next;
         V result = m_first->value;
         destroyEntry(m_first);
         m_first = next;
         return result;
       }
-    
+
       Entry* curr = m_first;
       Entry* next = m_first->next;
-      
-      while(next != nullptr){
-        if(next->key->equals(key)){
+
+      while(next != nullptr) {
+        if(next->key->equals(key)) {
           V result = next->value;
           curr->next = next->next;
           destroyEntry(next);
@@ -218,24 +231,24 @@ public:
         curr = next;
         next = curr->next;
       }
-      
     }
-    
+
     return V::empty();
   }
 
-  Entry* getEntryByIndex(v_int32 index) const{
+  Entry* getEntryByIndex(v_int32 index) const
+  {
 
-    if(index >= m_count){
+    if(index >= m_count) {
       return nullptr;
     }
 
     v_int32 i = 0;
     Entry* curr = m_first;
 
-    while(curr != nullptr){
+    while(curr != nullptr) {
 
-      if(i == index){
+      if(i == index) {
         return curr;
       }
 
@@ -244,32 +257,32 @@ public:
     }
 
     return nullptr;
-
   }
 
-  Entry* getFirstEntry() const {
+  Entry* getFirstEntry() const
+  {
     return m_first;
   }
-  
-  v_int32 count() const{
+
+  v_int32 count() const
+  {
     return m_count;
   }
-  
-  void clear(){
-    
+
+  void clear()
+  {
+
     Entry* curr = m_first;
-    while(curr != nullptr){
+    while(curr != nullptr) {
       Entry* next = curr->next;
       destroyEntry(curr);
       curr = next;
     }
-    
+
     m_first = nullptr;
     m_last = nullptr;
     m_count = 0;
-    
   }
-  
 };
 
 }}

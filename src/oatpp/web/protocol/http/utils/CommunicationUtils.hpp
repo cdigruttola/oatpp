@@ -25,9 +25,9 @@
 #ifndef oatpp_web_protocol_http_utils_CommunicationUtils_hpp
 #define oatpp_web_protocol_http_utils_CommunicationUtils_hpp
 
+#include "oatpp/web/protocol/http/encoding/ProviderCollection.hpp"
 #include "oatpp/web/protocol/http/incoming/Request.hpp"
 #include "oatpp/web/protocol/http/outgoing/Response.hpp"
-#include "oatpp/web/protocol/http/encoding/ProviderCollection.hpp"
 
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace utils {
 
@@ -50,10 +50,11 @@ public:
    * Connection state - upgrade.
    */
   static constexpr v_int32 CONNECTION_STATE_UPGRADE = 2;
+
 private:
   static bool headerEqualsCI_FAST(const oatpp::data::share::MemoryLabel& headerValue, const char* value);
-public:
 
+public:
   /**
    * Consider keep connection alive taking into account request headers, response headers and protocol version.<br>
    * Corresponding header will be set to response if not existed before. <br>
@@ -70,11 +71,11 @@ public:
   static v_int32 considerConnectionState(const std::shared_ptr<protocol::http::incoming::Request>& request,
                                          const std::shared_ptr<protocol::http::outgoing::Response>& response);
 
-  static std::shared_ptr<encoding::EncoderProvider> selectEncoder(const std::shared_ptr<http::incoming::Request>& request,
-                                                                  const std::shared_ptr<http::encoding::ProviderCollection>& providers);
-  
+  static std::shared_ptr<encoding::EncoderProvider> selectEncoder(
+   const std::shared_ptr<http::incoming::Request>& request,
+   const std::shared_ptr<http::encoding::ProviderCollection>& providers);
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_utils_CommunicationUtils_hpp */

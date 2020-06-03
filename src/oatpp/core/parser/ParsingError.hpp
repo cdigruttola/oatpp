@@ -34,19 +34,19 @@ namespace oatpp { namespace parser {
  * If parsing was made via oatpp::parser::ParsingCaret and ParsingCaret is accessible for user
  * then do not throw this error.- User should read error from ParsingCaret::getError()
  */
-class ParsingError : public std::runtime_error {
+class ParsingError: public std::runtime_error {
 private:
   oatpp::String m_message;
   v_int64 m_code;
   v_buff_size m_position;
-public:
 
+public:
   /**
    * Constructor
    * @param message
    * @param position
    */
-  ParsingError(const oatpp::String &message, v_int64 code, v_buff_size position);
+  ParsingError(const oatpp::String& message, v_int64 code, v_buff_size position);
 
   /**
    * get error message
@@ -65,9 +65,8 @@ public:
    * @return
    */
   v_buff_size getPosition() const;
-
 };
 
 }}
 
-#endif //oatpp_parser_ParsingError_hpp
+#endif // oatpp_parser_ParsingError_hpp

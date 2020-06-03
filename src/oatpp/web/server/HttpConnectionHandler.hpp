@@ -26,11 +26,11 @@
 #define oatpp_web_server_HttpConnectionHandler_hpp
 
 #include "./HttpProcessor.hpp"
-#include "./handler/ErrorHandler.hpp"
 #include "./HttpRouter.hpp"
+#include "./handler/ErrorHandler.hpp"
 
-#include "oatpp/network/server/ConnectionHandler.hpp"
 #include "oatpp/network/Connection.hpp"
+#include "oatpp/network/server/ConnectionHandler.hpp"
 
 namespace oatpp { namespace web { namespace server {
 
@@ -38,11 +38,13 @@ namespace oatpp { namespace web { namespace server {
  * Simple ConnectionHandler (&id:oatpp::network::server::ConnectionHandler;) for handling HTTP communication. <br>
  * Will create one thread per each connection to handle communication.
  */
-class HttpConnectionHandler : public base::Countable, public network::server::ConnectionHandler {
+class HttpConnectionHandler
+  : public base::Countable
+  , public network::server::ConnectionHandler {
 private:
   std::shared_ptr<HttpProcessor::Components> m_components;
-public:
 
+public:
   /**
    * Constructor.
    * @param components - &id:oatpp::web::server::HttpProcessor::Components;.
@@ -55,20 +57,20 @@ public:
    */
   HttpConnectionHandler(const std::shared_ptr<HttpRouter>& router)
     : HttpConnectionHandler(std::make_shared<HttpProcessor::Components>(router))
-  {}
+  {
+  }
 
   /**
    * Constructor.
    * @param router - &id:oatpp::web::server::HttpRouter; to route incoming requests.
    * @param config - &id:oatpp::web::server::HttpProcessor::Config;.
    */
-  HttpConnectionHandler(const std::shared_ptr<HttpRouter>& router,
-                        const std::shared_ptr<HttpProcessor::Config>& config)
+  HttpConnectionHandler(const std::shared_ptr<HttpRouter>& router, const std::shared_ptr<HttpProcessor::Config>& config)
     : HttpConnectionHandler(std::make_shared<HttpProcessor::Components>(router, config))
-  {}
+  {
+  }
 
 public:
-
   /**
    * Create shared HttpConnectionHandler.
    * @param router - &id:oatpp::web::server::HttpRouter; to route incoming requests.
@@ -84,7 +86,8 @@ public:
   void setErrorHandler(const std::shared_ptr<handler::ErrorHandler>& errorHandler);
 
   /**
-   * Set request interceptor. Request intercepted after route is resolved but before corresponding route endpoint is called.
+   * Set request interceptor. Request intercepted after route is resolved but before corresponding route endpoint is
+   * called.
    * @param interceptor - &id:oatpp::web::server::handler::RequestInterceptor;.
    */
   void addRequestInterceptor(const std::shared_ptr<handler::RequestInterceptor>& interceptor);
@@ -93,15 +96,15 @@ public:
    * Implementation of &id:oatpp::network::server::ConnectionHandler::handleConnection;.
    * @param connection - &id:oatpp::data::stream::IOStream; representing connection.
    */
-  void handleConnection(const std::shared_ptr<IOStream>& connection, const std::shared_ptr<const ParameterMap>& params) override;
+  void handleConnection(const std::shared_ptr<IOStream>& connection,
+                        const std::shared_ptr<const ParameterMap>& params) override;
 
   /**
    * Tell all worker threads to exit when done.
    */
   void stop() override;
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_web_server_HttpConnectionHandler_hpp */

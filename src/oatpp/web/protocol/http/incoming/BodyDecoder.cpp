@@ -29,17 +29,18 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // BodyDecoder
 
-oatpp::async::CoroutineStarterForResult<const oatpp::String&>
-BodyDecoder::decodeToStringAsync(const Headers& headers, const std::shared_ptr<data::stream::InputStream>& bodyStream) const {
+oatpp::async::CoroutineStarterForResult<const oatpp::String&> BodyDecoder::decodeToStringAsync(
+ const Headers& headers, const std::shared_ptr<data::stream::InputStream>& bodyStream) const
+{
 
-  class ToStringDecoder : public oatpp::async::CoroutineWithResult<ToStringDecoder, const oatpp::String&> {
+  class ToStringDecoder: public oatpp::async::CoroutineWithResult<ToStringDecoder, const oatpp::String&> {
   private:
     const BodyDecoder* m_decoder;
     Headers m_headers;
     std::shared_ptr<oatpp::data::stream::InputStream> m_bodyStream;
     std::shared_ptr<oatpp::data::stream::ChunkedBuffer> m_outputStream;
-  public:
 
+  public:
     ToStringDecoder(const BodyDecoder* decoder,
                     const Headers& headers,
                     const std::shared_ptr<data::stream::InputStream>& bodyStream)
@@ -47,20 +48,21 @@ BodyDecoder::decodeToStringAsync(const Headers& headers, const std::shared_ptr<d
       , m_headers(headers)
       , m_bodyStream(bodyStream)
       , m_outputStream(std::make_shared<data::stream::ChunkedBuffer>())
-    {}
+    {
+    }
 
-    Action act() override {
+    Action act() override
+    {
       return m_decoder->decodeAsync(m_headers, m_bodyStream, m_outputStream).next(yieldTo(&ToStringDecoder::onDecoded));
     }
 
-    Action onDecoded() {
+    Action onDecoded()
+    {
       return _return(m_outputStream->toString());
     }
-
   };
 
   return ToStringDecoder::startForResult(this, headers, bodyStream);
-
 }
 
 }}}}}

@@ -28,15 +28,16 @@
 #include "oatpp-test/UnitTest.hpp"
 
 namespace oatpp { namespace test { namespace collection {
-  
-class LinkedListTest : public UnitTest{
+
+class LinkedListTest: public UnitTest {
 public:
-  
-  LinkedListTest():UnitTest("TEST[oatpp::collection::LinkedListTest]"){}
+  LinkedListTest()
+    : UnitTest("TEST[oatpp::collection::LinkedListTest]")
+  {
+  }
   void onRun() override;
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_test_base_collection_LinkedListTest_hpp */

@@ -76,7 +76,6 @@ struct InlineReadData {
    * Same as `inc(bytesLeft).`
    */
   void setEof();
-
 };
 
 /**
@@ -124,7 +123,6 @@ struct InlineWriteData {
    * Same as `inc(bytesLeft).`
    */
   void setEof();
-
 };
 
 /**
@@ -133,7 +131,6 @@ struct InlineWriteData {
  */
 class Processor {
 public:
-
   /**
    * Enum of processing errors.
    */
@@ -165,7 +162,6 @@ public:
   };
 
 public:
-
   /**
    * Default virtual destructor.
    */
@@ -185,20 +181,18 @@ public:
    * @param dataOut - data provided to client by processor. Output data. &id:data::buffer::InlineReadData;.
    * @return - &l:Processor::Error;.
    */
-  virtual v_int32 iterate(data::buffer::InlineReadData& dataIn,
-                          data::buffer::InlineReadData& dataOut) = 0;
-
+  virtual v_int32 iterate(data::buffer::InlineReadData& dataIn, data::buffer::InlineReadData& dataOut) = 0;
 };
 
 /**
  * Pipeline of buffer processors.
  */
-class ProcessingPipeline : public Processor {
+class ProcessingPipeline: public Processor {
 private:
   std::vector<base::ObjectHandle<Processor>> m_processors;
   std::vector<data::buffer::InlineReadData> m_intermediateData;
-public:
 
+public:
   /**
    * Constructor.
    * @param m_processors - the array of processors defining the pipeline.
@@ -219,9 +213,7 @@ public:
    * @param dataOut - data provided to client by processor. Output data. &id:data::buffer::InlineReadData;.
    * @return - &l:Processor::Error;.
    */
-  v_int32 iterate(data::buffer::InlineReadData& dataIn,
-                  data::buffer::InlineReadData& dataOut) override;
-
+  v_int32 iterate(data::buffer::InlineReadData& dataIn, data::buffer::InlineReadData& dataOut) override;
 };
 
 }}}

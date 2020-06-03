@@ -38,6 +38,7 @@ namespace oatpp { namespace async {
  */
 class CoroutineWaitList {
   friend Processor;
+
 public:
   /**
    * Listener for new items in the wait-list.
@@ -55,10 +56,12 @@ public:
      */
     virtual void onNewItem(CoroutineWaitList& list) = 0;
   };
+
 private:
   oatpp::collection::FastQueue<CoroutineHandle> m_list;
   oatpp::concurrency::SpinLock m_lock;
   Listener* m_listener = nullptr;
+
 protected:
   /*
    * Put coroutine on wait-list.
@@ -73,8 +76,8 @@ protected:
    * @param coroutine
    */
   void pushBack(CoroutineHandle* coroutine);
-public:
 
+public:
   /**
    * Deleted copy-constructor.
    * @param other
@@ -83,7 +86,6 @@ public:
   CoroutineWaitList& operator=(const CoroutineWaitList&) = delete;
 
 public:
-
   /**
    * Default constructor.
    */
@@ -118,16 +120,16 @@ public:
    */
   void notifyAll();
 
-  CoroutineWaitList& operator=(CoroutineWaitList&& other) {
+  CoroutineWaitList& operator=(CoroutineWaitList&& other)
+  {
     notifyAll();
     std::lock_guard<oatpp::concurrency::SpinLock> lock(m_lock);
     std::memcpy(&m_list, &other.m_list, sizeof(m_list));
     std::memset(&other.m_list, 0, sizeof(m_list));
     return *this;
   }
-
 };
 
 }}
 
-#endif //oatpp_async_CoroutineWaitList_hpp
+#endif // oatpp_async_CoroutineWaitList_hpp

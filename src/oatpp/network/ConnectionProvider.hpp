@@ -25,9 +25,9 @@
 #ifndef oatpp_netword_ConnectionsProvider_hpp
 #define oatpp_netword_ConnectionsProvider_hpp
 
+#include "oatpp/core/async/Coroutine.hpp"
 #include "oatpp/core/data/share/MemoryLabel.hpp"
 #include "oatpp/core/data/stream/Stream.hpp"
-#include "oatpp/core/async/Coroutine.hpp"
 #include <unordered_map>
 
 namespace oatpp { namespace network {
@@ -49,6 +49,7 @@ public:
    * Predefined property key for PORT.
    */
   static const char* const PROPERTY_PORT;
+
 public:
   /**
    * Convenience typedef for &id:oatpp::data::stream::IOStream;.
@@ -60,16 +61,17 @@ public:
    */
   typedef oatpp::async::Action Action;
   typedef oatpp::async::Action (oatpp::async::AbstractCoroutine::*AsyncCallback)(const std::shared_ptr<IOStream>&);
+
 private:
   std::unordered_map<oatpp::data::share::StringKeyLabelCI, oatpp::data::share::StringKeyLabel> m_properties;
-protected:
 
+protected:
   /*
    * Set optional property
    */
   void setProperty(const oatpp::String& key, const oatpp::String& value);
-public:
 
+public:
   /**
    * Virtual default destructor.
    */
@@ -87,7 +89,8 @@ public:
    * Obtain IOStream representing connection to resource.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::stream::IOStream>&> getConnectionAsync() = 0;
+  virtual oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::stream::IOStream>&>
+   getConnectionAsync() = 0;
 
   /**
    * Invalidate connection that was previously created by this provider.
@@ -100,32 +103,31 @@ public:
    * Should close all handles here.
    */
   virtual void close() = 0;
-  
+
   /**
    * Some optional properties that user might want to know. <br>
    * Note: All properties are optional and user should not rely on this.
    */
   const std::unordered_map<oatpp::data::share::StringKeyLabelCI, oatpp::data::share::StringKeyLabel>& getProperties();
-  
+
   /**
    * Get optional property
    */
   oatpp::data::share::StringKeyLabel getProperty(const oatpp::String& key);
-  
-};
-  
-/**
- * No properties here. It is just a logical division
- */
-class ServerConnectionProvider : public ConnectionProvider {
 };
 
 /**
  * No properties here. It is just a logical division
  */
-class ClientConnectionProvider : public ConnectionProvider {
+class ServerConnectionProvider: public ConnectionProvider {
 };
-  
+
+/**
+ * No properties here. It is just a logical division
+ */
+class ClientConnectionProvider: public ConnectionProvider {
+};
+
 }}
 
 #endif /* oatpp_netword_ConnectionsProvider_hpp */

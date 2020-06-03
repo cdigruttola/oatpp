@@ -35,55 +35,65 @@ ConnectionProvider::ConnectionProvider(const std::shared_ptr<virtual_::Interface
   setProperty(PROPERTY_PORT, "0");
 }
 
-std::shared_ptr<ConnectionProvider> ConnectionProvider::createShared(const std::shared_ptr<virtual_::Interface>& interface) {
+std::shared_ptr<ConnectionProvider> ConnectionProvider::createShared(
+ const std::shared_ptr<virtual_::Interface>& interface)
+{
   return std::make_shared<ConnectionProvider>(interface);
 }
 
-void ConnectionProvider::close() {
-
+void ConnectionProvider::close()
+{
 }
 
-std::shared_ptr<ConnectionProvider::IOStream> ConnectionProvider::getConnection() {
+std::shared_ptr<ConnectionProvider::IOStream> ConnectionProvider::getConnection()
+{
   auto submission = m_interface->connect();
   if(submission->isValid()) {
     auto socket = submission->getSocket();
-    if (socket) {
+    if(socket) {
       socket->setOutputStreamIOMode(oatpp::data::stream::IOMode::BLOCKING);
       socket->setInputStreamIOMode(oatpp::data::stream::IOMode::BLOCKING);
       socket->setMaxAvailableToReadWrtie(m_maxAvailableToRead, m_maxAvailableToWrite);
       return socket;
     }
   }
-  throw std::runtime_error("[oatpp::network::virtual_::client::getConnection()]: Error. Can't connect. " + m_interface->getName()->std_str());
+  throw std::runtime_error("[oatpp::network::virtual_::client::getConnection()]: Error. Can't connect. " +
+                           m_interface->getName()->std_str());
 }
-  
-oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::stream::IOStream>&> ConnectionProvider::getConnectionAsync() {
-  
-  class ConnectCoroutine : public oatpp::async::CoroutineWithResult<ConnectCoroutine, const std::shared_ptr<oatpp::data::stream::IOStream>&> {
+
+oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::stream::IOStream>&>
+ ConnectionProvider::getConnectionAsync()
+{
+
+  class ConnectCoroutine
+    : public oatpp::async::CoroutineWithResult<ConnectCoroutine, const std::shared_ptr<oatpp::data::stream::IOStream>&> {
   private:
     std::shared_ptr<virtual_::Interface> m_interface;
     v_io_size m_maxAvailableToRead;
     v_io_size m_maxAvailableToWrite;
     std::shared_ptr<virtual_::Interface::ConnectionSubmission> m_submission;
+
   public:
-    
     ConnectCoroutine(const std::shared_ptr<virtual_::Interface>& interface,
                      v_io_size maxAvailableToRead,
                      v_io_size maxAvailableToWrite)
       : m_interface(interface)
       , m_maxAvailableToRead(maxAvailableToRead)
       , m_maxAvailableToWrite(maxAvailableToWrite)
-    {}
-    
-    Action act() override {
+    {
+    }
+
+    Action act() override
+    {
       m_submission = m_interface->connectNonBlocking();
-      if(m_submission){
+      if(m_submission) {
         return yieldTo(&ConnectCoroutine::obtainSocket);
       }
       return waitRepeat(std::chrono::milliseconds(100));
     }
 
-    Action obtainSocket() {
+    Action obtainSocket()
+    {
 
       if(m_submission->isValid()) {
 
@@ -99,14 +109,12 @@ oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::strea
         return waitRepeat(std::chrono::milliseconds(100));
       }
 
-      return error<Error>("[oatpp::network::virtual_::client::ConnectionProvider::getConnectionAsync()]: Error. Can't connect.");
-
+      return error<Error>(
+       "[oatpp::network::virtual_::client::ConnectionProvider::getConnectionAsync()]: Error. Can't connect.");
     }
-    
   };
-  
+
   return ConnectCoroutine::startForResult(m_interface, m_maxAvailableToRead, m_maxAvailableToWrite);
-  
 }
-  
+
 }}}}

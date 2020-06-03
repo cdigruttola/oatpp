@@ -28,13 +28,16 @@
 #include "oatpp-test/UnitTest.hpp"
 
 namespace oatpp { namespace test { namespace encoding {
-  
-class Base64Test : public UnitTest{
+
+class Base64Test: public UnitTest {
 public:
-  Base64Test():UnitTest("TEST[encoding::Base64Test]"){}
+  Base64Test()
+    : UnitTest("TEST[encoding::Base64Test]")
+  {
+  }
   void onRun() override;
 };
-  
+
 }}}
 
 #endif /* oatpp_test_encoding_Base64Test_hpp */

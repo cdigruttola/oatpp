@@ -33,15 +33,15 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
 /**
  * Chunked-encoding buffer processor. &id:oatpp::data::buffer::Processor;.
  */
-class EncoderChunked : public data::buffer::Processor {
+class EncoderChunked: public data::buffer::Processor {
 private:
   oatpp::String m_chunkHeader;
   bool m_writeChunkHeader = true;
   bool m_firstChunk = true;
   bool m_finished = false;
   v_io_size m_lastFlush = 0;
-public:
 
+public:
   /**
    * If the client is using the input stream to read data and push it to the processor,
    * the client MAY ask the processor for a suggested read size.
@@ -57,25 +57,26 @@ public:
    * @return - &l:Processor::Error;.
    */
   v_int32 iterate(data::buffer::InlineReadData& dataIn, data::buffer::InlineReadData& dataOut) override;
-
 };
 
 /**
  * Chunked-decoding buffer processor. &id:oatpp::data::buffer::Processor;.
  */
-class DecoderChunked : public data::buffer::Processor {
+class DecoderChunked: public data::buffer::Processor {
 public:
   static constexpr v_int32 ERROR_CHUNK_HEADER_TOO_LONG = 100;
+
 private:
   data::stream::BufferOutputStream m_chunkHeaderBuffer;
   v_io_size m_currentChunkSize;
   bool m_firstChunk;
   bool m_finished;
   v_io_size m_lastFlush;
+
 private:
   v_int32 readHeader(data::buffer::InlineReadData& dataIn);
-public:
 
+public:
   /**
    * Constructor.
    */
@@ -96,15 +97,13 @@ public:
    * @return - &l:Processor::Error;.
    */
   v_int32 iterate(data::buffer::InlineReadData& dataIn, data::buffer::InlineReadData& dataOut) override;
-
 };
 
 /**
  * EncoderProvider for "chunked" encoding.
  */
-class ChunkedEncoderProvider : public EncoderProvider {
+class ChunkedEncoderProvider: public EncoderProvider {
 public:
-
   /**
    * Get encoding name.
    * @return
@@ -116,15 +115,13 @@ public:
    * @return - &id:oatpp::data::buffer::Processor;
    */
   std::shared_ptr<data::buffer::Processor> getProcessor() override;
-
 };
 
 /**
  * EncoderProvider for "chunked" decoding.
  */
-class ChunkedDecoderProvider : public EncoderProvider {
+class ChunkedDecoderProvider: public EncoderProvider {
 public:
-
   /**
    * Get encoding name.
    * @return
@@ -136,9 +133,8 @@ public:
    * @return - &id:oatpp::data::buffer::Processor;
    */
   std::shared_ptr<data::buffer::Processor> getProcessor() override;
-
 };
 
 }}}}}
 
-#endif //oatpp_web_protocol_http_encoding_Chunked_hpp
+#endif // oatpp_web_protocol_http_encoding_Chunked_hpp

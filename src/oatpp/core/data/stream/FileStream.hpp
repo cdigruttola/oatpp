@@ -29,20 +29,21 @@
 
 #include <cstdio>
 
-namespace oatpp { namespace data{ namespace stream {
+namespace oatpp { namespace data { namespace stream {
 
 /**
  * Wrapper over `std::FILE`.
  */
-class FileInputStream : public InputStream {
+class FileInputStream: public InputStream {
 public:
   static oatpp::data::stream::DefaultInitializedContext DEFAULT_CONTEXT;
+
 private:
   std::FILE* m_file;
   bool m_ownsFile;
   IOMode m_ioMode;
-public:
 
+public:
   /**
    * Constructor.
    * @param file - file.
@@ -76,7 +77,7 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual number of bytes read.
    */
-  v_io_size read(void *data, v_buff_size count, async::Action& action) override;
+  v_io_size read(void* data, v_buff_size count, async::Action& action) override;
 
   /**
    * Set stream I/O mode.
@@ -95,21 +96,21 @@ public:
    * @return
    */
   Context& getInputStreamContext() override;
-
 };
 
 /**
  * Wrapper over `std::FILE`.
  */
-class FileOutputStream : public OutputStream {
+class FileOutputStream: public OutputStream {
 public:
   static oatpp::data::stream::DefaultInitializedContext DEFAULT_CONTEXT;
+
 private:
   std::FILE* m_file;
   bool m_ownsFile;
   IOMode m_ioMode;
-public:
 
+public:
   /**
    * Constructor.
    * @param file - file.
@@ -144,7 +145,7 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual number of bytes written. &id:oatpp::v_io_size;.
    */
-  v_io_size write(const void *data, v_buff_size count, async::Action& action) override;
+  v_io_size write(const void* data, v_buff_size count, async::Action& action) override;
 
   /**
    * Set stream I/O mode.
@@ -163,7 +164,6 @@ public:
    * @return
    */
   Context& getOutputStreamContext() override;
-
 };
 
 }}}

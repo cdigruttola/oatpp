@@ -27,43 +27,42 @@
 
 #include "./Type.hpp"
 
-#include <list>
 #include <initializer_list>
+#include <list>
 #include <utility>
 
 namespace oatpp { namespace data { namespace mapping { namespace type {
 
 namespace __class {
 
+/**
+ * Abstract PairList class.
+ */
+class AbstractPairList {
+public:
   /**
-   * Abstract PairList class.
+   * Class id.
    */
-  class AbstractPairList {
+  static const ClassId CLASS_ID;
+
+public:
+  /**
+   * Polymorphic Dispatcher.
+   */
+  class AbstractPolymorphicDispatcher {
   public:
     /**
-     * Class id.
+     * Add key-value pair to pair-list.
+     * @param object - pair list.
+     * @param key - key.
+     * @param value - value.
      */
-    static const ClassId CLASS_ID;
-  public:
-
-    /**
-     * Polymorphic Dispatcher.
-     */
-    class AbstractPolymorphicDispatcher {
-    public:
-      /**
-       * Add key-value pair to pair-list.
-       * @param object - pair list.
-       * @param key - key.
-       * @param value - value.
-       */
-      virtual void addPolymorphicItem(const type::Void& object, const type::Void& key, const type::Void& value) const = 0;
-    };
-
+    virtual void addPolymorphicItem(const type::Void& object, const type::Void& key, const type::Void& value) const = 0;
   };
+};
 
-  template<class Key, class Value>
-  class PairList;
+template<class Key, class Value>
+class PairList;
 
 }
 
@@ -74,62 +73,68 @@ namespace __class {
  * @tparam C - Class.
  */
 template<class Key, class Value, class C>
-class PairListObjectWrapper : public type::ObjectWrapper<std::list<std::pair<Key, Value>>, C> {
+class PairListObjectWrapper: public type::ObjectWrapper<std::list<std::pair<Key, Value>>, C> {
 public:
   typedef std::list<std::pair<Key, Value>> TemplateObjectType;
   typedef C TemplateObjectClass;
-public:
 
+public:
   OATPP_DEFINE_OBJECT_WRAPPER_DEFAULTS(PairListObjectWrapper, TemplateObjectType, TemplateObjectClass)
 
   PairListObjectWrapper(std::initializer_list<std::pair<Key, Value>> ilist)
     : type::ObjectWrapper<TemplateObjectType, TemplateObjectClass>(std::make_shared<TemplateObjectType>(ilist))
-  {}
+  {
+  }
 
-  static PairListObjectWrapper createShared() {
+  static PairListObjectWrapper createShared()
+  {
     return std::make_shared<TemplateObjectType>();
   }
 
-  PairListObjectWrapper& operator = (std::initializer_list<std::pair<Key, Value>> ilist) {
+  PairListObjectWrapper& operator=(std::initializer_list<std::pair<Key, Value>> ilist)
+  {
     this->m_ptr = std::make_shared<TemplateObjectType>(ilist);
     return *this;
   }
 
-  std::pair<Key, Value>& operator[] (v_buff_usize index) const {
+  std::pair<Key, Value>& operator[](v_buff_usize index) const
+  {
     auto it = this->m_ptr->begin();
     std::advance(it, index);
     return *it;
   }
-  
-  Value& operator[] (const Key& key) const {
+
+  Value& operator[](const Key& key) const
+  {
     auto& list = *(this->m_ptr.get());
     auto it = list.begin();
     while(it != list.end()) {
       if(it->first == key) {
         return it->second;
       }
-      it ++;
+      it++;
     }
     list.push_back({key, nullptr});
     return list.back().second;
   }
 
-  Value getValueByKey(const Key& key, const Value& defValue = nullptr) const {
+  Value getValueByKey(const Key& key, const Value& defValue = nullptr) const
+  {
     auto& list = *(this->m_ptr.get());
     auto it = list.begin();
     while(it != list.end()) {
       if(it->first == key) {
         return it->second;
       }
-      it ++;
+      it++;
     }
     return defValue;
   }
 
-  TemplateObjectType& operator*() const {
+  TemplateObjectType& operator*() const
+  {
     return this->m_ptr.operator*();
   }
-
 };
 
 /**
@@ -141,28 +146,27 @@ using PairList = PairListObjectWrapper<Key, Value, __class::PairList<Key, Value>
 namespace __class {
 
 template<class Key, class Value>
-class PairList : public AbstractPairList {
+class PairList: public AbstractPairList {
 private:
-
-  class PolymorphicDispatcher : public AbstractPolymorphicDispatcher {
+  class PolymorphicDispatcher: public AbstractPolymorphicDispatcher {
   public:
-
-    void addPolymorphicItem(const type::Void& object, const type::Void& key, const type::Void& value) const override {
+    void addPolymorphicItem(const type::Void& object, const type::Void& key, const type::Void& value) const override
+    {
       const auto& map = object.staticCast<type::PairList<Key, Value>>();
       const auto& k = key.staticCast<Key>();
       const auto& v = value.staticCast<Value>();
       map->push_back({k, v});
     }
-
   };
 
 private:
-
-  static type::Void creator() {
+  static type::Void creator()
+  {
     return type::Void(std::make_shared<std::list<std::pair<Key, Value>>>(), getType());
   }
 
-  static Type createType() {
+  static Type createType()
+  {
     Type type(__class::AbstractPairList::CLASS_ID, nullptr, &creator, nullptr, new PolymorphicDispatcher());
     type.params.push_back(Key::Class::getType());
     type.params.push_back(Value::Class::getType());
@@ -170,12 +174,11 @@ private:
   }
 
 public:
-
-  static Type* getType() {
+  static Type* getType()
+  {
     static Type type = createType();
     return &type;
   }
-
 };
 
 }

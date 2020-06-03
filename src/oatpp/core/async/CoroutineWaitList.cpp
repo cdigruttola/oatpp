@@ -29,20 +29,24 @@
 namespace oatpp { namespace async {
 
 
-CoroutineWaitList::CoroutineWaitList(CoroutineWaitList&& other) {
+CoroutineWaitList::CoroutineWaitList(CoroutineWaitList&& other)
+{
   std::memcpy(&m_list, &other.m_list, sizeof(m_list));
   std::memset(&other.m_list, 0, sizeof(m_list));
 }
 
-CoroutineWaitList::~CoroutineWaitList() {
+CoroutineWaitList::~CoroutineWaitList()
+{
   notifyAll();
 }
 
-void CoroutineWaitList::setListener(Listener* listener) {
+void CoroutineWaitList::setListener(Listener* listener)
+{
   m_listener = listener;
 }
 
-void CoroutineWaitList::pushFront(CoroutineHandle* coroutine) {
+void CoroutineWaitList::pushFront(CoroutineHandle* coroutine)
+{
   {
     std::lock_guard<oatpp::concurrency::SpinLock> lock(m_lock);
     m_list.pushFront(coroutine);
@@ -52,7 +56,8 @@ void CoroutineWaitList::pushFront(CoroutineHandle* coroutine) {
   }
 }
 
-void CoroutineWaitList::pushBack(CoroutineHandle* coroutine) {
+void CoroutineWaitList::pushBack(CoroutineHandle* coroutine)
+{
   {
     std::lock_guard<oatpp::concurrency::SpinLock> lock(m_lock);
     m_list.pushBack(coroutine);
@@ -62,7 +67,8 @@ void CoroutineWaitList::pushBack(CoroutineHandle* coroutine) {
   }
 }
 
-void CoroutineWaitList::notifyFirst() {
+void CoroutineWaitList::notifyFirst()
+{
   std::lock_guard<oatpp::concurrency::SpinLock> lock(m_lock);
   if(m_list.first) {
     auto coroutine = m_list.popFront();
@@ -70,7 +76,8 @@ void CoroutineWaitList::notifyFirst() {
   }
 }
 
-void CoroutineWaitList::notifyAll() {
+void CoroutineWaitList::notifyAll()
+{
   std::lock_guard<oatpp::concurrency::SpinLock> lock(m_lock);
   auto curr = m_list.first;
   while(curr != nullptr) {

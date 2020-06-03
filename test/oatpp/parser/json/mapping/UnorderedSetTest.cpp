@@ -28,7 +28,8 @@
 
 namespace oatpp { namespace test { namespace parser { namespace json { namespace mapping {
 
-void UnorderedSetTest::onRun() {
+void UnorderedSetTest::onRun()
+{
 
   oatpp::parser::json::mapping::ObjectMapper mapper;
 
@@ -43,11 +44,10 @@ void UnorderedSetTest::onRun() {
     auto set = mapper.readFromString<oatpp::UnorderedSet<oatpp::String>>(json);
     OATPP_ASSERT(set);
     OATPP_ASSERT(set->size() == 3);
-    for(auto& item : *set) {
+    for(auto& item: *set) {
       OATPP_LOGD(TAG, "item='%s'", item->c_str());
     }
   }
-  
 }
 
 }}}}}

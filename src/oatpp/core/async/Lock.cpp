@@ -35,7 +35,8 @@ Lock::Lock()
   m_list.setListener(this);
 }
 
-void Lock::onNewItem(CoroutineWaitList& list) {
+void Lock::onNewItem(CoroutineWaitList& list)
+{
   auto counter = m_counter.load();
   if(counter == 0) {
     list.notifyFirst();
@@ -44,7 +45,8 @@ void Lock::onNewItem(CoroutineWaitList& list) {
   }
 }
 
-Action Lock::waitAsync() {
+Action Lock::waitAsync()
+{
   auto counter = m_counter.load();
   if(counter > 0) {
     return Action::createWaitListAction(&m_list);
@@ -54,24 +56,27 @@ Action Lock::waitAsync() {
   throw std::runtime_error("[oatpp::async::Lock::waitAsync()]: Error. Invalid state.");
 }
 
-void Lock::lock() {
+void Lock::lock()
+{
   m_mutex.lock();
-  ++ m_counter;
+  ++m_counter;
 }
 
-void Lock::unlock() {
+void Lock::unlock()
+{
   m_mutex.unlock();
-  -- m_counter;
+  --m_counter;
   if(m_counter < 0) {
     throw std::runtime_error("[oatpp::async::Lock::unlock()]: Error. Invalid state.");
   }
   m_list.notifyFirst();
 }
 
-bool Lock::try_lock() {
+bool Lock::try_lock()
+{
   bool result = m_mutex.try_lock();
   if(result) {
-    ++ m_counter;
+    ++m_counter;
   }
   return result;
 }
@@ -83,55 +88,63 @@ bool Lock::try_lock() {
 LockGuard::LockGuard()
   : m_ownsLock(false)
   , m_lock(nullptr)
-{}
+{
+}
 
 LockGuard::LockGuard(Lock* lock)
   : m_ownsLock(false)
   , m_lock(lock)
-{}
+{
+}
 
-LockGuard::~LockGuard() {
+LockGuard::~LockGuard()
+{
   if(m_ownsLock) {
     m_lock->unlock();
   }
 }
 
-void LockGuard::setLockObject(Lock* lock) {
+void LockGuard::setLockObject(Lock* lock)
+{
   if(m_lock == nullptr) {
     m_lock = lock;
   } else if(m_lock != lock) {
-    throw std::runtime_error("[oatpp::async::LockGuard::setLockObject()]: Error. Invalid state. LockGuard is NOT reusable.");
+    throw std::runtime_error(
+     "[oatpp::async::LockGuard::setLockObject()]: Error. Invalid state. LockGuard is NOT reusable.");
   }
 }
 
-CoroutineStarter LockGuard::lockAsync() {
+CoroutineStarter LockGuard::lockAsync()
+{
 
-  class LockCoroutine : public Coroutine<LockCoroutine> {
+  class LockCoroutine: public Coroutine<LockCoroutine> {
   private:
     LockGuard* m_guard;
-  public:
 
+  public:
     LockCoroutine(LockGuard* guard)
       : m_guard(guard)
-    {}
-
-    Action act() override {
-      return m_guard->lockAsyncInline(finish());
+    {
     }
 
+    Action act() override
+    {
+      return m_guard->lockAsyncInline(finish());
+    }
   };
 
   return LockCoroutine::start(this);
-
 }
 
-CoroutineStarter LockGuard::lockAsync(Lock* lock) {
+CoroutineStarter LockGuard::lockAsync(Lock* lock)
+{
   setLockObject(lock);
   return lockAsync();
 }
 
 
-Action LockGuard::lockAsyncInline(oatpp::async::Action&& nextAction) {
+Action LockGuard::lockAsyncInline(oatpp::async::Action&& nextAction)
+{
 
   if(!m_ownsLock) {
 
@@ -146,11 +159,11 @@ Action LockGuard::lockAsyncInline(oatpp::async::Action&& nextAction) {
   } else {
     throw std::runtime_error("[oatpp::async::LockGuard::lockAsyncInline()]: Error. Invalid state. Double lock attempt.");
   }
-
 }
 
 
-void LockGuard::unlock() {
+void LockGuard::unlock()
+{
 
   if(m_lock) {
 
@@ -160,39 +173,40 @@ void LockGuard::unlock() {
       m_ownsLock = false;
 
     } else {
-      throw std::runtime_error("[oatpp::async::LockGuard::unlock()]: Error. Invalid state. LockGuard is NOT owning the lock.");
+      throw std::runtime_error(
+       "[oatpp::async::LockGuard::unlock()]: Error. Invalid state. LockGuard is NOT owning the lock.");
     }
 
   } else {
     throw std::runtime_error("[oatpp::async::LockGuard::unlock()]: Error. Invalid state. Lock object is nullptr.");
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Misc
 
-CoroutineStarter synchronize(oatpp::async::Lock *lock, CoroutineStarter&& starter) {
+CoroutineStarter synchronize(oatpp::async::Lock* lock, CoroutineStarter&& starter)
+{
 
-  class Synchronized : public oatpp::async::Coroutine<Synchronized> {
+  class Synchronized: public oatpp::async::Coroutine<Synchronized> {
   private:
     oatpp::async::LockGuard m_lockGuard;
     CoroutineStarter m_starter;
-  public:
 
-    Synchronized(oatpp::async::Lock *lock, CoroutineStarter&& starter)
+  public:
+    Synchronized(oatpp::async::Lock* lock, CoroutineStarter&& starter)
       : m_lockGuard(lock)
       , m_starter(std::forward<CoroutineStarter>(starter))
-    {}
-
-    Action act() override {
-      return m_lockGuard.lockAsync().next(std::move(m_starter)).next(finish());
+    {
     }
 
+    Action act() override
+    {
+      return m_lockGuard.lockAsync().next(std::move(m_starter)).next(finish());
+    }
   };
 
   return new Synchronized(lock, std::forward<CoroutineStarter>(starter));
-
 }
 
 }}

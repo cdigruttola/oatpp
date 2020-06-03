@@ -24,10 +24,6 @@
 
 #include "PairList.hpp"
 
-namespace oatpp { namespace data { namespace mapping { namespace type {
-  
-namespace __class {
-  const ClassId AbstractPairList::CLASS_ID("PairList");
-}
-  
-}}}}
+namespace oatpp { namespace data { namespace mapping { namespace type { namespace __class {
+const ClassId AbstractPairList::CLASS_ID("PairList");
+}}}}}

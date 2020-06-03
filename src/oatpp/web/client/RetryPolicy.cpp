@@ -32,19 +32,23 @@ SimpleRetryPolicy::SimpleRetryPolicy(v_int64 maxAttempts,
   : m_maxAttempts(maxAttempts)
   , m_delay(delay.count())
   , m_httpCodes(httpCodes)
-{}
+{
+}
 
-bool SimpleRetryPolicy::canRetry(const Context& context) {
+bool SimpleRetryPolicy::canRetry(const Context& context)
+{
   return context.attempt <= m_maxAttempts || m_maxAttempts == -1;
 }
 
-bool SimpleRetryPolicy::retryOnResponse(v_int32 responseStatusCode, const Context& context) {
-  (void) context;
+bool SimpleRetryPolicy::retryOnResponse(v_int32 responseStatusCode, const Context& context)
+{
+  (void)context;
   return m_httpCodes.find(responseStatusCode) != m_httpCodes.end();
 }
 
-v_int64 SimpleRetryPolicy::waitForMicroseconds(const Context& context) {
-  (void) context;
+v_int64 SimpleRetryPolicy::waitForMicroseconds(const Context& context)
+{
+  (void)context;
   return m_delay;
 }
 

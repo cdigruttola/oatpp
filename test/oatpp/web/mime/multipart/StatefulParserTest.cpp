@@ -35,68 +35,66 @@ namespace oatpp { namespace test { namespace web { namespace mime { namespace mu
 
 namespace {
 
-  typedef oatpp::web::mime::multipart::Part Part;
+typedef oatpp::web::mime::multipart::Part Part;
 
-  static const char* TEST_DATA_1 =
-    "--12345\r\n"
-    "Content-Disposition: form-data; name=\"part1\"\r\n"
-    "\r\n"
-    "part1-value\r\n"
-    "--12345\r\n"
-    "Content-Disposition: form-data; name='part2' filename=\"filename.txt\"\r\n"
-    "\r\n"
-    "--part2-file-content-line1\r\n"
-    "--1234part2-file-content-line2\r\n"
-    "--12345\r\n"
-    "Content-Disposition: form-data; name=part3 filename=\"filename.jpg\"\r\n"
-    "\r\n"
-    "part3-file-binary-data\r\n"
-    "--12345--\r\n"
-    ;
+static const char* TEST_DATA_1 = "--12345\r\n"
+                                 "Content-Disposition: form-data; name=\"part1\"\r\n"
+                                 "\r\n"
+                                 "part1-value\r\n"
+                                 "--12345\r\n"
+                                 "Content-Disposition: form-data; name='part2' filename=\"filename.txt\"\r\n"
+                                 "\r\n"
+                                 "--part2-file-content-line1\r\n"
+                                 "--1234part2-file-content-line2\r\n"
+                                 "--12345\r\n"
+                                 "Content-Disposition: form-data; name=part3 filename=\"filename.jpg\"\r\n"
+                                 "\r\n"
+                                 "part3-file-binary-data\r\n"
+                                 "--12345--\r\n";
 
 
-  void parseStepByStep(const oatpp::String& text,
-                       const oatpp::String& boundary,
-                       const std::shared_ptr<oatpp::web::mime::multipart::StatefulParser::Listener>& listener,
-                       const v_int32 step)
-  {
+void parseStepByStep(const oatpp::String& text,
+                     const oatpp::String& boundary,
+                     const std::shared_ptr<oatpp::web::mime::multipart::StatefulParser::Listener>& listener,
+                     const v_int32 step)
+{
 
-    oatpp::web::mime::multipart::StatefulParser parser(boundary, listener, nullptr);
+  oatpp::web::mime::multipart::StatefulParser parser(boundary, listener, nullptr);
 
-    oatpp::data::stream::BufferInputStream stream(text.getPtr(), text->getData(), text->getSize());
-    std::unique_ptr<v_char8[]> buffer(new v_char8[step]);
-    v_io_size size;
-    while((size = stream.readSimple(buffer.get(), step)) != 0) {
-      oatpp::data::buffer::InlineWriteData inlineData(buffer.get(), size);
-      while(inlineData.bytesLeft > 0 && !parser.finished()) {
-        oatpp::async::Action action;
-        parser.parseNext(inlineData, action);
-      }
+  oatpp::data::stream::BufferInputStream stream(text.getPtr(), text->getData(), text->getSize());
+  std::unique_ptr<v_char8 []> buffer(new v_char8 [ step ]);
+  v_io_size size;
+  while((size = stream.readSimple(buffer.get(), step)) != 0) {
+    oatpp::data::buffer::InlineWriteData inlineData(buffer.get(), size);
+    while(inlineData.bytesLeft > 0 && !parser.finished()) {
+      oatpp::async::Action action;
+      parser.parseNext(inlineData, action);
     }
-    OATPP_ASSERT(parser.finished());
-
   }
+  OATPP_ASSERT(parser.finished());
+}
 
-  void assertPartData(const std::shared_ptr<Part>& part, const oatpp::String& value) {
+void assertPartData(const std::shared_ptr<Part>& part, const oatpp::String& value)
+{
 
-    OATPP_ASSERT(part->getInMemoryData());
-    OATPP_ASSERT(part->getInMemoryData() == value);
+  OATPP_ASSERT(part->getInMemoryData());
+  OATPP_ASSERT(part->getInMemoryData() == value);
 
-    v_int64 bufferSize = 16;
-    std::unique_ptr<v_char8[]> buffer(new v_char8[bufferSize]);
+  v_int64 bufferSize = 16;
+  std::unique_ptr<v_char8 []> buffer(new v_char8 [ bufferSize ]);
 
-    oatpp::data::stream::ChunkedBuffer stream;
-    oatpp::data::stream::transfer(part->getInputStream().get(), &stream, 0, buffer.get(), bufferSize);
+  oatpp::data::stream::ChunkedBuffer stream;
+  oatpp::data::stream::transfer(part->getInputStream().get(), &stream, 0, buffer.get(), bufferSize);
 
-    oatpp::String readData = stream.toString();
+  oatpp::String readData = stream.toString();
 
-    OATPP_ASSERT(readData == part->getInMemoryData());
-
-  }
+  OATPP_ASSERT(readData == part->getInMemoryData());
+}
 
 }
 
-void StatefulParserTest::onRun() {
+void StatefulParserTest::onRun()
+{
 
   oatpp::String text = TEST_DATA_1;
 
@@ -130,9 +128,7 @@ void StatefulParserTest::onRun() {
     assertPartData(part1, "part1-value");
     assertPartData(part2, "--part2-file-content-line1\r\n--1234part2-file-content-line2");
     assertPartData(part3, "part3-file-binary-data");
-
   }
-
 }
 
 }}}}}

@@ -26,9 +26,10 @@
 
 #include "oatpp/core/Types.hpp"
 
-namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace  type {
+namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace type {
 
-void ListTest::onRun() {
+void ListTest::onRun()
+{
 
   {
     OATPP_LOGI(TAG, "test default constructor...");
@@ -97,8 +98,8 @@ void ListTest::onRun() {
     OATPP_ASSERT(list1->size() == 1);
     OATPP_ASSERT(list2->size() == 2);
 
-    OATPP_ASSERT(list2[0] == "b");
-    OATPP_ASSERT(list2[1] == "c");
+    OATPP_ASSERT(list2 [ 0 ] == "b");
+    OATPP_ASSERT(list2 [ 1 ] == "c");
     OATPP_LOGI(TAG, "OK");
   }
 
@@ -122,17 +123,17 @@ void ListTest::onRun() {
     OATPP_ASSERT(list != nullptr);
     OATPP_ASSERT(list->size() == 3);
 
-    OATPP_ASSERT(list[0] == "a");
-    OATPP_ASSERT(list[1] == "b");
-    OATPP_ASSERT(list[2] == "c");
+    OATPP_ASSERT(list [ 0 ] == "a");
+    OATPP_ASSERT(list [ 1 ] == "b");
+    OATPP_ASSERT(list [ 2 ] == "c");
 
-    list[1] = "Hello!";
+    list [ 1 ] = "Hello!";
 
     OATPP_ASSERT(list->size() == 3);
 
-    OATPP_ASSERT(list[0] == "a");
-    OATPP_ASSERT(list[1] == "Hello!");
-    OATPP_ASSERT(list[2] == "c");
+    OATPP_ASSERT(list [ 0 ] == "a");
+    OATPP_ASSERT(list [ 1 ] == "Hello!");
+    OATPP_ASSERT(list [ 2 ] == "c");
     OATPP_LOGI(TAG, "OK");
   }
 
@@ -140,21 +141,20 @@ void ListTest::onRun() {
     OATPP_LOGI(TAG, "test polymorphicDispatcher...");
     oatpp::List<oatpp::String> list = {"a", "b", "c"};
 
-    auto polymorphicDispatcher = static_cast<const typename oatpp::List<oatpp::String>::Class::AbstractPolymorphicDispatcher*>(
-      list.valueType->polymorphicDispatcher
-    );
+    auto polymorphicDispatcher =
+     static_cast<const typename oatpp::List<oatpp::String>::Class::AbstractPolymorphicDispatcher*>(
+      list.valueType->polymorphicDispatcher);
 
     polymorphicDispatcher->addPolymorphicItem(list, oatpp::String("d"));
 
     OATPP_ASSERT(list->size() == 4);
 
-    OATPP_ASSERT(list[0] == "a");
-    OATPP_ASSERT(list[1] == "b");
-    OATPP_ASSERT(list[2] == "c");
-    OATPP_ASSERT(list[3] == "d");
+    OATPP_ASSERT(list [ 0 ] == "a");
+    OATPP_ASSERT(list [ 1 ] == "b");
+    OATPP_ASSERT(list [ 2 ] == "c");
+    OATPP_ASSERT(list [ 3 ] == "d");
     OATPP_LOGI(TAG, "OK");
   }
-
 }
 
 }}}}}}

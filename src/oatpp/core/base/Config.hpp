@@ -53,7 +53,7 @@
  * Higher number reduces threads racing for resources on each shard.
  */
 #ifndef OATPP_THREAD_DISTRIBUTED_MEM_POOL_SHARDS_COUNT
-  #define OATPP_THREAD_DISTRIBUTED_MEM_POOL_SHARDS_COUNT 10
+#define OATPP_THREAD_DISTRIBUTED_MEM_POOL_SHARDS_COUNT 10
 #endif
 
 /**
@@ -63,7 +63,7 @@
 //#define OATPP_COMPAT_BUILD_NO_THREAD_LOCAL 1
 
 #ifndef OATPP_FLOAT_STRING_FORMAT
-  #define OATPP_FLOAT_STRING_FORMAT "%.16g"
+#define OATPP_FLOAT_STRING_FORMAT "%.16g"
 #endif
 
 /**

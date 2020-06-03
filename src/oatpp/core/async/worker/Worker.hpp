@@ -36,7 +36,6 @@ namespace oatpp { namespace async { namespace worker {
  */
 class Worker {
 public:
-
   /**
    * Worker type
    */
@@ -66,14 +65,15 @@ public:
 
 private:
   Type m_type;
+
 protected:
   static void setCoroutineScheduledAction(CoroutineHandle* coroutine, Action&& action);
   static Action& getCoroutineScheduledAction(CoroutineHandle* coroutine);
   static Processor* getCoroutineProcessor(CoroutineHandle* coroutine);
   static void dismissAction(Action& action);
   static CoroutineHandle* nextCoroutine(CoroutineHandle* coroutine);
-public:
 
+public:
   /**
    * Constructor.
    * @param type - worker type - one of &l:Worker::Type; values.
@@ -117,9 +117,8 @@ public:
    * @return - one of &l:Worker::Type; values.
    */
   Type getType();
-
 };
 
 }}}
 
-#endif //oatpp_async_worker_Worker_hpp
+#endif // oatpp_async_worker_Worker_hpp

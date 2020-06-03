@@ -29,8 +29,8 @@
 
 #include "oatpp/core/Types.hpp"
 
-#include <utility>
 #include <list>
+#include <utility>
 
 namespace oatpp { namespace web { namespace url { namespace mapping {
 
@@ -39,9 +39,8 @@ namespace oatpp { namespace web { namespace url { namespace mapping {
  * @tparam Endpoint - endpoint of the route.
  */
 template<class Endpoint>
-class Router : public base::Countable {
+class Router: public base::Countable {
 private:
-
   /**
    * Pair &id:oatpp::web::url::mapping::Pattern; to Endpoint.
    */
@@ -51,22 +50,23 @@ private:
    * Convenience typedef &id:oatpp::data::share::StringKeyLabel;.
    */
   typedef oatpp::data::share::StringKeyLabel StringKeyLabel;
-public:
 
+public:
   /**
    * Resolved "Route" for "path-pattern"
    */
   class Route {
   private:
     Endpoint* m_endpoint;
-  public:
 
+  public:
     /**
      * Default constructor.
      */
     Route()
       : m_endpoint(nullptr)
-    {}
+    {
+    }
 
     /**
      * Constructor.
@@ -76,12 +76,14 @@ public:
     Route(Endpoint* endpoint, const Pattern::MatchMap& pMatchMap)
       : m_endpoint(endpoint)
       , matchMap(pMatchMap)
-    {}
+    {
+    }
 
     /**
      * Get endpoint of the route.
      */
-    Endpoint* getEndpoint() {
+    Endpoint* getEndpoint()
+    {
       return m_endpoint;
     }
 
@@ -89,18 +91,19 @@ public:
      * Match map of resolved path containing resolved path variables.
      */
     Pattern::MatchMap matchMap;
-    
-    explicit operator bool() const {
+
+    explicit operator bool() const
+    {
       return m_endpoint != nullptr;
     }
-    
   };
-  
+
 private:
   std::list<Pair> m_endpointsByPattern;
+
 public:
-  
-  static std::shared_ptr<Router> createShared(){
+  static std::shared_ptr<Router> createShared()
+  {
     return std::make_shared<Router>();
   }
 
@@ -109,7 +112,8 @@ public:
    * @param pathPattern - path pattern for endpoint.
    * @param endpoint - route endpoint.
    */
-  void route(const oatpp::String& pathPattern, const std::shared_ptr<Endpoint>& endpoint) {
+  void route(const oatpp::String& pathPattern, const std::shared_ptr<Endpoint>& endpoint)
+  {
     auto pattern = Pattern::parse(pathPattern);
     m_endpointsByPattern.push_back({pattern, endpoint});
   }
@@ -119,9 +123,10 @@ public:
    * @param path
    * @return - &id:Router::Route;.
    */
-  Route getRoute(const StringKeyLabel& path){
+  Route getRoute(const StringKeyLabel& path)
+  {
 
-    for(auto& pair : m_endpointsByPattern) {
+    for(auto& pair: m_endpointsByPattern) {
       Pattern::MatchMap matchMap;
       if(pair.first->match(path, matchMap)) {
         return Route(pair.second.get(), matchMap);
@@ -130,18 +135,17 @@ public:
 
     return Route();
   }
-  
-  void logRouterMappings(const oatpp::data::share::StringKeyLabel &branch) {
 
-    for(auto& pair : m_endpointsByPattern) {
+  void logRouterMappings(const oatpp::data::share::StringKeyLabel& branch)
+  {
+
+    for(auto& pair: m_endpointsByPattern) {
       auto mapping = pair.first->toString();
-      OATPP_LOGD("Router", "url '%s %s' -> mapped", (const char*)branch.getData(), (const char*) mapping->getData());
+      OATPP_LOGD("Router", "url '%s %s' -> mapped", (const char*)branch.getData(), (const char*)mapping->getData());
     }
-
   }
-  
 };
-  
+
 }}}}
 
 #endif /* oatpp_web_url_mapping_Router_hpp */

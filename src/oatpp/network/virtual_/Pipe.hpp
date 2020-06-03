@@ -34,50 +34,52 @@
 
 #include "oatpp/core/concurrency/SpinLock.hpp"
 
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
 
 namespace oatpp { namespace network { namespace virtual_ {
 
 /**
- * Virtual pipe implementation. Can be used for unidirectional data transfer between different threads of the same process. <br>
- * Under the hood it uses &id:oatpp::data::buffer::SynchronizedFIFOBuffer; over the &id:oatpp::data::buffer::IOBuffer;.
+ * Virtual pipe implementation. Can be used for unidirectional data transfer between different threads of the same
+ * process. <br> Under the hood it uses &id:oatpp::data::buffer::SynchronizedFIFOBuffer; over the
+ * &id:oatpp::data::buffer::IOBuffer;.
  */
-class Pipe : public oatpp::base::Countable {
+class Pipe: public oatpp::base::Countable {
 public:
-
   /**
    * Pipe Reader. Extends &id:oatpp::data::stream::InputStream;.
    * Provides read interface for the pipe. Can work in both blocking and nonblocking regime.
    */
-  class Reader : public oatpp::data::stream::InputStream {
+  class Reader: public oatpp::data::stream::InputStream {
     friend Pipe;
+
   public:
     static data::stream::DefaultInitializedContext DEFAULT_CONTEXT;
-  private:
 
-    class WaitListListener : public oatpp::async::CoroutineWaitList::Listener {
+  private:
+    class WaitListListener: public oatpp::async::CoroutineWaitList::Listener {
     private:
       Pipe* m_pipe;
-    public:
 
+    public:
       WaitListListener(Pipe* pipe)
         : m_pipe(pipe)
-      {}
+      {
+      }
 
-      void onNewItem(oatpp::async::CoroutineWaitList& list) override {
+      void onNewItem(oatpp::async::CoroutineWaitList& list) override
+      {
         std::lock_guard<std::mutex> lock(m_pipe->m_mutex);
-        if (m_pipe->m_fifo.availableToRead() > 0 || !m_pipe->m_open) {
+        if(m_pipe->m_fifo.availableToRead() > 0 || !m_pipe->m_open) {
           list.notifyAll();
         }
       }
-
     };
 
   private:
     Pipe* m_pipe;
     oatpp::data::stream::IOMode m_ioMode;
-    
+
     /*
      * this one used for testing purposes only
      */
@@ -85,8 +87,8 @@ public:
 
     oatpp::async::CoroutineWaitList m_waitList;
     WaitListListener m_waitListListener;
+
   protected:
-    
     Reader(Pipe* pipe, oatpp::data::stream::IOMode ioMode = oatpp::data::stream::IOMode::BLOCKING)
       : m_pipe(pipe)
       , m_ioMode(ioMode)
@@ -97,7 +99,6 @@ public:
     }
 
   public:
-
     /**
      * Limit the available amount of bytes to read from pipe.<br>
      * This method is used for testing purposes only.<br>
@@ -115,7 +116,7 @@ public:
      * caller MUST return this action on coroutine iteration.
      * @return - &id:oatpp::v_io_size;.
      */
-    v_io_size read(void *data, v_buff_size count, async::Action& action) override;
+    v_io_size read(void* data, v_buff_size count, async::Action& action) override;
 
     /**
      * Set InputStream I/O mode.
@@ -139,37 +140,42 @@ public:
      * Notify coroutine wait-list
      */
     void notifyWaitList();
-    
   };
 
   /**
    * Pipe writer. Extends &id:oatpp::data::stream::OutputStream;.
    * Provides write interface for the pipe. Can work in both blocking and nonblocking regime.
    */
-  class Writer : public oatpp::data::stream::OutputStream {
+  class Writer: public oatpp::data::stream::OutputStream {
     friend Pipe;
+
   public:
     static data::stream::DefaultInitializedContext DEFAULT_CONTEXT;
+
   private:
-    class WaitListListener : public oatpp::async::CoroutineWaitList::Listener {
+    class WaitListListener: public oatpp::async::CoroutineWaitList::Listener {
     private:
       Pipe* m_pipe;
+
     public:
       WaitListListener(Pipe* pipe)
         : m_pipe(pipe)
-      {}
+      {
+      }
 
-      void onNewItem(oatpp::async::CoroutineWaitList& list) override {
+      void onNewItem(oatpp::async::CoroutineWaitList& list) override
+      {
         std::lock_guard<std::mutex> lock(m_pipe->m_mutex);
-        if (m_pipe->m_fifo.availableToWrite() > 0 || !m_pipe->m_open) {
+        if(m_pipe->m_fifo.availableToWrite() > 0 || !m_pipe->m_open) {
           list.notifyAll();
         }
       }
     };
+
   private:
     Pipe* m_pipe;
     oatpp::data::stream::IOMode m_ioMode;
-    
+
     /*
      * this one used for testing purposes only
      */
@@ -177,8 +183,8 @@ public:
 
     oatpp::async::CoroutineWaitList m_waitList;
     WaitListListener m_waitListListener;
+
   protected:
-    
     Writer(Pipe* pipe, oatpp::data::stream::IOMode ioMode = oatpp::data::stream::IOMode::BLOCKING)
       : m_pipe(pipe)
       , m_ioMode(ioMode)
@@ -189,7 +195,6 @@ public:
     }
 
   public:
-
     /**
      * Limit the available space for data writes in pipe.<br>
      * This method is used for testing purposes only.<br>
@@ -207,7 +212,7 @@ public:
      * caller MUST return this action on coroutine iteration.
      * @return - &id:oatpp::v_io_size;.
      */
-    v_io_size write(const void *data, v_buff_size count, async::Action& action) override;
+    v_io_size write(const void* data, v_buff_size count, async::Action& action) override;
 
     /**
      * Set OutputStream I/O mode.
@@ -231,9 +236,8 @@ public:
      * Notify coroutine wait-list
      */
     void notifyWaitList();
-    
   };
-  
+
 private:
   bool m_open;
   Writer m_writer;
@@ -245,8 +249,8 @@ private:
   std::mutex m_mutex;
   std::condition_variable m_conditionRead;
   std::condition_variable m_conditionWrite;
-public:
 
+public:
   /**
    * Constructor.
    */
@@ -282,9 +286,8 @@ public:
    * Mark pipe as closed.
    */
   void close();
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_network_virtual__Pipe_hpp */

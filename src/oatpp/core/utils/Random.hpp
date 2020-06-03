@@ -25,8 +25,8 @@
 #ifndef oatpp_utils_Random_hpp
 #define oatpp_utils_Random_hpp
 
-#include "oatpp/core/concurrency/SpinLock.hpp"
 #include "oatpp/core/Types.hpp"
+#include "oatpp/core/concurrency/SpinLock.hpp"
 #include <random>
 
 namespace oatpp { namespace utils { namespace random {
@@ -43,14 +43,12 @@ private:
   static oatpp::concurrency::SpinLock RANDOM_LOCK;
 #endif
 public:
-
   /**
    * Fill in buffer with random bytes [0..255].
    * @param buffer - pointer to buffer.
    * @param bufferSize - size of the buffer.
    */
   static void randomBytes(p_char8 buffer, v_buff_size bufferSize);
-
 };
 
 }}}

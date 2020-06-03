@@ -24,10 +24,6 @@
 
 #include "UnorderedSet.hpp"
 
-namespace oatpp { namespace data { namespace mapping { namespace type {
-
-namespace __class {
-  const ClassId AbstractUnorderedSet::CLASS_ID("UnorderedSet");
-}
-
-}}}}
+namespace oatpp { namespace data { namespace mapping { namespace type { namespace __class {
+const ClassId AbstractUnorderedSet::CLASS_ID("UnorderedSet");
+}}}}}

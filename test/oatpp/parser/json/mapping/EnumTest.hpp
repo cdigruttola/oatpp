@@ -29,12 +29,13 @@
 
 namespace oatpp { namespace test { namespace parser { namespace json { namespace mapping {
 
-class EnumTest : public UnitTest{
+class EnumTest: public UnitTest {
 public:
-
-  EnumTest():UnitTest("TEST[parser::json::mapping::EnumTest]"){}
+  EnumTest()
+    : UnitTest("TEST[parser::json::mapping::EnumTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}}}

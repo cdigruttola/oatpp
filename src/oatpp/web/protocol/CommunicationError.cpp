@@ -25,19 +25,22 @@
 #include "CommunicationError.hpp"
 
 namespace oatpp { namespace web { namespace protocol {
-  
+
 CommunicationError::CommunicationError(oatpp::v_io_size ioStatus, const oatpp::String& message)
-  :std::runtime_error(message->std_str())
+  : std::runtime_error(message->std_str())
   , m_ioStatus(ioStatus)
   , m_message(message)
-{}
-  
-oatpp::v_io_size CommunicationError::getIOStatus() {
+{
+}
+
+oatpp::v_io_size CommunicationError::getIOStatus()
+{
   return m_ioStatus;
 }
 
-oatpp::String& CommunicationError::getMessage(){
+oatpp::String& CommunicationError::getMessage()
+{
   return m_message;
 }
-  
+
 }}}

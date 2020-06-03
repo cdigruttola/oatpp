@@ -24,7 +24,7 @@
 
 #include "Processor.hpp"
 
-namespace oatpp { namespace data{ namespace buffer {
+namespace oatpp { namespace data { namespace buffer {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // InlineReadData
@@ -32,25 +32,30 @@ namespace oatpp { namespace data{ namespace buffer {
 InlineReadData::InlineReadData()
   : currBufferPtr(nullptr)
   , bytesLeft(0)
-{}
+{
+}
 
 InlineReadData::InlineReadData(void* data, v_buff_size size)
   : currBufferPtr(data)
   , bytesLeft(size)
-{}
+{
+}
 
-void InlineReadData::set(void* data, v_buff_size size) {
+void InlineReadData::set(void* data, v_buff_size size)
+{
   currBufferPtr = data;
   bytesLeft = size;
 }
 
-void InlineReadData::inc(v_buff_size amount) {
-  currBufferPtr = &((p_char8) currBufferPtr)[amount];
+void InlineReadData::inc(v_buff_size amount)
+{
+  currBufferPtr = &((p_char8)currBufferPtr) [ amount ];
   bytesLeft -= amount;
 }
 
-void InlineReadData::setEof() {
-  currBufferPtr = &((p_char8) currBufferPtr)[bytesLeft];
+void InlineReadData::setEof()
+{
+  currBufferPtr = &((p_char8)currBufferPtr) [ bytesLeft ];
   bytesLeft = 0;
 }
 
@@ -60,25 +65,30 @@ void InlineReadData::setEof() {
 InlineWriteData::InlineWriteData()
   : currBufferPtr(nullptr)
   , bytesLeft(0)
-{}
+{
+}
 
 InlineWriteData::InlineWriteData(const void* data, v_buff_size size)
   : currBufferPtr(data)
   , bytesLeft(size)
-{}
+{
+}
 
-void InlineWriteData::set(const void* data, v_buff_size size) {
+void InlineWriteData::set(const void* data, v_buff_size size)
+{
   currBufferPtr = data;
   bytesLeft = size;
 }
 
-void InlineWriteData::inc(v_buff_size amount) {
-  currBufferPtr = &((p_char8) currBufferPtr)[amount];
+void InlineWriteData::inc(v_buff_size amount)
+{
+  currBufferPtr = &((p_char8)currBufferPtr) [ amount ];
   bytesLeft -= amount;
 }
 
-void InlineWriteData::setEof() {
-  currBufferPtr = &((p_char8) currBufferPtr)[bytesLeft];
+void InlineWriteData::setEof()
+{
+  currBufferPtr = &((p_char8)currBufferPtr) [ bytesLeft ];
   bytesLeft = 0;
 }
 
@@ -88,17 +98,17 @@ void InlineWriteData::setEof() {
 ProcessingPipeline::ProcessingPipeline(const std::vector<base::ObjectHandle<Processor>>& processors)
   : m_processors(processors)
 {
-  for(v_int32 i = 0; i < (v_int32) m_processors.size() - 1; i ++) {
+  for(v_int32 i = 0; i < (v_int32)m_processors.size() - 1; i++) {
     m_intermediateData.push_back(data::buffer::InlineReadData());
   }
 }
 
-v_io_size ProcessingPipeline::suggestInputStreamReadSize() {
-  return m_processors[0]->suggestInputStreamReadSize();
+v_io_size ProcessingPipeline::suggestInputStreamReadSize()
+{
+  return m_processors [ 0 ]->suggestInputStreamReadSize();
 }
 
-v_int32 ProcessingPipeline::iterate(data::buffer::InlineReadData& dataIn,
-                                    data::buffer::InlineReadData& dataOut)
+v_int32 ProcessingPipeline::iterate(data::buffer::InlineReadData& dataIn, data::buffer::InlineReadData& dataOut)
 {
 
   if(dataOut.bytesLeft > 0) {
@@ -110,16 +120,16 @@ v_int32 ProcessingPipeline::iterate(data::buffer::InlineReadData& dataIn,
 
   while(res == Error::OK) {
 
-    auto& p = m_processors[i];
+    auto& p = m_processors [ i ];
 
     data::buffer::InlineReadData* currDataIn = &dataIn;
     if(i > 0) {
-      currDataIn = &m_intermediateData[i - 1];
+      currDataIn = &m_intermediateData [ i - 1 ];
     }
 
     data::buffer::InlineReadData* currDataOut = &dataOut;
-    if(i < (v_int32) m_intermediateData.size()) {
-      currDataOut = &m_intermediateData[i];
+    if(i < (v_int32)m_intermediateData.size()) {
+      currDataOut = &m_intermediateData [ i ];
     }
 
     while(res == Error::OK) {
@@ -128,36 +138,33 @@ v_int32 ProcessingPipeline::iterate(data::buffer::InlineReadData& dataIn,
 
     const v_int32 numOfProcessors = m_processors.size();
 
-    switch (res) {
-      case Error::PROVIDE_DATA_IN:
-        if (i > 0) {
-          i --;
-          res = Error::OK;
-        }
-        break;
+    switch(res) {
+    case Error::PROVIDE_DATA_IN:
+      if(i > 0) {
+        i--;
+        res = Error::OK;
+      }
+      break;
 
 
-      case Error::FLUSH_DATA_OUT:
-        if (i < numOfProcessors - 1) {
-          i ++;
-          res = Error::OK;
-        }
-        break;
+    case Error::FLUSH_DATA_OUT:
+      if(i < numOfProcessors - 1) {
+        i++;
+        res = Error::OK;
+      }
+      break;
 
 
-      case Error::FINISHED:
-        if (i < numOfProcessors - 1) {
-          i ++;
-          res = Error::OK;
-        }
-        break;
-
+    case Error::FINISHED:
+      if(i < numOfProcessors - 1) {
+        i++;
+        res = Error::OK;
+      }
+      break;
     }
-
   }
 
   return res;
-
 }
 
 }}}

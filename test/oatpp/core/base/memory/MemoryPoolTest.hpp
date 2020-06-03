@@ -28,18 +28,19 @@
 #include "oatpp-test/UnitTest.hpp"
 
 namespace oatpp { namespace test { namespace memory {
-  
+
 /**
  * Test memory pool allocations
  */
-class MemoryPoolTest : public UnitTest{
+class MemoryPoolTest: public UnitTest {
 public:
-  
-  MemoryPoolTest():UnitTest("TEST[base::memory::MemoryPoolTest]"){}
+  MemoryPoolTest()
+    : UnitTest("TEST[base::memory::MemoryPoolTest]")
+  {
+  }
   void onRun() override;
-  
 };
-  
+
 }}}
 
 #endif /* test_memory_MemoryPoolTest_hpp */

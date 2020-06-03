@@ -25,9 +25,9 @@
 #ifndef oatpp_web_mime_multipart_StatefulParser_hpp
 #define oatpp_web_mime_multipart_StatefulParser_hpp
 
-#include "oatpp/core/data/stream/ChunkedBuffer.hpp"
-#include "oatpp/core/data/share/LazyStringMap.hpp"
 #include "oatpp/core/Types.hpp"
+#include "oatpp/core/data/share/LazyStringMap.hpp"
+#include "oatpp/core/data/stream/ChunkedBuffer.hpp"
 
 #include <unordered_map>
 
@@ -44,16 +44,18 @@ private:
   static constexpr v_int32 STATE_HEADERS = 2;
   static constexpr v_int32 STATE_DATA = 3;
   static constexpr v_int32 STATE_DONE = 4;
+
 private:
   static constexpr v_uint32 HEADERS_SECTION_END = ('\r' << 24) | ('\n' << 16) | ('\r' << 8) | ('\n');
+
 private:
   /**
    * Typedef for headers map. Headers map key is case-insensitive.
    * For more info see &id:oatpp::data::share::LazyStringMap;.
    */
   typedef oatpp::data::share::LazyStringMap<oatpp::data::share::StringKeyLabelCI_FAST> Headers;
-public:
 
+public:
   /**
    * Listener for parsed items.
    */
@@ -64,8 +66,8 @@ public:
      * For more info see &id:oatpp::data::share::LazyStringMap;.
      */
     typedef oatpp::data::share::LazyStringMap<oatpp::data::share::StringKeyLabelCI_FAST> Headers;
-  public:
 
+  public:
     /**
      * Default virtual Destructor.
      */
@@ -86,11 +88,9 @@ public:
      * @param size - size of the data in bytes.
      */
     virtual void onPartData(p_char8 data, v_buff_size size) = 0;
-
   };
 
 public:
-
   /**
    * Async Listener for parsed items.
    */
@@ -101,8 +101,8 @@ public:
      * For more info see &id:oatpp::data::share::LazyStringMap;.
      */
     typedef oatpp::data::share::LazyStringMap<oatpp::data::share::StringKeyLabelCI_FAST> Headers;
-  public:
 
+  public:
     /**
      * Default virtual Destructor.
      */
@@ -123,25 +123,22 @@ public:
      * @param size - size of the data in bytes.
      */
     virtual async::CoroutineStarter onPartDataAsync(p_char8 data, v_buff_size size) = 0;
-
   };
 
 private:
-
   class ListenerCall {
   public:
-
     static constexpr v_int32 CALL_NONE = 0;
     static constexpr v_int32 CALL_ON_HEADERS = 1;
     static constexpr v_int32 CALL_ON_DATA = 2;
 
   public:
-
     ListenerCall()
       : callType(CALL_NONE)
       , data(nullptr)
       , size(0)
-    {}
+    {
+    }
 
     v_int32 callType;
     p_char8 data;
@@ -154,11 +151,9 @@ private:
     async::CoroutineStarter callAsync(StatefulParser* parser);
 
     explicit operator bool() const;
-
   };
 
 private:
-
   v_int32 m_state;
   v_int64 m_currPartIndex;
   v_buff_size m_currBoundaryCharIndex;
@@ -186,18 +181,15 @@ private:
   std::shared_ptr<AsyncListener> m_asyncListener;
 
 private:
-
   void parseHeaders(Headers& headers);
 
 private:
-
   ListenerCall parseNext_Boundary(data::buffer::InlineWriteData& inlineData);
-  void         parseNext_AfterBoundary(data::buffer::InlineWriteData& inlineData);
+  void parseNext_AfterBoundary(data::buffer::InlineWriteData& inlineData);
   ListenerCall parseNext_Headers(data::buffer::InlineWriteData& inlineData);
   ListenerCall parseNext_Data(data::buffer::InlineWriteData& inlineData);
 
 public:
-
   /**
    * Constructor.
    * @param boundary - value of multipart boundary.
@@ -220,7 +212,6 @@ public:
    * @return - `true` or `false`.
    */
   bool finished();
-
 };
 
 }}}}

@@ -40,31 +40,30 @@ namespace oatpp { namespace data { namespace mapping {
  */
 class ObjectMapper {
 public:
-
   /**
    * Metadata for ObjectMapper.
    */
   class Info {
   public:
-
     /**
      * Constructor.
      * @param _http_content_type
      */
     Info(const char* _http_content_type)
       : http_content_type(_http_content_type)
-    {}
+    {
+    }
 
     /**
      * Value for Content-Type http header when DTO is serialized via specified ObjectMapper.
      */
     const char* const http_content_type;
-
   };
+
 private:
   Info m_info;
-public:
 
+public:
   /**
    * Constructor.
    * @param info - Metadata for ObjectMapper.
@@ -108,7 +107,8 @@ public:
    * @throws - depends on implementation.
    */
   template<class Wrapper>
-  Wrapper readFromCaret(oatpp::parser::Caret& caret) const {
+  Wrapper readFromCaret(oatpp::parser::Caret& caret) const
+  {
     auto type = Wrapper::Class::getType();
     return read(caret, type).template staticCast<Wrapper>();
   }
@@ -122,7 +122,8 @@ public:
    * @throws - depends on implementation.
    */
   template<class Wrapper>
-  Wrapper readFromString(const oatpp::String& str) const {
+  Wrapper readFromString(const oatpp::String& str) const
+  {
     auto type = Wrapper::Class::getType();
     oatpp::parser::Caret caret(str);
     auto result = read(caret, type).template staticCast<Wrapper>();
@@ -131,9 +132,8 @@ public:
     }
     return result;
   }
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_data_mapping_ObjectMapper_hpp */

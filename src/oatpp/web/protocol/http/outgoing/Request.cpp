@@ -24,10 +24,10 @@
 
 #include "Request.hpp"
 
-#include "oatpp/web/protocol/http/encoding/Chunked.hpp"
-#include "oatpp/core/data/stream/BufferStream.hpp"
 #include "oatpp/core/data/buffer/IOBuffer.hpp"
+#include "oatpp/core/data/stream/BufferStream.hpp"
 #include "oatpp/core/utils/ConversionUtils.hpp"
+#include "oatpp/web/protocol/http/encoding/Chunked.hpp"
 
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace outgoing {
 
@@ -39,44 +39,55 @@ Request::Request(const oatpp::data::share::StringKeyLabel& method,
   , m_path(path)
   , m_headers(headers)
   , m_body(body)
-{}
+{
+}
 
 std::shared_ptr<Request> Request::createShared(const oatpp::data::share::StringKeyLabel& method,
                                                const oatpp::data::share::StringKeyLabel& path,
                                                const Headers& headers,
-                                               const std::shared_ptr<Body>& body) {
+                                               const std::shared_ptr<Body>& body)
+{
   return Shared_Outgoing_Request_Pool::allocateShared(method, path, headers, body);
 }
 
-const oatpp::data::share::StringKeyLabel& Request::getMethod() const {
+const oatpp::data::share::StringKeyLabel& Request::getMethod() const
+{
   return m_method;
 }
 
-const oatpp::data::share::StringKeyLabel& Request::getPath() const {
+const oatpp::data::share::StringKeyLabel& Request::getPath() const
+{
   return m_path;
 }
 
-protocol::http::Headers& Request::getHeaders() {
+protocol::http::Headers& Request::getHeaders()
+{
   return m_headers;
 }
 
-void Request::putHeader(const oatpp::data::share::StringKeyLabelCI_FAST& key, const oatpp::data::share::StringKeyLabel& value) {
+void Request::putHeader(const oatpp::data::share::StringKeyLabelCI_FAST& key,
+                        const oatpp::data::share::StringKeyLabel& value)
+{
   m_headers.put(key, value);
 }
 
-bool Request::putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key, const oatpp::data::share::StringKeyLabel& value) {
+bool Request::putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key,
+                                   const oatpp::data::share::StringKeyLabel& value)
+{
   return m_headers.putIfNotExists(key, value);
 }
 
-std::shared_ptr<Body> Request::getBody() {
+std::shared_ptr<Body> Request::getBody()
+{
   return m_body;
 }
 
-void Request::send(data::stream::OutputStream* stream){
+void Request::send(data::stream::OutputStream* stream)
+{
 
   v_buff_size bodySize = -1;
 
-  if(m_body){
+  if(m_body) {
 
     m_body->declareHeaders(m_headers);
 
@@ -126,38 +137,38 @@ void Request::send(data::stream::OutputStream* stream){
       /* Reuse headers buffer */
       buffer.setCurrentPosition(0);
       data::stream::transfer(m_body, stream, 0, buffer.getData(), buffer.getCapacity(), &chunkedEncoder);
-
     }
 
   } else {
     buffer.flushToStream(stream);
   }
-  
 }
 
 oatpp::async::CoroutineStarter Request::sendAsync(std::shared_ptr<Request> _this,
                                                   const std::shared_ptr<data::stream::OutputStream>& stream)
 {
-  
-  class SendAsyncCoroutine : public oatpp::async::Coroutine<SendAsyncCoroutine> {
+
+  class SendAsyncCoroutine: public oatpp::async::Coroutine<SendAsyncCoroutine> {
   private:
     std::shared_ptr<Request> m_this;
     std::shared_ptr<data::stream::OutputStream> m_stream;
     std::shared_ptr<oatpp::data::stream::BufferOutputStream> m_headersWriteBuffer;
+
   public:
-    
     SendAsyncCoroutine(const std::shared_ptr<Request>& request,
                        const std::shared_ptr<data::stream::OutputStream>& stream)
       : m_this(request)
       , m_stream(stream)
       , m_headersWriteBuffer(std::make_shared<oatpp::data::stream::BufferOutputStream>())
-    {}
-    
-    Action act() {
+    {
+    }
+
+    Action act()
+    {
 
       v_buff_size bodySize = -1;
 
-      if(m_this->m_body){
+      if(m_this->m_body) {
 
         m_this->m_body->declareHeaders(m_this->m_headers);
 
@@ -172,7 +183,7 @@ oatpp::async::CoroutineStarter Request::sendAsync(std::shared_ptr<Request> _this
       } else {
         m_this->m_headers.put_LockFree(Header::CONTENT_LENGTH, "0");
       }
-      
+
       m_headersWriteBuffer->writeSimple(m_this->m_method.getData(), m_this->m_method.getSize());
       m_headersWriteBuffer->writeSimple(" /", 2);
       m_headersWriteBuffer->writeSimple(m_this->m_path.getData(), m_this->m_path.getSize());
@@ -181,7 +192,7 @@ oatpp::async::CoroutineStarter Request::sendAsync(std::shared_ptr<Request> _this
       m_headersWriteBuffer->writeSimple("\r\n", 2);
 
       http::Utils::writeHeaders(m_this->m_headers, m_headersWriteBuffer.get());
-      
+
       m_headersWriteBuffer->writeSimple("\r\n", 2);
 
       if(m_this->m_body) {
@@ -192,35 +203,35 @@ oatpp::async::CoroutineStarter Request::sendAsync(std::shared_ptr<Request> _this
 
             m_headersWriteBuffer->writeSimple(m_this->m_body->getKnownData(), bodySize);
             return oatpp::data::stream::BufferOutputStream::flushToStreamAsync(m_headersWriteBuffer, m_stream)
-              .next(finish());
+             .next(finish());
           } else {
 
             return oatpp::data::stream::BufferOutputStream::flushToStreamAsync(m_headersWriteBuffer, m_stream)
-              .next(m_stream->writeExactSizeDataAsync(m_this->m_body->getKnownData(), bodySize))
-              .next(finish());
+             .next(m_stream->writeExactSizeDataAsync(m_this->m_body->getKnownData(), bodySize))
+             .next(finish());
           }
 
         } else {
 
           auto chunkedEncoder = std::make_shared<http::encoding::EncoderChunked>();
           return oatpp::data::stream::BufferOutputStream::flushToStreamAsync(m_headersWriteBuffer, m_stream)
-                 .next(data::stream::transferAsync(m_this->m_body, m_stream, 0, data::buffer::IOBuffer::createShared(), chunkedEncoder))
-                 .next(finish());
-
+           .next(data::stream::transferAsync(m_this->m_body,
+                                             m_stream,
+                                             0,
+                                             data::buffer::IOBuffer::createShared(),
+                                             chunkedEncoder))
+           .next(finish());
         }
 
       } else {
 
         return oatpp::data::stream::BufferOutputStream::flushToStreamAsync(m_headersWriteBuffer, m_stream)
-          .next(finish());
+         .next(finish());
       }
-      
     }
-    
   };
-  
+
   return SendAsyncCoroutine::start(_this, stream);
-  
 }
-  
+
 }}}}}

@@ -24,12 +24,13 @@
 
 #include "ChunkedTest.hpp"
 
-#include "oatpp/web/protocol/http/encoding/Chunked.hpp"
 #include "oatpp/core/data/stream/BufferStream.hpp"
+#include "oatpp/web/protocol/http/encoding/Chunked.hpp"
 
 namespace oatpp { namespace test { namespace web { namespace protocol { namespace http { namespace encoding {
 
-void ChunkedTest::onRun() {
+void ChunkedTest::onRun()
+{
 
   oatpp::String data = "Hello World!!!";
   oatpp::String encoded;
@@ -42,7 +43,7 @@ void ChunkedTest::onRun() {
     oatpp::web::protocol::http::encoding::EncoderChunked encoder;
 
     const v_int32 bufferSize = 5;
-    v_char8 buffer[bufferSize];
+    v_char8 buffer [ bufferSize ];
 
     auto count = oatpp::data::stream::transfer(&inStream, &outStream, 0, buffer, bufferSize, &encoder);
     encoded = outStream.toString();
@@ -58,7 +59,7 @@ void ChunkedTest::onRun() {
     oatpp::web::protocol::http::encoding::DecoderChunked decoder;
 
     const v_int32 bufferSize = 5;
-    v_char8 buffer[bufferSize];
+    v_char8 buffer [ bufferSize ];
 
     auto count = oatpp::data::stream::transfer(&inStream, &outStream, 0, buffer, bufferSize, &decoder);
     decoded = outStream.toString();
@@ -73,7 +74,7 @@ void ChunkedTest::onRun() {
     oatpp::web::protocol::http::encoding::EncoderChunked encoder;
 
     const v_int32 bufferSize = 5;
-    v_char8 buffer[bufferSize];
+    v_char8 buffer [ bufferSize ];
 
     auto count = oatpp::data::stream::transfer(&inStream, &outStream, 0, buffer, bufferSize, &encoder);
     encoded = outStream.toString();
@@ -89,7 +90,7 @@ void ChunkedTest::onRun() {
     oatpp::web::protocol::http::encoding::DecoderChunked decoder;
 
     const v_int32 bufferSize = 5;
-    v_char8 buffer[bufferSize];
+    v_char8 buffer [ bufferSize ];
 
     auto count = oatpp::data::stream::transfer(&inStream, &outStream, 0, buffer, bufferSize, &decoder);
     decoded = outStream.toString();
@@ -104,13 +105,10 @@ void ChunkedTest::onRun() {
 
     oatpp::web::protocol::http::encoding::EncoderChunked encoder;
     oatpp::web::protocol::http::encoding::DecoderChunked decoder;
-    oatpp::data::buffer::ProcessingPipeline pipeline({
-      &encoder,
-      &decoder
-    });
+    oatpp::data::buffer::ProcessingPipeline pipeline({&encoder, &decoder});
 
     const v_int32 bufferSize = 5;
-    v_char8 buffer[bufferSize];
+    v_char8 buffer [ bufferSize ];
 
     auto count = oatpp::data::stream::transfer(&inStream, &outStream, 0, buffer, bufferSize, &pipeline);
     auto result = outStream.toString();
@@ -118,8 +116,6 @@ void ChunkedTest::onRun() {
     OATPP_LOGD(TAG, "result='%s'", result->getData());
     OATPP_ASSERT(result == data);
   }
-
-
 }
 
 }}}}}}

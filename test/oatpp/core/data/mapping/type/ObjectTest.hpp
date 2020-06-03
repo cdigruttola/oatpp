@@ -27,14 +27,15 @@
 
 #include "oatpp-test/UnitTest.hpp"
 
-namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace  type {
+namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace type {
 
-class ObjectTest : public UnitTest{
+class ObjectTest: public UnitTest {
 public:
-
-  ObjectTest():UnitTest("TEST[core::data::mapping::type::ObjectTest]"){}
+  ObjectTest()
+    : UnitTest("TEST[core::data::mapping::type::ObjectTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}}}}

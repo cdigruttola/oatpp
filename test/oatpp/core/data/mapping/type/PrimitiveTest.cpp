@@ -26,19 +26,21 @@
 
 #include "oatpp/core/Types.hpp"
 
-namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace  type {
+namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace type {
 
 namespace {
 
-  template<class T>
-  void checkHash(const T& val) {
-    auto h = std::hash<T>{}(val);
-    OATPP_LOGI("HASH", "type='%s', hash=%llu", val.valueType->classId.name, h);
-  }
+template<class T>
+void checkHash(const T& val)
+{
+  auto h = std::hash<T> {}(val);
+  OATPP_LOGI("HASH", "type='%s', hash=%llu", val.valueType->classId.name, h);
+}
 
 }
 
-void PrimitiveTest::onRun() {
+void PrimitiveTest::onRun()
+{
 
   {
     checkHash(oatpp::Boolean(true));
@@ -243,7 +245,6 @@ void PrimitiveTest::onRun() {
 
     OATPP_LOGI(TAG, "OK");
   }
-
 }
 
 }}}}}}

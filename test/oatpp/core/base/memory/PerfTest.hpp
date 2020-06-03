@@ -28,15 +28,16 @@
 #include "oatpp-test/UnitTest.hpp"
 
 namespace oatpp { namespace test { namespace memory {
-  
-class PerfTest : public UnitTest{
+
+class PerfTest: public UnitTest {
 public:
-  
-  PerfTest():UnitTest("TEST[base::memory::PerfTest]"){}
+  PerfTest()
+    : UnitTest("TEST[base::memory::PerfTest]")
+  {
+  }
   void onRun() override;
-  
 };
-  
+
 }}}
 
 #endif /* PerfTest_hpp */

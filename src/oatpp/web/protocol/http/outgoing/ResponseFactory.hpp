@@ -38,9 +38,9 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
  */
 class ResponseFactory {
 public:
-
   /**
-   * Create &id:oatpp::web::protocol::http::outgoing::Response; with &id:oatpp::web::protocol::http::outgoing::BufferBody;.
+   * Create &id:oatpp::web::protocol::http::outgoing::Response; with
+   * &id:oatpp::web::protocol::http::outgoing::BufferBody;.
    * @param status - &id:oatpp::web::protocol::http::Status;.
    * @param text - &id:oatpp::String;.
    * @return - `std::shared_ptr` to &id:oatpp::web::protocol::http::outgoing::Response;.
@@ -57,9 +57,8 @@ public:
   static std::shared_ptr<Response> createResponse(const Status& status,
                                                   const oatpp::Void& dto,
                                                   const std::shared_ptr<data::mapping::ObjectMapper>& objectMapper);
-  
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_outgoing_ResponseFactory_hpp */

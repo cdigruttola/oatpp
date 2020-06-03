@@ -29,20 +29,20 @@
 
 namespace oatpp { namespace test { namespace web {
 
-class PipelineAsyncTest : public UnitTest {
+class PipelineAsyncTest: public UnitTest {
 private:
   v_int32 m_port;
   v_int32 m_pipelineSize;
-public:
 
+public:
   PipelineAsyncTest(v_int32 port, v_int32 pipelineSize)
     : UnitTest("TEST[web::PipelineAsyncTest]")
     , m_port(port)
     , m_pipelineSize(pipelineSize)
-  {}
+  {
+  }
 
   void onRun() override;
-
 };
 
 }}}

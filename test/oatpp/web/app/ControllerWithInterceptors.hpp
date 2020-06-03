@@ -25,11 +25,11 @@
 #ifndef oatpp_test_web_app_ControllerWithInterceptors_hpp
 #define oatpp_test_web_app_ControllerWithInterceptors_hpp
 
-#include "oatpp/web/server/api/ApiController.hpp"
-#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
-#include "oatpp/core/utils/ConversionUtils.hpp"
 #include "oatpp/core/macro/codegen.hpp"
 #include "oatpp/core/macro/component.hpp"
+#include "oatpp/core/utils/ConversionUtils.hpp"
+#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
+#include "oatpp/web/server/api/ApiController.hpp"
 
 #include <sstream>
 
@@ -37,22 +37,27 @@ namespace oatpp { namespace test { namespace web { namespace app {
 
 namespace multipart = oatpp::web::mime::multipart;
 
-class ControllerWithInterceptors : public oatpp::web::server::api::ApiController {
+class ControllerWithInterceptors: public oatpp::web::server::api::ApiController {
 private:
   static constexpr const char* TAG = "test::web::app::ControllerWithInterceptors";
+
 public:
   ControllerWithInterceptors(const std::shared_ptr<ObjectMapper>& objectMapper)
     : oatpp::web::server::api::ApiController(objectMapper)
-  {}
-public:
+  {
+  }
 
-  static std::shared_ptr<ControllerWithInterceptors> createShared(const std::shared_ptr<ObjectMapper>& objectMapper = OATPP_GET_COMPONENT(std::shared_ptr<ObjectMapper>)){
+public:
+  static std::shared_ptr<ControllerWithInterceptors> createShared(
+   const std::shared_ptr<ObjectMapper>& objectMapper = OATPP_GET_COMPONENT(std::shared_ptr<ObjectMapper>))
+  {
     return std::make_shared<ControllerWithInterceptors>(objectMapper);
   }
 
 #include OATPP_CODEGEN_BEGIN(ApiController)
 
-  ENDPOINT_INTERCEPTOR(interceptor, inter1) {
+  ENDPOINT_INTERCEPTOR(interceptor, inter1)
+  {
 
     /* assert order of interception */
     OATPP_ASSERT(request->getHeader("header-in-inter2") == "inter2");
@@ -63,9 +68,9 @@ public:
     auto response = (this->*intercepted)(request);
     response->putHeader("header-out-inter1", "inter1");
     return response;
-
   }
-  ENDPOINT_INTERCEPTOR(interceptor, inter2) {
+  ENDPOINT_INTERCEPTOR(interceptor, inter2)
+  {
 
     /* assert order of interception */
     OATPP_ASSERT(request->getHeader("header-in-inter3") == "inter3");
@@ -75,15 +80,16 @@ public:
     auto response = (this->*intercepted)(request);
     response->putHeader("header-out-inter2", "inter2");
     return response;
-
   }
-  ENDPOINT_INTERCEPTOR(interceptor, inter3) {
+  ENDPOINT_INTERCEPTOR(interceptor, inter3)
+  {
     request->putHeader("header-in-inter3", "inter3");
     auto response = (this->*intercepted)(request);
     response->putHeader("header-out-inter3", "inter3");
     return response;
   }
-  ENDPOINT_INTERCEPTOR(interceptor, asserter) {
+  ENDPOINT_INTERCEPTOR(interceptor, asserter)
+  {
     auto response = (this->*intercepted)(request);
 
     OATPP_ASSERT(response->getHeader("header-out-inter1") == "inter1");
@@ -92,8 +98,7 @@ public:
 
     return response;
   }
-  ENDPOINT("GET", "test/interceptors", interceptor,
-           REQUEST(std::shared_ptr<IncomingRequest>, request))
+  ENDPOINT("GET", "test/interceptors", interceptor, REQUEST(std::shared_ptr<IncomingRequest>, request))
   {
 
     OATPP_ASSERT(request->getHeader("header-in-inter1") == "inter1");
@@ -101,12 +106,10 @@ public:
     OATPP_ASSERT(request->getHeader("header-in-inter3") == "inter3");
 
     return createResponse(Status::CODE_200, "Hello World!!!");
-
   }
 
 
 #include OATPP_CODEGEN_END(ApiController)
-
 };
 
 }}}}

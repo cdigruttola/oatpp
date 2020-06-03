@@ -29,15 +29,16 @@
 
 namespace oatpp { namespace test { namespace network {
 
-class UrlTest : public UnitTest {
+class UrlTest: public UnitTest {
 public:
-
-  UrlTest():UnitTest("TEST[network::UrlTest]"){}
+  UrlTest()
+    : UnitTest("TEST[network::UrlTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}
 
 
-#endif //oatpp_test_network_UrlTest_hpp
+#endif // oatpp_test_network_UrlTest_hpp

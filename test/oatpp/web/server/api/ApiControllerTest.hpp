@@ -29,12 +29,13 @@
 
 namespace oatpp { namespace test { namespace web { namespace server { namespace api {
 
-class ApiControllerTest : public UnitTest {
+class ApiControllerTest: public UnitTest {
 public:
-
-  ApiControllerTest():UnitTest("TEST[web::server::api::ApiControllerTest]"){}
+  ApiControllerTest()
+    : UnitTest("TEST[web::server::api::ApiControllerTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}}}

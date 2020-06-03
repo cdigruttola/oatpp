@@ -27,9 +27,9 @@
 
 #include "oatpp/web/protocol/http/Http.hpp"
 
-#include "oatpp/core/data/stream/Stream.hpp"
-#include "oatpp/core/collection/ListMap.hpp"
 #include "oatpp/core/async/Coroutine.hpp"
+#include "oatpp/core/collection/ListMap.hpp"
+#include "oatpp/core/data/stream/Stream.hpp"
 
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace outgoing {
 
@@ -37,11 +37,11 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
  * Abstract http outgoing body.
  * You may extend this class in order to implement custom body transferring functionality.
  */
-class Body : public data::stream::ReadCallback {
+class Body: public data::stream::ReadCallback {
 protected:
   typedef http::Headers Headers;
-public:
 
+public:
   /**
    * Virtual destructor.
    */
@@ -50,7 +50,7 @@ public:
   ///////////////////////////
   // From the ReadCallback //
   //
-  //virtual v_io_size read(void *buffer, v_buff_size count, async::Action& action) = 0;
+  // virtual v_io_size read(void *buffer, v_buff_size count, async::Action& action) = 0;
 
   /**
    * Declare headers describing body.
@@ -71,9 +71,8 @@ public:
    * @return - &id:oatpp::v_io_size;.
    */
   virtual v_buff_size getKnownSize() = 0;
-  
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_outgoing_Body_hpp */

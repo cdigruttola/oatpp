@@ -29,67 +29,60 @@
 
 #include <unordered_map>
 
-namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace  type {
+namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace type {
 
 #include OATPP_CODEGEN_BEGIN(DTO)
 
 ENUM(Enum0, v_int32)
 
-ENUM(Enum1, v_int32,
-     VALUE(V1, 1),
-     VALUE(V2, 2),
-     VALUE(V3, 3)
-)
+ENUM(Enum1, v_int32, VALUE(V1, 1), VALUE(V2, 2), VALUE(V3, 3))
 
-ENUM(Enum2, v_int32,
-  VALUE(NAME_1, 1, "name-1"),
-  VALUE(NAME_2, 2, "name-2"),
-  VALUE(NAME_3, 3, "name-3")
-)
+ENUM(Enum2, v_int32, VALUE(NAME_1, 1, "name-1"), VALUE(NAME_2, 2, "name-2"), VALUE(NAME_3, 3, "name-3"))
 
-ENUM(Enum3, v_int32,
-   VALUE(V_1, 1, "v-1", "description_1"),
-   VALUE(V_2, 2, "v-2", "description_2"),
-   VALUE(V_3, 3, "v-3", "description_3")
-)
+ENUM(Enum3,
+     v_int32,
+     VALUE(V_1, 1, "v-1", "description_1"),
+     VALUE(V_2, 2, "v-2", "description_2"),
+     VALUE(V_3, 3, "v-3", "description_3"))
 
 #include OATPP_CODEGEN_END(DTO)
 
-void EnumTest::onRun() {
+void EnumTest::onRun()
+{
 
   {
     OATPP_LOGI(TAG, "Check Hash...");
 
     {
-      auto v = std::hash<oatpp::Enum<Enum1>>{}(oatpp::Enum<Enum1>());
+      auto v = std::hash<oatpp::Enum<Enum1>> {}(oatpp::Enum<Enum1>());
       OATPP_ASSERT(v == 0);
     }
 
     {
-      auto v = std::hash<oatpp::Enum<Enum1>>{}(oatpp::Enum<Enum1>(Enum1::V1));
+      auto v = std::hash<oatpp::Enum<Enum1>> {}(oatpp::Enum<Enum1>(Enum1::V1));
       OATPP_ASSERT(v == 1);
     }
 
     {
-      auto v = std::hash<oatpp::Enum<Enum1>>{}(oatpp::Enum<Enum1>(Enum1::V2));
+      auto v = std::hash<oatpp::Enum<Enum1>> {}(oatpp::Enum<Enum1>(Enum1::V2));
       OATPP_ASSERT(v == 2);
     }
 
     {
-      auto v = std::hash<oatpp::Enum<Enum1>>{}(oatpp::Enum<Enum1>(Enum1::V3));
+      auto v = std::hash<oatpp::Enum<Enum1>> {}(oatpp::Enum<Enum1>(Enum1::V3));
       OATPP_ASSERT(v == 3);
     }
 
     std::unordered_map<oatpp::Enum<Enum1>, oatpp::String> map({
-      {Enum1::V1, "v1"},
-      {Enum1::V2, "v2"},
-      {Enum1::V3, "v3"},
+     {Enum1::V1, "v1"},
+     {Enum1::V2, "v2"},
+     {Enum1::V3, "v3"},
     });
 
     OATPP_ASSERT(map.size() == 3);
-    OATPP_ASSERT(map[Enum1::V1] == "v1");
-    OATPP_ASSERT(map[Enum1::V2] == "v2");
-    OATPP_ASSERT(map[Enum1::V3] == "v3");
+    OATPP_ASSERT(map [ Enum1::V1 ] == "v1");
+    OATPP_ASSERT(map [ Enum1::V2 ] == "v2");
+    OATPP_ASSERT(map [ Enum1::V3 ] == "v3");
 
     OATPP_LOGI(TAG, "OK");
   }
@@ -97,32 +90,41 @@ void EnumTest::onRun() {
   {
     OATPP_LOGI(TAG, "Check Meta...");
     {
-      const auto &entries = oatpp::Enum<Enum0>::getEntries();
+      const auto& entries = oatpp::Enum<Enum0>::getEntries();
       OATPP_ASSERT(entries.size() == 0);
     }
 
     {
-      const auto &v = oatpp::Enum<Enum1>::getEntries();
+      const auto& v = oatpp::Enum<Enum1>::getEntries();
       OATPP_ASSERT(v.size() == 3);
-      OATPP_ASSERT(v[0].index == 0 && v[0].name == "V1" && v[0].value == Enum1::V1 && v[0].description == nullptr);
-      OATPP_ASSERT(v[1].index == 1 && v[1].name == "V2" && v[1].value == Enum1::V2 && v[1].description == nullptr);
-      OATPP_ASSERT(v[2].index == 2 && v[2].name == "V3" && v[2].value == Enum1::V3 && v[2].description == nullptr);
+      OATPP_ASSERT(v [ 0 ].index == 0 && v [ 0 ].name == "V1" && v [ 0 ].value == Enum1::V1 &&
+                   v [ 0 ].description == nullptr);
+      OATPP_ASSERT(v [ 1 ].index == 1 && v [ 1 ].name == "V2" && v [ 1 ].value == Enum1::V2 &&
+                   v [ 1 ].description == nullptr);
+      OATPP_ASSERT(v [ 2 ].index == 2 && v [ 2 ].name == "V3" && v [ 2 ].value == Enum1::V3 &&
+                   v [ 2 ].description == nullptr);
     }
 
     {
-      const auto &v = oatpp::Enum<Enum2>::getEntries();
+      const auto& v = oatpp::Enum<Enum2>::getEntries();
       OATPP_ASSERT(v.size() == 3);
-      OATPP_ASSERT(v[0].index == 0 && v[0].name == "name-1" && v[0].value == Enum2::NAME_1 && v[0].description == nullptr);
-      OATPP_ASSERT(v[1].index == 1 && v[1].name == "name-2" && v[1].value == Enum2::NAME_2 && v[1].description == nullptr);
-      OATPP_ASSERT(v[2].index == 2 && v[2].name == "name-3" && v[2].value == Enum2::NAME_3 && v[2].description == nullptr);
+      OATPP_ASSERT(v [ 0 ].index == 0 && v [ 0 ].name == "name-1" && v [ 0 ].value == Enum2::NAME_1 &&
+                   v [ 0 ].description == nullptr);
+      OATPP_ASSERT(v [ 1 ].index == 1 && v [ 1 ].name == "name-2" && v [ 1 ].value == Enum2::NAME_2 &&
+                   v [ 1 ].description == nullptr);
+      OATPP_ASSERT(v [ 2 ].index == 2 && v [ 2 ].name == "name-3" && v [ 2 ].value == Enum2::NAME_3 &&
+                   v [ 2 ].description == nullptr);
     }
 
     {
-      const auto &v = oatpp::Enum<Enum3>::getEntries();
+      const auto& v = oatpp::Enum<Enum3>::getEntries();
       OATPP_ASSERT(v.size() == 3);
-      OATPP_ASSERT(v[0].index == 0 && v[0].name == "v-1" && v[0].value == Enum3::V_1 && v[0].description == "description_1");
-      OATPP_ASSERT(v[1].index == 1 && v[1].name == "v-2" && v[1].value == Enum3::V_2 && v[1].description == "description_2");
-      OATPP_ASSERT(v[2].index == 2 && v[2].name == "v-3" && v[2].value == Enum3::V_3 && v[2].description == "description_3");
+      OATPP_ASSERT(v [ 0 ].index == 0 && v [ 0 ].name == "v-1" && v [ 0 ].value == Enum3::V_1 &&
+                   v [ 0 ].description == "description_1");
+      OATPP_ASSERT(v [ 1 ].index == 1 && v [ 1 ].name == "v-2" && v [ 1 ].value == Enum3::V_2 &&
+                   v [ 1 ].description == "description_2");
+      OATPP_ASSERT(v [ 2 ].index == 2 && v [ 2 ].name == "v-3" && v [ 2 ].value == Enum3::V_3 &&
+                   v [ 2 ].description == "description_3");
     }
 
     OATPP_LOGI(TAG, "OK");
@@ -143,12 +145,10 @@ void EnumTest::onRun() {
     OATPP_ASSERT(oatpp::Enum<Enum2>::NotNull::AsNumber::Interpreter::notNull == true);
 
     auto pd1 = static_cast<const oatpp::data::mapping::type::__class::AbstractEnum::AbstractPolymorphicDispatcher*>(
-      oatpp::Enum<Enum2>::Class::getType()->polymorphicDispatcher
-    );
+     oatpp::Enum<Enum2>::Class::getType()->polymorphicDispatcher);
 
     auto pd2 = static_cast<const oatpp::data::mapping::type::__class::AbstractEnum::AbstractPolymorphicDispatcher*>(
-      oatpp::Enum<Enum2>::NotNull::Class::getType()->polymorphicDispatcher
-    );
+     oatpp::Enum<Enum2>::NotNull::Class::getType()->polymorphicDispatcher);
 
     OATPP_ASSERT(pd1->notNull == false);
     OATPP_ASSERT(pd2->notNull == true);
@@ -156,7 +156,7 @@ void EnumTest::onRun() {
     {
       auto interEnum = pd1->getInterpretedEnum();
       OATPP_ASSERT(interEnum.size() == 3);
-      OATPP_ASSERT(interEnum[0].getStoredType() == oatpp::String::Class::getType());
+      OATPP_ASSERT(interEnum [ 0 ].getStoredType() == oatpp::String::Class::getType());
     }
 
     OATPP_LOGI(TAG, "OK");
@@ -165,7 +165,8 @@ void EnumTest::onRun() {
   {
     OATPP_LOGI(TAG, "Test Interpreter AsString...");
     oatpp::data::mapping::type::EnumInterpreterError e = oatpp::data::mapping::type::EnumInterpreterError::OK;
-    auto inter = oatpp::Enum<Enum2>::AsString::Interpreter::toInterpretation(oatpp::Enum<Enum2>::AsString(Enum2::NAME_1), e);
+    auto inter =
+     oatpp::Enum<Enum2>::AsString::Interpreter::toInterpretation(oatpp::Enum<Enum2>::AsString(Enum2::NAME_1), e);
     OATPP_ASSERT(inter.valueType == oatpp::String::Class::getType());
     OATPP_ASSERT(e == oatpp::data::mapping::type::EnumInterpreterError::OK);
 
@@ -184,7 +185,8 @@ void EnumTest::onRun() {
   {
     OATPP_LOGI(TAG, "Test Interpreter AsNumber...");
     oatpp::data::mapping::type::EnumInterpreterError e = oatpp::data::mapping::type::EnumInterpreterError::OK;
-    auto inter = oatpp::Enum<Enum2>::AsNumber::Interpreter::toInterpretation(oatpp::Enum<Enum2>::AsNumber(Enum2::NAME_1), e);
+    auto inter =
+     oatpp::Enum<Enum2>::AsNumber::Interpreter::toInterpretation(oatpp::Enum<Enum2>::AsNumber(Enum2::NAME_1), e);
     OATPP_ASSERT(inter.valueType == oatpp::Int32::Class::getType());
     OATPP_ASSERT(e == oatpp::data::mapping::type::EnumInterpreterError::OK);
 
@@ -299,8 +301,6 @@ void EnumTest::onRun() {
 
     OATPP_LOGI(TAG, "OK");
   }
-
-
 }
 
 }}}}}}

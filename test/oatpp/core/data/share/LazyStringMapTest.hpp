@@ -29,12 +29,13 @@
 
 namespace oatpp { namespace test { namespace core { namespace data { namespace share {
 
-class LazyStringMapTest : public UnitTest{
+class LazyStringMapTest: public UnitTest {
 public:
-
-  LazyStringMapTest():UnitTest("TEST[core::data::share::LazyStringMapTest]"){}
+  LazyStringMapTest()
+    : UnitTest("TEST[core::data::share::LazyStringMapTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}}}

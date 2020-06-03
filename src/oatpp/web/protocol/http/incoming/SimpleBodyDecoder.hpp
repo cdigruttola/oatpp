@@ -33,14 +33,15 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
 /**
  * Default implementation of &id:oatpp::web::protocol::http::incoming::BodyDecoder;.
  */
-class SimpleBodyDecoder : public BodyDecoder {
+class SimpleBodyDecoder: public BodyDecoder {
 private:
   std::shared_ptr<encoding::ProviderCollection> m_contentDecoders;
-private:
-  base::ObjectHandle<data::buffer::Processor> getStreamProcessor(const data::share::StringKeyLabelCI& transferEncoding,
-                                                                 const data::share::StringKeyLabelCI& contentEncoding) const;
-public:
 
+private:
+  base::ObjectHandle<data::buffer::Processor> getStreamProcessor(
+   const data::share::StringKeyLabelCI& transferEncoding, const data::share::StringKeyLabelCI& contentEncoding) const;
+
+public:
   /**
    * Constructor.
    * @param decoders - collection content decoders.
@@ -53,7 +54,9 @@ public:
    * @param bodyStream - pointer to &id:oatpp::data::stream::InputStream;.
    * @param writeCallback - &id:oatpp::data::stream::WriteCallback;.
    */
-  void decode(const Headers& headers, data::stream::InputStream* bodyStream, data::stream::WriteCallback* writeCallback) const override;
+  void decode(const Headers& headers,
+              data::stream::InputStream* bodyStream,
+              data::stream::WriteCallback* writeCallback) const override;
 
   /**
    * Same as &l:SimpleBodyDecoder::decode (); but Async.
@@ -62,13 +65,12 @@ public:
    * @param writeCallback - `std::shared_ptr` to &id:oatpp::data::stream::WriteCallback;.
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  oatpp::async::CoroutineStarter decodeAsync(const Headers& headers,
-                                             const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
-                                             const std::shared_ptr<oatpp::data::stream::WriteCallback>& writeCallback) const override;
-  
-  
+  oatpp::async::CoroutineStarter decodeAsync(
+   const Headers& headers,
+   const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
+   const std::shared_ptr<oatpp::data::stream::WriteCallback>& writeCallback) const override;
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_incoming_SimpleBodyDecoder_hpp */

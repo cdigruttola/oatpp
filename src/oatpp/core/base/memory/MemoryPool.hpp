@@ -25,14 +25,14 @@
 #ifndef oatpp_base_memory_MemoryPool_hpp
 #define oatpp_base_memory_MemoryPool_hpp
 
-#include "oatpp/core/concurrency/SpinLock.hpp"
 #include "oatpp/core/base/Environment.hpp"
+#include "oatpp/core/concurrency/SpinLock.hpp"
 
+#include <cstring>
 #include <list>
 #include <unordered_map>
-#include <cstring>
 
-namespace oatpp { namespace base { namespace  memory {
+namespace oatpp { namespace base { namespace memory {
 
 /**
  * Memory Pool allocates memory chunks. Each chunk consists of specified number of fixed-size entries.
@@ -42,28 +42,29 @@ class MemoryPool {
 public:
   static oatpp::concurrency::SpinLock POOLS_SPIN_LOCK;
   static std::unordered_map<v_int64, MemoryPool*> POOLS;
+
 private:
   static std::atomic<v_int64> poolIdCounter;
+
 private:
-  
   class EntryHeader {
   public:
-    
     EntryHeader(MemoryPool* pPool, v_int64 pPoolId, EntryHeader* pNext)
       : pool(pPool)
       , poolId(pPoolId)
       , next(pNext)
-    {}
-    
+    {
+    }
+
     MemoryPool* pool;
     v_int64 poolId;
     EntryHeader* next;
-    
   };
-  
+
 private:
   void allocChunk();
   void freeByEntryHeader(EntryHeader* entry);
+
 private:
   std::string m_name;
   v_buff_size m_entrySize;
@@ -73,8 +74,8 @@ private:
   EntryHeader* m_rootEntry;
   v_int64 m_objectsCount;
   oatpp::concurrency::SpinLock m_lock;
-public:
 
+public:
   /**
    * Constructor.
    * @param name - name of the pool.
@@ -95,7 +96,8 @@ public:
 
   /**
    * Obtain pointer to memory entry.
-   * When entry is no more needed, user must call &id:oatpp::base::memory::MemoryPool::free; and pass obtained entry pointer as a parameter.
+   * When entry is no more needed, user must call &id:oatpp::base::memory::MemoryPool::free; and pass obtained entry
+   * pointer as a parameter.
    * @return - pointer to memory entry.
    */
   void* obtain();
@@ -130,25 +132,25 @@ public:
    * @return - number of entries currently in use.
    */
   v_int64 getObjectsCount();
-  
 };
 
 /**
- * Creates multiple MemoryPools (&l:MemoryPool;) to reduce concurrency blocking in call to &l:ThreadDistributedMemoryPool::obtain ();
+ * Creates multiple MemoryPools (&l:MemoryPool;) to reduce concurrency blocking in call to
+ * &l:ThreadDistributedMemoryPool::obtain ();
  */
 class ThreadDistributedMemoryPool {
 private:
   v_int64 m_shardsCount;
   MemoryPool** m_shards;
   bool m_deleted;
-public:
 
+public:
   /**
    * Default number of MemoryPools (&l:MemoryPool;) "shards" to create.
    */
   static const v_int64 SHARDS_COUNT_DEFAULT;
-public:
 
+public:
   /**
    * Constructor.
    * @param name - name of the memory pool.
@@ -156,7 +158,9 @@ public:
    * @param chunkSize - number of entries in chunk.
    * @param shardsCount - number of MemoryPools (&l:MemoryPool;) "shards" to create.
    */
-  ThreadDistributedMemoryPool(const std::string& name, v_buff_size entrySize, v_buff_size chunkSize,
+  ThreadDistributedMemoryPool(const std::string& name,
+                              v_buff_size entrySize,
+                              v_buff_size chunkSize,
                               v_int64 shardsCount = SHARDS_COUNT_DEFAULT);
 
   /**
@@ -168,11 +172,11 @@ public:
 
   /**
    * Obtain pointer to memory entry.
-   * When entry is no more needed, user must call &id:oatpp::base::memory::MemoryPool::free; and pass obtained entry pointer as a parameter.
+   * When entry is no more needed, user must call &id:oatpp::base::memory::MemoryPool::free; and pass obtained entry
+   * pointer as a parameter.
    * @return - pointer to memory entry.
    */
   void* obtain();
-
 };
 
 /**
@@ -182,45 +186,44 @@ public:
 template<typename T>
 class Bench {
 private:
-  
   class Block {
   public:
     Block(p_char8 mem, Block* pNext)
       : memory(mem)
       , next(pNext)
-    {}
+    {
+    }
     p_char8 memory;
     Block* next;
   };
-  
+
 private:
-  
-  void grow(){
-    
+  void grow()
+  {
+
     v_buff_size newSize = m_size + m_growSize;
-    T** newIndex = new T*[newSize];
+    T** newIndex = new T*[ newSize ];
     std::memcpy(newIndex, m_index, m_size);
-    
-    Block* b = new Block(new v_char8 [m_growSize * sizeof(T)], m_blocks);
+
+    Block* b = new Block(new v_char8 [ m_growSize * sizeof(T) ], m_blocks);
     m_blocks = b;
     for(v_buff_size i = 0; i < m_growSize; i++) {
-      newIndex[m_size + i] = (T*) (&b->memory[i * sizeof(T)]);
+      newIndex [ m_size + i ] = (T*)(&b->memory [ i * sizeof(T) ]);
     }
-    
+
     delete [] m_index;
     m_size = newSize;
     m_index = newIndex;
-    
   }
-  
+
 private:
   v_buff_size m_growSize;
   v_buff_size m_size;
   v_buff_size m_indexPosition;
   Block* m_blocks;
   T** m_index;
-public:
 
+public:
   /**
    * Constructor.
    * @param growSize - number of objects to allocate when no free objects left.
@@ -238,9 +241,10 @@ public:
   /**
    * Non virtual destructor.
    */
-  ~Bench(){
+  ~Bench()
+  {
     auto curr = m_blocks;
-    while (curr != nullptr) {
+    while(curr != nullptr) {
       auto next = curr->next;
       delete curr;
       curr = next;
@@ -254,25 +258,26 @@ public:
    * @param args - actual arguments to pass to object constructor.
    * @return - pointer to constructed object.
    */
-  template<typename ... Args>
-  T* obtain(Args... args) {
+  template<typename... Args>
+  T* obtain(Args... args)
+  {
     if(m_indexPosition == m_size) {
       grow();
     }
-    return new (m_index[m_indexPosition ++]) T(args...);
+    return new(m_index [ m_indexPosition++ ]) T(args...);
   }
 
   /**
    * Call object destructor and put it on "bench".
    * @param entry - object to be freed.
    */
-  void free(T* entry) {
+  void free(T* entry)
+  {
     entry->~T();
-    m_index[--m_indexPosition] = entry;
+    m_index [ --m_indexPosition ] = entry;
   }
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_base_memory_MemoryPool_hpp */

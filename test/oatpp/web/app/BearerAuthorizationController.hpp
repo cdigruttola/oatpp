@@ -27,31 +27,32 @@
 
 #include "./DTOs.hpp"
 
-#include "oatpp/web/server/api/ApiController.hpp"
-#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
-#include "oatpp/core/utils/ConversionUtils.hpp"
 #include "oatpp/core/macro/codegen.hpp"
 #include "oatpp/core/macro/component.hpp"
+#include "oatpp/core/utils/ConversionUtils.hpp"
+#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
+#include "oatpp/web/server/api/ApiController.hpp"
 
 #include <sstream>
 
 namespace oatpp { namespace test { namespace web { namespace app {
 
-class BearerAuthorizationObject : public oatpp::web::server::handler::AuthorizationObject {
+class BearerAuthorizationObject: public oatpp::web::server::handler::AuthorizationObject {
 public:
   oatpp::String user;
   oatpp::String password;
   oatpp::String token;
 };
 
-class MyBearerAuthorizationHandler : public oatpp::web::server::handler::BearerAuthorizationHandler {
+class MyBearerAuthorizationHandler: public oatpp::web::server::handler::BearerAuthorizationHandler {
 public:
-
   MyBearerAuthorizationHandler()
     : oatpp::web::server::handler::BearerAuthorizationHandler("custom-bearer-realm")
-  {}
+  {
+  }
 
-  std::shared_ptr<AuthorizationObject> authorize(const oatpp::String& token) override {
+  std::shared_ptr<AuthorizationObject> authorize(const oatpp::String& token) override
+  {
 
     if(token == "4e99e8c12de7e01535248d2bac85e732") {
       auto obj = std::make_shared<BearerAuthorizationObject>();
@@ -63,30 +64,35 @@ public:
 
     return nullptr;
   }
-
 };
 
-class BearerAuthorizationController : public oatpp::web::server::api::ApiController {
+class BearerAuthorizationController: public oatpp::web::server::api::ApiController {
 private:
   static constexpr const char* TAG = "test::web::app::BearerAuthorizationController";
 
 private:
   std::shared_ptr<AuthorizationHandler> m_authHandler = std::make_shared<MyBearerAuthorizationHandler>();
-public:
 
+public:
   BearerAuthorizationController(const std::shared_ptr<ObjectMapper>& objectMapper)
     : oatpp::web::server::api::ApiController(objectMapper)
-  {}
-public:
+  {
+  }
 
-  static std::shared_ptr<BearerAuthorizationController> createShared(const std::shared_ptr<ObjectMapper>& objectMapper = OATPP_GET_COMPONENT(std::shared_ptr<ObjectMapper>)){
+public:
+  static std::shared_ptr<BearerAuthorizationController> createShared(
+   const std::shared_ptr<ObjectMapper>& objectMapper = OATPP_GET_COMPONENT(std::shared_ptr<ObjectMapper>))
+  {
     return std::make_shared<BearerAuthorizationController>(objectMapper);
   }
 
 #include OATPP_CODEGEN_BEGIN(ApiController)
 
-  ENDPOINT("GET", "bearer-authorization", authorization,
-           AUTHORIZATION(std::shared_ptr<BearerAuthorizationObject>, authorizatioBearer, m_authHandler)) {
+  ENDPOINT("GET",
+           "bearer-authorization",
+           authorization,
+           AUTHORIZATION(std::shared_ptr<BearerAuthorizationObject>, authorizatioBearer, m_authHandler))
+  {
     auto dto = TestDto::createShared();
     dto->testValue = authorizatioBearer->user + ":" + authorizatioBearer->password;
     if(dto->testValue == "foo:bar" && authorizatioBearer->token == "4e99e8c12de7e01535248d2bac85e732") {
@@ -97,7 +103,6 @@ public:
   }
 
 #include OATPP_CODEGEN_END(ApiController)
-
 };
 
 }}}}

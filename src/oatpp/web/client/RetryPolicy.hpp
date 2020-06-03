@@ -36,7 +36,6 @@ namespace oatpp { namespace web { namespace client {
  */
 class RetryPolicy {
 public:
-
   /**
    * This structure holds information about request attempts.
    */
@@ -49,7 +48,6 @@ public:
   };
 
 public:
-
   /**
    * Virtual destructor.
    */
@@ -76,16 +74,15 @@ public:
    * @return - delay in microseconds.
    */
   virtual v_int64 waitForMicroseconds(const Context& context) = 0;
-
 };
 
-class SimpleRetryPolicy : public RetryPolicy {
+class SimpleRetryPolicy: public RetryPolicy {
 private:
   v_int64 m_maxAttempts;
   v_int64 m_delay;
   std::unordered_set<v_int32> m_httpCodes;
-public:
 
+public:
   /**
    * Constructor.
    * @param maxAttempts - max number of attempts to retry. `-1` - retry infinitely.
@@ -119,7 +116,6 @@ public:
    * @return - delay in microseconds.
    */
   v_int64 waitForMicroseconds(const Context& context) override;
-
 };
 
 }}}

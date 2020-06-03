@@ -24,8 +24,8 @@
 
 #include "SimpleBodyDecoder.hpp"
 
-#include "oatpp/web/protocol/http/encoding/Chunked.hpp"
 #include "oatpp/core/utils/ConversionUtils.hpp"
+#include "oatpp/web/protocol/http/encoding/Chunked.hpp"
 
 #include <vector>
 
@@ -33,11 +33,11 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
 
 SimpleBodyDecoder::SimpleBodyDecoder(const std::shared_ptr<encoding::ProviderCollection>& contentDecoders)
   : m_contentDecoders(contentDecoders)
-{}
+{
+}
 
-base::ObjectHandle<data::buffer::Processor>
-SimpleBodyDecoder::getStreamProcessor (const data::share::StringKeyLabelCI& transferEncoding,
-                                       const data::share::StringKeyLabelCI& contentEncoding ) const
+base::ObjectHandle<data::buffer::Processor> SimpleBodyDecoder::getStreamProcessor(
+ const data::share::StringKeyLabelCI& transferEncoding, const data::share::StringKeyLabelCI& contentEncoding) const
 {
 
   if(!transferEncoding && !contentEncoding) {
@@ -53,7 +53,8 @@ SimpleBodyDecoder::getStreamProcessor (const data::share::StringKeyLabelCI& tran
   if(transferEncoding) {
     if(transferEncoding != Header::Value::TRANSFER_ENCODING_CHUNKED) {
       throw std::runtime_error("[oatpp::web::protocol::http::incoming::SimpleBodyDecoder::getStreamProcessor()]: "
-                               "Error. Unsupported Transfer-Encoding. '" + transferEncoding.std_str() + "'.");
+                               "Error. Unsupported Transfer-Encoding. '" +
+                               transferEncoding.std_str() + "'.");
     }
     processors.push_back(std::make_shared<http::encoding::DecoderChunked>());
   }
@@ -62,7 +63,8 @@ SimpleBodyDecoder::getStreamProcessor (const data::share::StringKeyLabelCI& tran
     auto provider = m_contentDecoders->get(contentEncoding);
     if(!provider) {
       throw std::runtime_error("[oatpp::web::protocol::http::incoming::SimpleBodyDecoder::getStreamProcessor()]: "
-                               "Error. Unsupported Content-Encoding. '" + contentEncoding.std_str() + "'.");
+                               "Error. Unsupported Content-Encoding. '" +
+                               contentEncoding.std_str() + "'.");
     }
     processors.push_back(provider->getProcessor());
   }
@@ -70,16 +72,16 @@ SimpleBodyDecoder::getStreamProcessor (const data::share::StringKeyLabelCI& tran
   if(processors.size() > 1) {
     return std::make_shared<data::buffer::ProcessingPipeline>(processors);
   } else if(processors.size() == 1) {
-    return processors[0].getPtr();
+    return processors [ 0 ].getPtr();
   }
 
   return &data::stream::StatelessDataTransferProcessor::INSTANCE;
-
 }
 
 void SimpleBodyDecoder::decode(const Headers& headers,
                                data::stream::InputStream* bodyStream,
-                               data::stream::WriteCallback* writeCallback) const {
+                               data::stream::WriteCallback* writeCallback) const
+{
 
   auto transferEncoding = headers.getAsMemoryLabel<data::share::StringKeyLabelCI>(Header::TRANSFER_ENCODING);
 
@@ -89,7 +91,12 @@ void SimpleBodyDecoder::decode(const Headers& headers,
     auto processor = getStreamProcessor(transferEncoding, contentEncoding);
 
     data::buffer::IOBuffer buffer;
-    data::stream::transfer(bodyStream, writeCallback, 0 /* read until error */, buffer.getData(), buffer.getSize(), processor);
+    data::stream::transfer(bodyStream,
+                           writeCallback,
+                           0 /* read until error */,
+                           buffer.getData(),
+                           buffer.getSize(),
+                           processor);
 
   } else {
 
@@ -99,13 +106,12 @@ void SimpleBodyDecoder::decode(const Headers& headers,
       bool success;
       auto contentLength = utils::conversion::strToInt64(contentLengthStr.toString(), success);
 
-      if (success && contentLength > 0) {
+      if(success && contentLength > 0) {
 
         auto contentEncoding = headers.getAsMemoryLabel<data::share::StringKeyLabelCI>(Header::CONTENT_ENCODING);
         auto processor = getStreamProcessor(nullptr, contentEncoding);
         data::buffer::IOBuffer buffer;
         data::stream::transfer(bodyStream, writeCallback, contentLength, buffer.getData(), buffer.getSize(), processor);
-
       }
 
     } else {
@@ -117,21 +123,26 @@ void SimpleBodyDecoder::decode(const Headers& headers,
         auto contentEncoding = headers.getAsMemoryLabel<data::share::StringKeyLabelCI>(Header::CONTENT_ENCODING);
         auto processor = getStreamProcessor(nullptr, contentEncoding);
         data::buffer::IOBuffer buffer;
-        data::stream::transfer(bodyStream, writeCallback,  0 /* read until error */, buffer.getData(), buffer.getSize(), processor);
+        data::stream::transfer(bodyStream,
+                               writeCallback,
+                               0 /* read until error */,
+                               buffer.getData(),
+                               buffer.getSize(),
+                               processor);
 
       } else {
-        throw std::runtime_error("[oatpp::web::protocol::http::incoming::SimpleBodyDecoder::decode()]: Error. Invalid Request.");
+        throw std::runtime_error(
+         "[oatpp::web::protocol::http::incoming::SimpleBodyDecoder::decode()]: Error. Invalid Request.");
       }
-
     }
-
   }
-
 }
 
-async::CoroutineStarter SimpleBodyDecoder::decodeAsync(const Headers& headers,
-                                                       const std::shared_ptr<data::stream::InputStream>& bodyStream,
-                                                       const std::shared_ptr<data::stream::WriteCallback>& writeCallback) const {
+async::CoroutineStarter SimpleBodyDecoder::decodeAsync(
+ const Headers& headers,
+ const std::shared_ptr<data::stream::InputStream>& bodyStream,
+ const std::shared_ptr<data::stream::WriteCallback>& writeCallback) const
+{
 
   auto transferEncoding = headers.getAsMemoryLabel<data::share::StringKeyLabelCI>(Header::TRANSFER_ENCODING);
 
@@ -150,13 +161,12 @@ async::CoroutineStarter SimpleBodyDecoder::decodeAsync(const Headers& headers,
       bool success;
       auto contentLength = utils::conversion::strToInt64(contentLengthStr.toString(), success);
 
-      if (success && contentLength > 0) {
+      if(success && contentLength > 0) {
 
         auto contentEncoding = headers.getAsMemoryLabel<data::share::StringKeyLabelCI>(Header::CONTENT_ENCODING);
         auto processor = getStreamProcessor(nullptr, contentEncoding);
         auto buffer = data::buffer::IOBuffer::createShared();
         return data::stream::transferAsync(bodyStream, writeCallback, contentLength, buffer, processor);
-
       }
 
     } else {
@@ -168,16 +178,13 @@ async::CoroutineStarter SimpleBodyDecoder::decodeAsync(const Headers& headers,
         auto contentEncoding = headers.getAsMemoryLabel<data::share::StringKeyLabelCI>(Header::CONTENT_ENCODING);
         auto processor = getStreamProcessor(nullptr, contentEncoding);
         auto buffer = data::buffer::IOBuffer::createShared();
-        return data::stream::transferAsync(bodyStream, writeCallback,  0 /* read until error */, buffer, processor);
-
+        return data::stream::transferAsync(bodyStream, writeCallback, 0 /* read until error */, buffer, processor);
       }
-
     }
-
   }
 
-  throw std::runtime_error("[oatpp::web::protocol::http::incoming::SimpleBodyDecoder::decodeAsync()]: Error. Invalid Request.");
-
+  throw std::runtime_error(
+   "[oatpp::web::protocol::http::incoming::SimpleBodyDecoder::decodeAsync()]: Error. Invalid Request.");
 }
-  
+
 }}}}}

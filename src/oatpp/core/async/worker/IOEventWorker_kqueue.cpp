@@ -31,28 +31,32 @@
 
 #include "oatpp/core/async/Processor.hpp"
 
-#include <unistd.h>
 #include <sys/event.h>
+#include <unistd.h>
 
 namespace oatpp { namespace async { namespace worker {
 
-void IOEventWorker::initEventQueue() {
+void IOEventWorker::initEventQueue()
+{
 
   m_eventQueueHandle = ::kqueue();
   if(m_eventQueueHandle == -1) {
-    throw std::runtime_error("[oatpp::async::worker::IOEventWorker::initEventQueue()]: Error. Call to ::kqueue() failed.");
+    throw std::runtime_error(
+     "[oatpp::async::worker::IOEventWorker::initEventQueue()]: Error. Call to ::kqueue() failed.");
   }
 
-  m_outEvents = std::unique_ptr<v_char8[]>(new (std::nothrow) v_char8[MAX_EVENTS * sizeof(struct kevent)]);
+  m_outEvents = std::unique_ptr<v_char8 []>(new(std::nothrow) v_char8 [ MAX_EVENTS * sizeof(struct kevent) ]);
   if(!m_outEvents) {
     OATPP_LOGE("[oatpp::async::worker::IOEventWorker::initEventQueue()]",
-               "Error. Unable to allocate %d bytes for events.", MAX_EVENTS * sizeof(struct kevent));
-    throw std::runtime_error("[oatpp::async::worker::IOEventWorker::initEventQueue()]: Error. Unable to allocate memory for events.");
+               "Error. Unable to allocate %d bytes for events.",
+               MAX_EVENTS * sizeof(struct kevent));
+    throw std::runtime_error(
+     "[oatpp::async::worker::IOEventWorker::initEventQueue()]: Error. Unable to allocate memory for events.");
   }
-
 }
 
-void IOEventWorker::triggerWakeup() {
+void IOEventWorker::triggerWakeup()
+{
 
   struct kevent event;
   memset(&event, 0, sizeof(event));
@@ -65,37 +69,38 @@ void IOEventWorker::triggerWakeup() {
   if(res < 0) {
     throw std::runtime_error("[oatpp::async::worker::IOEventWorker::triggerWakeup()]: Error. trigger wakeup failed.");
   }
-
 }
 
-void IOEventWorker::setTriggerEvent(p_char8 eventPtr) {
+void IOEventWorker::setTriggerEvent(p_char8 eventPtr)
+{
 
-  struct kevent* event = (struct kevent*) eventPtr;
+  struct kevent* event = (struct kevent*)eventPtr;
 
   std::memset(event, 0, sizeof(struct kevent));
 
   event->ident = 0;
   event->filter = EVFILT_USER;
   event->flags = EV_ADD | EV_CLEAR;
-
 }
 
-void IOEventWorker::setCoroutineEvent(CoroutineHandle* coroutine, int operation, p_char8 eventPtr) {
+void IOEventWorker::setCoroutineEvent(CoroutineHandle* coroutine, int operation, p_char8 eventPtr)
+{
 
   (void)operation;
   auto& action = getCoroutineScheduledAction(coroutine);
 
   switch(action.getType()) {
 
-    case Action::TYPE_IO_WAIT: break;
-    case Action::TYPE_IO_REPEAT: break;
+  case Action::TYPE_IO_WAIT:
+    break;
+  case Action::TYPE_IO_REPEAT:
+    break;
 
-    default:
-      throw std::runtime_error("[oatpp::async::worker::IOEventWorker::pushCoroutineToQueue()]: Error. Unknown Action.");
-
+  default:
+    throw std::runtime_error("[oatpp::async::worker::IOEventWorker::pushCoroutineToQueue()]: Error. Unknown Action.");
   }
 
-  struct kevent* event = (struct kevent*) eventPtr;
+  struct kevent* event = (struct kevent*)eventPtr;
   std::memset(event, 0, sizeof(struct kevent));
 
   event->ident = action.getIOHandle();
@@ -104,22 +109,22 @@ void IOEventWorker::setCoroutineEvent(CoroutineHandle* coroutine, int operation,
 
   switch(action.getIOEventType()) {
 
-    case Action::IOEventType::IO_EVENT_READ:
-      event->filter = EVFILT_READ;
-      break;
+  case Action::IOEventType::IO_EVENT_READ:
+    event->filter = EVFILT_READ;
+    break;
 
-    case Action::IOEventType::IO_EVENT_WRITE:
-      event->filter = EVFILT_WRITE;
-      break;
+  case Action::IOEventType::IO_EVENT_WRITE:
+    event->filter = EVFILT_WRITE;
+    break;
 
-    default:
-      throw std::runtime_error("[oatpp::async::worker::IOEventWorker::pushCoroutineToQueue()]: Error. Unknown Action Event Type.");
-
+  default:
+    throw std::runtime_error(
+     "[oatpp::async::worker::IOEventWorker::pushCoroutineToQueue()]: Error. Unknown Action Event Type.");
   }
-
 }
 
-void IOEventWorker::consumeBacklog() {
+void IOEventWorker::consumeBacklog()
+{
 
   std::lock_guard<oatpp::concurrency::SpinLock> lock(m_backlogLock);
 
@@ -129,21 +134,22 @@ void IOEventWorker::consumeBacklog() {
 
     m_inEventsCapacity = m_inEventsCount;
 
-    m_inEvents = std::unique_ptr<v_char8[]>(new (std::nothrow) v_char8[m_inEventsCapacity * sizeof(struct kevent)]);
+    m_inEvents = std::unique_ptr<v_char8 []>(new(std::nothrow) v_char8 [ m_inEventsCapacity * sizeof(struct kevent) ]);
     if(!m_inEvents) {
       OATPP_LOGE("[oatpp::async::worker::IOEventWorker::consumeBacklog()]",
-                 "Error. Unable to allocate %d bytes for events.", m_inEventsCapacity * sizeof(struct kevent));
-      throw std::runtime_error("[oatpp::async::worker::IOEventWorker::consumeBacklog()]: Error. Unable to allocate memory for events.");
+                 "Error. Unable to allocate %d bytes for events.",
+                 m_inEventsCapacity * sizeof(struct kevent));
+      throw std::runtime_error(
+       "[oatpp::async::worker::IOEventWorker::consumeBacklog()]: Error. Unable to allocate memory for events.");
     }
-
   }
 
-  setTriggerEvent(&m_inEvents[0]);
+  setTriggerEvent(&m_inEvents [ 0 ]);
 
   auto curr = m_backlog.first;
   v_int32 i = 1;
   while(curr != nullptr) {
-    setCoroutineEvent(curr, 0, &m_inEvents[i * sizeof(struct kevent)]);
+    setCoroutineEvent(curr, 0, &m_inEvents [ i * sizeof(struct kevent) ]);
     curr = nextCoroutine(curr);
     ++i;
   }
@@ -151,31 +157,41 @@ void IOEventWorker::consumeBacklog() {
   m_backlog.first = nullptr;
   m_backlog.last = nullptr;
   m_backlog.count = 0;
-
 }
 
-void IOEventWorker::waitEvents() {
+void IOEventWorker::waitEvents()
+{
 
-  auto eventsCount = kevent(m_eventQueueHandle, (struct kevent*)m_inEvents.get(), m_inEventsCount, (struct kevent*)m_outEvents.get(), MAX_EVENTS, NULL);
+  auto eventsCount = kevent(m_eventQueueHandle,
+                            (struct kevent*)m_inEvents.get(),
+                            m_inEventsCount,
+                            (struct kevent*)m_outEvents.get(),
+                            MAX_EVENTS,
+                            NULL);
 
   if((eventsCount < 0) && (errno != EINTR)) {
-    OATPP_LOGE("[oatpp::async::worker::IOEventWorker::waitEvents()]", "Error:\n"
+    OATPP_LOGE("[oatpp::async::worker::IOEventWorker::waitEvents()]",
+               "Error:\n"
                "errno=%d\n"
                "in-events=%d\n"
                "foreman=%d\n"
                "this=%d\n"
                "specialization=%d",
-               errno, m_inEventsCount, m_foreman, this, m_specialization);
+               errno,
+               m_inEventsCount,
+               m_foreman,
+               this,
+               m_specialization);
     throw std::runtime_error("[oatpp::async::worker::IOEventWorker::waitEvents()]: Error. Event loop failed.");
   }
 
   oatpp::collection::FastQueue<CoroutineHandle> repeatQueue;
   oatpp::collection::FastQueue<CoroutineHandle> popQueue;
 
-  for(v_int32 i = 0; i < eventsCount; i ++) {
+  for(v_int32 i = 0; i < eventsCount; i++) {
 
-    struct kevent* event = (struct kevent *)&m_outEvents[i * sizeof(struct kevent)];
-    auto coroutine = (CoroutineHandle*) event->udata;
+    struct kevent* event = (struct kevent*)&m_outEvents [ i * sizeof(struct kevent) ];
+    auto coroutine = (CoroutineHandle*)event->udata;
 
     if((event->flags & EV_ERROR) > 0) {
       OATPP_LOGD("Error", "data='%s'", strerror((int)event->data));
@@ -188,44 +204,41 @@ void IOEventWorker::waitEvents() {
 
       switch(action.getIOEventCode() | m_specialization) {
 
-        case Action::CODE_IO_WAIT_READ:
-          setCoroutineScheduledAction(coroutine, std::move(action));
-          repeatQueue.pushBack(coroutine);
-          break;
+      case Action::CODE_IO_WAIT_READ:
+        setCoroutineScheduledAction(coroutine, std::move(action));
+        repeatQueue.pushBack(coroutine);
+        break;
 
-        case Action::CODE_IO_WAIT_WRITE:
-          setCoroutineScheduledAction(coroutine, std::move(action));
-          repeatQueue.pushBack(coroutine);
-          break;
+      case Action::CODE_IO_WAIT_WRITE:
+        setCoroutineScheduledAction(coroutine, std::move(action));
+        repeatQueue.pushBack(coroutine);
+        break;
 
-        case Action::CODE_IO_REPEAT_READ:
-          setCoroutineScheduledAction(coroutine, std::move(action));
-          repeatQueue.pushBack(coroutine);
-          break;
+      case Action::CODE_IO_REPEAT_READ:
+        setCoroutineScheduledAction(coroutine, std::move(action));
+        repeatQueue.pushBack(coroutine);
+        break;
 
-        case Action::CODE_IO_REPEAT_WRITE:
-          setCoroutineScheduledAction(coroutine, std::move(action));
-          repeatQueue.pushBack(coroutine);
-          break;
+      case Action::CODE_IO_REPEAT_WRITE:
+        setCoroutineScheduledAction(coroutine, std::move(action));
+        repeatQueue.pushBack(coroutine);
+        break;
 
-        case Action::CODE_IO_WAIT_RESCHEDULE:
-          setCoroutineScheduledAction(coroutine, std::move(action));
-          popQueue.pushBack(coroutine);
-          break;
+      case Action::CODE_IO_WAIT_RESCHEDULE:
+        setCoroutineScheduledAction(coroutine, std::move(action));
+        popQueue.pushBack(coroutine);
+        break;
 
-        case Action::CODE_IO_REPEAT_RESCHEDULE:
-          setCoroutineScheduledAction(coroutine, std::move(action));
-          popQueue.pushBack(coroutine);
-          break;
+      case Action::CODE_IO_REPEAT_RESCHEDULE:
+        setCoroutineScheduledAction(coroutine, std::move(action));
+        popQueue.pushBack(coroutine);
+        break;
 
-        default:
-          setCoroutineScheduledAction(coroutine, std::move(action));
-          getCoroutineProcessor(coroutine)->pushOneTask(coroutine);
-
+      default:
+        setCoroutineScheduledAction(coroutine, std::move(action));
+        getCoroutineProcessor(coroutine)->pushOneTask(coroutine);
       }
-
     }
-
   }
 
   if(repeatQueue.count > 0) {
@@ -238,7 +251,6 @@ void IOEventWorker::waitEvents() {
   if(popQueue.count > 0) {
     m_foreman->pushTasks(popQueue);
   }
-
 }
 
 }}}

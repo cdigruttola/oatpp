@@ -29,59 +29,72 @@ namespace oatpp { namespace network { namespace virtual_ {
 Socket::Socket(const std::shared_ptr<Pipe>& pipeIn, const std::shared_ptr<Pipe>& pipeOut)
   : m_pipeIn(pipeIn)
   , m_pipeOut(pipeOut)
-{}
+{
+}
 
-Socket::~Socket() {
+Socket::~Socket()
+{
   close();
 }
 
-std::shared_ptr<Socket> Socket::createShared(const std::shared_ptr<Pipe>& pipeIn, const std::shared_ptr<Pipe>& pipeOut) {
+std::shared_ptr<Socket> Socket::createShared(const std::shared_ptr<Pipe>& pipeIn, const std::shared_ptr<Pipe>& pipeOut)
+{
   return std::make_shared<Socket>(pipeIn, pipeOut);
 }
 
-void Socket::setMaxAvailableToReadWrtie(v_io_size maxToRead, v_io_size maxToWrite) {
+void Socket::setMaxAvailableToReadWrtie(v_io_size maxToRead, v_io_size maxToWrite)
+{
   m_pipeIn->getReader()->setMaxAvailableToRead(maxToRead);
   m_pipeOut->getWriter()->setMaxAvailableToWrite(maxToWrite);
 }
-  
-v_io_size Socket::read(void *data, v_buff_size count, async::Action& action) {
+
+v_io_size Socket::read(void* data, v_buff_size count, async::Action& action)
+{
   return m_pipeIn->getReader()->read(data, count, action);
 }
 
-v_io_size Socket::write(const void *data, v_buff_size count, async::Action& action) {
+v_io_size Socket::write(const void* data, v_buff_size count, async::Action& action)
+{
   return m_pipeOut->getWriter()->write(data, count, action);
 }
 
-void Socket::setOutputStreamIOMode(oatpp::data::stream::IOMode ioMode) {
+void Socket::setOutputStreamIOMode(oatpp::data::stream::IOMode ioMode)
+{
   m_pipeOut->getWriter()->setOutputStreamIOMode(ioMode);
 }
 
-oatpp::data::stream::IOMode Socket::getOutputStreamIOMode() {
+oatpp::data::stream::IOMode Socket::getOutputStreamIOMode()
+{
   return m_pipeOut->getWriter()->getOutputStreamIOMode();
 }
 
-void Socket::setInputStreamIOMode(oatpp::data::stream::IOMode ioMode) {
+void Socket::setInputStreamIOMode(oatpp::data::stream::IOMode ioMode)
+{
   m_pipeIn->getReader()->setInputStreamIOMode(ioMode);
 }
 
-oatpp::data::stream::IOMode Socket::getInputStreamIOMode() {
+oatpp::data::stream::IOMode Socket::getInputStreamIOMode()
+{
   return m_pipeIn->getReader()->getInputStreamIOMode();
 }
 
-oatpp::data::stream::Context& Socket::getOutputStreamContext() {
+oatpp::data::stream::Context& Socket::getOutputStreamContext()
+{
   return m_pipeOut->getWriter()->getOutputStreamContext();
 }
 
 
-oatpp::data::stream::Context& Socket::getInputStreamContext() {
+oatpp::data::stream::Context& Socket::getInputStreamContext()
+{
   return m_pipeIn->getReader()->getInputStreamContext();
 }
 
-void Socket::close() {
+void Socket::close()
+{
   m_pipeIn->close();
   m_pipeOut->close();
   m_pipeIn.reset();
   m_pipeOut.reset();
 }
-  
+
 }}}

@@ -42,23 +42,20 @@ namespace oatpp { namespace network { namespace server {
  * Server calls &id:oatpp::network::ConnectionProvider::getConnection; in the loop and passes obtained Connection
  * to &id:oatpp::network::server::ConnectionHandler;.
  */
-class Server : public base::Countable {
+class Server: public base::Countable {
 private:
-
   void mainLoop();
-  
+
   bool setStatus(v_int32 expectedStatus, v_int32 newStatus);
   void setStatus(v_int32 status);
 
 private:
-  
   std::atomic<v_int32> m_status;
-  
+
   std::shared_ptr<ServerConnectionProvider> m_connectionProvider;
   std::shared_ptr<ConnectionHandler> m_connectionHandler;
-  
-public:
 
+public:
   /**
    * Constructor.
    * @param connectionProvider - &id:oatpp::network::ConnectionProvider;.
@@ -66,9 +63,8 @@ public:
    */
   Server(const std::shared_ptr<ServerConnectionProvider>& connectionProvider,
          const std::shared_ptr<ConnectionHandler>& connectionHandler);
-  
-public:
 
+public:
   /**
    * Status constant.
    */
@@ -96,7 +92,8 @@ public:
    * @return - `std::shared_ptr` to Server.
    */
   static std::shared_ptr<Server> createShared(const std::shared_ptr<ServerConnectionProvider>& connectionProvider,
-                                              const std::shared_ptr<ConnectionHandler>& connectionHandler){
+                                              const std::shared_ptr<ConnectionHandler>& connectionHandler)
+  {
     return std::make_shared<Server>(connectionProvider, connectionHandler);
   }
 
@@ -108,7 +105,8 @@ public:
 
   /**
    * Break server loop.
-   * Note: thread can still be blocked on the &l:Server::run (); call as it may be waiting for ConnectionProvider to provide connection.
+   * Note: thread can still be blocked on the &l:Server::run (); call as it may be waiting for ConnectionProvider to
+   * provide connection.
    */
   void stop();
 
@@ -123,10 +121,9 @@ public:
    * </ul>
    */
   v_int32 getStatus();
-  
 };
 
-  
+
 }}}
 
 #endif /* network_server_Server_hpp */

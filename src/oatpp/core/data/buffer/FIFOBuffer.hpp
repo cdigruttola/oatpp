@@ -25,10 +25,10 @@
 #ifndef oatpp_data_buffer_FIFOBuffer_hpp
 #define oatpp_data_buffer_FIFOBuffer_hpp
 
-#include "oatpp/core/data/stream/Stream.hpp"
 #include "oatpp/core/IODefinitions.hpp"
 #include "oatpp/core/async/Coroutine.hpp"
 #include "oatpp/core/concurrency/SpinLock.hpp"
+#include "oatpp/core/data/stream/Stream.hpp"
 
 namespace oatpp { namespace data { namespace buffer {
 
@@ -43,27 +43,31 @@ private:
   v_buff_size m_readPosition;
   v_buff_size m_writePosition;
   bool m_canRead;
-public:
 
+public:
   /**
    * Constructor.
    * @param buffer - pointer to buffer used for reads/writes.
    * @param bufferSize - buffer size.
    * @param readPosition - initial read position in buffer.
    * @param writePosition - initial write position in buffer.
-   * @param canRead - flag to resolve ambiguity when readPosition == writePosition. If(readPosition == writePosition && canRead) then
-   * &l:FIFOBuffer::availableToRead (); returns buffer size, and &l:FIFOBuffer::availableToWrite (); returns 0.
+   * @param canRead - flag to resolve ambiguity when readPosition == writePosition. If(readPosition == writePosition &&
+   * canRead) then &l:FIFOBuffer::availableToRead (); returns buffer size, and &l:FIFOBuffer::availableToWrite ();
+   * returns 0.
    */
-  FIFOBuffer(void* buffer, v_buff_size bufferSize,
-             v_buff_size readPosition = 0, v_buff_size writePosition = 0,
+  FIFOBuffer(void* buffer,
+             v_buff_size bufferSize,
+             v_buff_size readPosition = 0,
+             v_buff_size writePosition = 0,
              bool canRead = false);
 
   /**
    * Set read and write positions in buffer.
    * @param readPosition - read position in buffer.
    * @param writePosition - write position in buffer.
-   * @param canRead - flag to resolve ambiguity when readPosition == writePosition. If(readPosition == writePosition && canRead) then
-   * &l:FIFOBuffer::availableToRead (); returns buffer size, and &l:FIFOBuffer::availableToWrite (); returns 0.
+   * @param canRead - flag to resolve ambiguity when readPosition == writePosition. If(readPosition == writePosition &&
+   * canRead) then &l:FIFOBuffer::availableToRead (); returns buffer size, and &l:FIFOBuffer::availableToWrite ();
+   * returns 0.
    */
   void setBufferPosition(v_buff_size readPosition, v_buff_size writePosition, bool canRead);
 
@@ -91,7 +95,7 @@ public:
    * @param count
    * @return [1..count], IOErrors.
    */
-  v_io_size read(void *data, v_buff_size count);
+  v_io_size read(void* data, v_buff_size count);
 
   /**
    * Peek up to count of bytes int he buffer
@@ -99,7 +103,7 @@ public:
    * @param count
    * @return [1..count], IOErrors.
    */
-  v_io_size peek(void *data, v_buff_size count);
+  v_io_size peek(void* data, v_buff_size count);
 
   /**
    * Commit read offset
@@ -114,7 +118,7 @@ public:
    * @param count
    * @return [1..count], IOErrors.
    */
-  v_io_size write(const void *data, v_buff_size count);
+  v_io_size write(const void* data, v_buff_size count);
 
   /**
    * call read and then write bytes read to output stream
@@ -147,8 +151,6 @@ public:
    * @return - &id:async::CoroutineStarter;.
    */
   async::CoroutineStarter flushToStreamAsync(const std::shared_ptr<data::stream::OutputStream>& stream);
-
-  
 };
 
 /**
@@ -158,27 +160,31 @@ class SynchronizedFIFOBuffer {
 private:
   FIFOBuffer m_fifo;
   oatpp::concurrency::SpinLock m_lock;
-public:
 
+public:
   /**
    * Constructor.
    * @param buffer - pointer to buffer used for reads/writes.
    * @param bufferSize - buffer size.
    * @param readPosition - initial read position in buffer.
    * @param writePosition - initial write position in buffer.
-   * @param canRead - flag to resolve ambiguity when readPosition == writePosition. If(readPosition == writePosition && canRead) then
-   * &l:SynchronizedFIFOBuffer::availableToRead (); returns buffer size, and &l:SynchronizedFIFOBuffer::availableToWrite (); returns 0.
+   * @param canRead - flag to resolve ambiguity when readPosition == writePosition. If(readPosition == writePosition &&
+   * canRead) then &l:SynchronizedFIFOBuffer::availableToRead (); returns buffer size, and
+   * &l:SynchronizedFIFOBuffer::availableToWrite (); returns 0.
    */
-  SynchronizedFIFOBuffer(void* buffer, v_buff_size bufferSize,
-                         v_buff_size readPosition = 0, v_buff_size writePosition = 0,
+  SynchronizedFIFOBuffer(void* buffer,
+                         v_buff_size bufferSize,
+                         v_buff_size readPosition = 0,
+                         v_buff_size writePosition = 0,
                          bool canRead = false);
 
   /**
    * Set read and write positions in buffer.
    * @param readPosition - read position in buffer.
    * @param writePosition - write position in buffer.
-   * @param canRead - flag to resolve ambiguity when readPosition == writePosition. If(readPosition == writePosition && canRead) then
-   * &l:SynchronizedFIFOBuffer::availableToRead (); returns buffer size, and &l:SynchronizedFIFOBuffer::availableToWrite (); returns 0.
+   * @param canRead - flag to resolve ambiguity when readPosition == writePosition. If(readPosition == writePosition &&
+   * canRead) then &l:SynchronizedFIFOBuffer::availableToRead (); returns buffer size, and
+   * &l:SynchronizedFIFOBuffer::availableToWrite (); returns 0.
    */
   void setBufferPosition(v_buff_size readPosition, v_buff_size writePosition, bool canRead);
 
@@ -200,7 +206,7 @@ public:
    * @param count
    * @return [1..count], IOErrors.
    */
-  v_io_size read(void *data, v_buff_size count);
+  v_io_size read(void* data, v_buff_size count);
 
   /**
    * write up to count bytes from data to buffer
@@ -208,13 +214,12 @@ public:
    * @param count
    * @return [1..count], IOErrors.
    */
-  v_io_size write(const void *data, v_buff_size count);
+  v_io_size write(const void* data, v_buff_size count);
 
   /* No implementation of other methods */
   /* User should implement his own synchronization for other methods */
-
 };
-  
+
 }}}
 
 #endif /* FIFOBuffer_hpp */

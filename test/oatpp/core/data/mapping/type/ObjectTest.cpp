@@ -24,28 +24,29 @@
 
 #include "ObjectTest.hpp"
 
-#include "oatpp/core/macro/codegen.hpp"
 #include "oatpp/core/Types.hpp"
+#include "oatpp/core/macro/codegen.hpp"
 
 #include "oatpp-test/Checker.hpp"
 
 #include <thread>
 
-namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace  type {
+namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace type {
 
 namespace {
 
 #include OATPP_CODEGEN_BEGIN(DTO)
 
-class Dto0 : public oatpp::DTO {
+class Dto0: public oatpp::DTO {
   DTO_INIT(Dto0, DTO)
 };
 
-class DtoA : public oatpp::DTO {
+class DtoA: public oatpp::DTO {
 
   DTO_INIT(DtoA, DTO)
 
-  DTO_FIELD_INFO(id) {
+  DTO_FIELD_INFO(id)
+  {
     info->description = "identifier";
   }
   DTO_FIELD(String, id) = "Some default id";
@@ -53,25 +54,24 @@ class DtoA : public oatpp::DTO {
   DTO_HC_EQ(id)
 
 public:
-
   DtoA(const String& pId)
     : id(pId)
-  {}
-
+  {
+  }
 };
 
-class DtoB : public DtoA {
+class DtoB: public DtoA {
 
   DTO_INIT(DtoB, DtoA)
 
-  DTO_FIELD_INFO(a) {
+  DTO_FIELD_INFO(a)
+  {
     info->description = "some field with a qualified name";
   }
   DTO_FIELD(String, a, "field-a") = "default-value";
-
 };
 
-class DtoC : public DtoA {
+class DtoC: public DtoA {
 
   DTO_INIT(DtoC, DtoA)
 
@@ -80,33 +80,34 @@ class DtoC : public DtoA {
   DTO_FIELD(String, c);
 
   DTO_HC_EQ(a, b, c);
-
 };
 
 #include OATPP_CODEGEN_END(DTO)
 
-void runDtoInitializations() {
-  for(v_int32 i = 0; i < 1000; i ++) {
+void runDtoInitializations()
+{
+  for(v_int32 i = 0; i < 1000; i++) {
     auto dto = DtoB::createShared();
   }
 }
 
-void runDtoInitializetionsInThreads() {
+void runDtoInitializetionsInThreads()
+{
 
   std::list<std::thread> threads;
   for(v_int32 i = 0; i < 500; i++) {
     threads.push_back(std::thread(runDtoInitializations));
   }
 
-  for(auto& t : threads) {
+  for(auto& t: threads) {
     t.join();
   }
-
 }
 
 }
 
-void ObjectTest::onRun() {
+void ObjectTest::onRun()
+{
 
   {
     oatpp::test::PerformanceChecker timer("DTO - Initializations.");
@@ -180,7 +181,7 @@ void ObjectTest::onRun() {
     OATPP_ASSERT(a != b);
     OATPP_ASSERT(b != a);
     auto ohc = a->hashCode();
-    auto whc = std::hash<oatpp::Object<DtoA>>{}(a);
+    auto whc = std::hash<oatpp::Object<DtoA>> {}(a);
     OATPP_ASSERT(ohc == whc);
     OATPP_LOGI(TAG, "OK");
   }
@@ -288,14 +289,13 @@ void ObjectTest::onRun() {
     oatpp::UnorderedSet<oatpp::Object<DtoB>> set = {a, b, c, d, e};
 
     OATPP_ASSERT(set->size() == 2);
-    OATPP_ASSERT(set[a] == true);
-    OATPP_ASSERT(set[b] == true);
-    OATPP_ASSERT(set[c] == true);
-    OATPP_ASSERT(set[d] == true);
-    OATPP_ASSERT(set[e] == true);
+    OATPP_ASSERT(set [ a ] == true);
+    OATPP_ASSERT(set [ b ] == true);
+    OATPP_ASSERT(set [ c ] == true);
+    OATPP_ASSERT(set [ d ] == true);
+    OATPP_ASSERT(set [ e ] == true);
     OATPP_LOGI(TAG, "OK");
   }
-
 }
 
 }}}}}}

@@ -24,21 +24,21 @@
 
 #include "./SimpleTCPConnectionProvider.hpp"
 
-#include "oatpp/network/Connection.hpp"
 #include "oatpp/core/data/stream/ChunkedBuffer.hpp"
 #include "oatpp/core/utils/ConversionUtils.hpp"
+#include "oatpp/network/Connection.hpp"
 
 #include <fcntl.h>
 
 #if defined(WIN32) || defined(_WIN32)
-  #include <io.h>
-  #include <WinSock2.h>
-  #include <WS2tcpip.h>
+#include <WS2tcpip.h>
+#include <WinSock2.h>
+#include <io.h>
 #else
-  #include <netdb.h>
-  #include <arpa/inet.h>
-  #include <sys/socket.h>
-  #include <unistd.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #endif
 
 namespace oatpp { namespace network { namespace client {
@@ -51,7 +51,8 @@ SimpleTCPConnectionProvider::SimpleTCPConnectionProvider(const oatpp::String& ho
   setProperty(PROPERTY_PORT, oatpp::utils::conversion::int32ToStr(port));
 }
 
-std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getConnection(){
+std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getConnection()
+{
 
   auto portStr = oatpp::utils::conversion::int32ToStr(m_port);
 
@@ -66,16 +67,18 @@ std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getC
   struct addrinfo* result;
   auto res = getaddrinfo(m_host->c_str(), portStr->c_str(), &hints, &result);
 
-  if (res != 0) {
-    throw std::runtime_error("[oatpp::network::client::SimpleTCPConnectionProvider::getConnection()]. Error. Call to getaddrinfo() faild.");
+  if(res != 0) {
+    throw std::runtime_error(
+     "[oatpp::network::client::SimpleTCPConnectionProvider::getConnection()]. Error. Call to getaddrinfo() faild.");
   }
 
-  if (result == nullptr) {
-    throw std::runtime_error("[oatpp::network::client::SimpleTCPConnectionProvider::getConnection()]. Error. Call to getaddrinfo() returned no results.");
+  if(result == nullptr) {
+    throw std::runtime_error("[oatpp::network::client::SimpleTCPConnectionProvider::getConnection()]. Error. Call to "
+                             "getaddrinfo() returned no results.");
   }
 
   struct addrinfo* currResult = result;
-  oatpp::v_io_handle clientHandle =- 1;
+  oatpp::v_io_handle clientHandle = -1;
 
   while(currResult != nullptr) {
 
@@ -87,63 +90,70 @@ std::shared_ptr<oatpp::data::stream::IOStream> SimpleTCPConnectionProvider::getC
         break;
       } else {
 #if defined(WIN32) || defined(_WIN32)
-		    ::closesocket(clientHandle);
+        ::closesocket(clientHandle);
 #else
         ::close(clientHandle);
 #endif
       }
-
     }
 
     currResult = currResult->ai_next;
-
   }
 
   freeaddrinfo(result);
 
   if(currResult == nullptr) {
-    throw std::runtime_error("[oatpp::network::client::SimpleTCPConnectionProvider::getConnection()]: Error. Can't connect.");
+    throw std::runtime_error(
+     "[oatpp::network::client::SimpleTCPConnectionProvider::getConnection()]: Error. Can't connect.");
   }
 
 #ifdef SO_NOSIGPIPE
   int yes = 1;
   v_int32 ret = setsockopt(clientHandle, SOL_SOCKET, SO_NOSIGPIPE, &yes, sizeof(int));
   if(ret < 0) {
-    OATPP_LOGD("[oatpp::network::client::SimpleTCPConnectionProvider::getConnection()]", "Warning. Failed to set %s for socket", "SO_NOSIGPIPE");
+    OATPP_LOGD("[oatpp::network::client::SimpleTCPConnectionProvider::getConnection()]",
+               "Warning. Failed to set %s for socket",
+               "SO_NOSIGPIPE");
   }
 #endif
 
   return std::make_shared<oatpp::network::Connection>(clientHandle);
-
 }
 
-oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::stream::IOStream>&> SimpleTCPConnectionProvider::getConnectionAsync() {
+oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::stream::IOStream>&>
+ SimpleTCPConnectionProvider::getConnectionAsync()
+{
 
-  class ConnectCoroutine : public oatpp::async::CoroutineWithResult<ConnectCoroutine, const std::shared_ptr<oatpp::data::stream::IOStream>&> {
+  class ConnectCoroutine
+    : public oatpp::async::CoroutineWithResult<ConnectCoroutine, const std::shared_ptr<oatpp::data::stream::IOStream>&> {
   private:
     oatpp::String m_host;
     v_int32 m_port;
     oatpp::v_io_handle m_clientHandle;
+
   private:
     struct addrinfo* m_result;
     struct addrinfo* m_currentResult;
     bool m_isHandleOpened;
-  public:
 
+  public:
     ConnectCoroutine(const oatpp::String& host, v_int32 port)
       : m_host(host)
       , m_port(port)
       , m_result(nullptr)
       , m_isHandleOpened(false)
-    {}
+    {
+    }
 
-    ~ConnectCoroutine() {
+    ~ConnectCoroutine()
+    {
       if(m_result != nullptr) {
         freeaddrinfo(m_result);
       }
     }
 
-    Action act() override {
+    Action act() override
+    {
       auto portStr = oatpp::utils::conversion::int32ToStr(m_port);
 
       struct addrinfo hints;
@@ -156,23 +166,23 @@ oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::strea
 
       // TODO make call to get addrinfo non-blocking !!!
       auto res = getaddrinfo(m_host->c_str(), portStr->c_str(), &hints, &m_result);
-      if (res != 0) {
-        return error<async::Error>(
-          "[oatpp::network::client::SimpleTCPConnectionProvider::getConnectionAsync()]. Error. Call to getaddrinfo() faild.");
+      if(res != 0) {
+        return error<async::Error>("[oatpp::network::client::SimpleTCPConnectionProvider::getConnectionAsync()]. Error. "
+                                   "Call to getaddrinfo() faild.");
       }
 
       m_currentResult = m_result;
 
-      if (m_result == nullptr) {
-        return error<async::Error>(
-          "[oatpp::network::client::SimpleTCPConnectionProvider::getConnectionAsync()]. Error. Call to getaddrinfo() returned no results.");
+      if(m_result == nullptr) {
+        return error<async::Error>("[oatpp::network::client::SimpleTCPConnectionProvider::getConnectionAsync()]. Error. "
+                                   "Call to getaddrinfo() returned no results.");
       }
 
       return yieldTo(&ConnectCoroutine::iterateAddrInfoResults);
-
     }
 
-    Action iterateAddrInfoResults() {
+    Action iterateAddrInfoResults()
+    {
 
       /*
        * Close previously opened socket here.
@@ -185,7 +195,6 @@ oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::strea
 #else
         ::close(m_clientHandle);
 #endif
-
       }
 
       if(m_currentResult != nullptr) {
@@ -193,14 +202,14 @@ oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::strea
         m_clientHandle = socket(m_currentResult->ai_family, m_currentResult->ai_socktype, m_currentResult->ai_protocol);
 
 #if defined(WIN32) || defined(_WIN32)
-        if (m_clientHandle == INVALID_SOCKET) {
+        if(m_clientHandle == INVALID_SOCKET) {
           m_currentResult = m_currentResult->ai_next;
           return repeat();
         }
         u_long flags = 1;
         ioctlsocket(m_clientHandle, FIONBIO, &flags);
 #else
-        if (m_clientHandle < 0) {
+        if(m_clientHandle < 0) {
           m_currentResult = m_currentResult->ai_next;
           return repeat();
         }
@@ -211,20 +220,22 @@ oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::strea
         int yes = 1;
         v_int32 ret = setsockopt(m_clientHandle, SOL_SOCKET, SO_NOSIGPIPE, &yes, sizeof(int));
         if(ret < 0) {
-          OATPP_LOGD("[oatpp::network::client::SimpleTCPConnectionProvider::getConnectionAsync()]", "Warning. Failed to set %s for socket", "SO_NOSIGPIPE");
+          OATPP_LOGD("[oatpp::network::client::SimpleTCPConnectionProvider::getConnectionAsync()]",
+                     "Warning. Failed to set %s for socket",
+                     "SO_NOSIGPIPE");
         }
 #endif
 
         m_isHandleOpened = true;
         return yieldTo(&ConnectCoroutine::doConnect);
-
       }
 
-      return error<Error>("[oatpp::network::client::SimpleTCPConnectionProvider::getConnectionAsync()]: Error. Can't connect.");
-
+      return error<Error>(
+       "[oatpp::network::client::SimpleTCPConnectionProvider::getConnectionAsync()]: Error. Can't connect.");
     }
 
-    Action doConnect() {
+    Action doConnect()
+    {
       errno = 0;
 
       auto res = connect(m_clientHandle, m_currentResult->ai_addr, (int)m_currentResult->ai_addrlen);
@@ -257,16 +268,14 @@ oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::data::strea
 
       m_currentResult = m_currentResult->ai_next;
       return yieldTo(&ConnectCoroutine::iterateAddrInfoResults);
-
     }
-
   };
 
   return ConnectCoroutine::startForResult(m_host, m_port);
-
 }
 
-void SimpleTCPConnectionProvider::invalidateConnection(const std::shared_ptr<IOStream>& connection) {
+void SimpleTCPConnectionProvider::invalidateConnection(const std::shared_ptr<IOStream>& connection)
+{
 
   /************************************************
    * WARNING!!!
@@ -288,7 +297,6 @@ void SimpleTCPConnectionProvider::invalidateConnection(const std::shared_ptr<IOS
 #else
   shutdown(handle, SHUT_RDWR);
 #endif
-
 }
 
 }}}

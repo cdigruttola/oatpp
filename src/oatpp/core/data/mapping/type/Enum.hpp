@@ -72,34 +72,32 @@ enum class EnumInterpreterError : v_int32 {
 
 namespace __class {
 
-  /**
-   * Abstract Enum class.
-   */
-  class AbstractEnum {
+/**
+ * Abstract Enum class.
+ */
+class AbstractEnum {
+public:
+  static const ClassId CLASS_ID;
+
+public:
+  class AbstractPolymorphicDispatcher {
   public:
-    static const ClassId CLASS_ID;
-  public:
+    AbstractPolymorphicDispatcher(bool pNotNull)
+      : notNull(pNotNull)
+    {
+    }
 
-    class AbstractPolymorphicDispatcher {
-    public:
+    const bool notNull;
 
-      AbstractPolymorphicDispatcher(bool pNotNull)
-        : notNull(pNotNull)
-      {}
-
-      const bool notNull;
-
-      virtual type::Void toInterpretation(const type::Void& enumValue, EnumInterpreterError& error) const = 0;
-      virtual type::Void fromInterpretation(const type::Void& interValue, EnumInterpreterError& error) const = 0;
-      virtual type::Type* getInterpretationType() const = 0;
-      virtual std::vector<type::Any> getInterpretedEnum() const = 0;
-
-    };
-
+    virtual type::Void toInterpretation(const type::Void& enumValue, EnumInterpreterError& error) const = 0;
+    virtual type::Void fromInterpretation(const type::Void& interValue, EnumInterpreterError& error) const = 0;
+    virtual type::Type* getInterpretationType() const = 0;
+    virtual std::vector<type::Any> getInterpretedEnum() const = 0;
   };
+};
 
-  template<class T, class Interpreter>
-  class Enum;
+template<class T, class Interpreter>
+class Enum;
 
 }
 
@@ -124,7 +122,7 @@ struct EnumValueInfo {
    * &id:oatpp::data::share::StringKeyLabel;.
    */
   const data::share::StringKeyLabel name;
-  
+
   /**
    * Description of the enum etry. <br>
    * &id:oatpp::data::share::StringKeyLabel;.
@@ -155,8 +153,10 @@ class EnumMeta {
 
 public:
   typedef T EnumType;
+
 protected:
-  static EnumInfo<T>* getInfo() {
+  static EnumInfo<T>* getInfo()
+  {
     static EnumInfo<T> info;
     return &info;
   }
@@ -164,18 +164,21 @@ protected:
 
 /**
  * Enum interpreter `AsString`
- * @tparam T 
- * @tparam notnull 
+ * @tparam T
+ * @tparam notnull
  */
 template<class T, bool notnull>
 class EnumInterpreterAsString {
 public:
   typedef String UnderlyingTypeObjectWrapper;
+
 public:
-  template <bool N>
+  template<bool N>
   using InterpreterType = EnumInterpreterAsString<T, N>;
+
 public:
   constexpr static bool notNull = notnull;
+
 public:
   static Void toInterpretation(const Void& enumValue, EnumInterpreterError& error);
   static Void fromInterpretation(const Void& interValue, EnumInterpreterError& error);
@@ -184,20 +187,24 @@ public:
 
 /**
  * Enum interpreter `AsNumber`
- * @tparam T 
- * @tparam notnull 
+ * @tparam T
+ * @tparam notnull
  */
 template<class T, bool notnull>
 class EnumInterpreterAsNumber {
 private:
   typedef typename std::underlying_type<T>::type EnumUnderlyingType;
+
 public:
   typedef typename ObjectWrapperByUnderlyingType<EnumUnderlyingType>::ObjectWrapper UnderlyingTypeObjectWrapper;
+
 public:
-  template <bool N>
+  template<bool N>
   using InterpreterType = EnumInterpreterAsNumber<T, N>;
+
 public:
   constexpr static bool notNull = notnull;
+
 public:
   static Void toInterpretation(const Void& enumValue, EnumInterpreterError& error);
   static Void fromInterpretation(const Void& interValue, EnumInterpreterError& error);
@@ -210,9 +217,10 @@ public:
  * @tparam EnumInterpreter - enum interpreter.
  */
 template<class T, class EnumInterpreter>
-class EnumObjectWrapper : public ObjectWrapper<T, __class::Enum<T, EnumInterpreter>>{
+class EnumObjectWrapper: public ObjectWrapper<T, __class::Enum<T, EnumInterpreter>> {
   template<class Type, class Interpreter>
   friend class EnumObjectWrapper;
+
 public:
   typedef typename std::underlying_type<T>::type UnderlyingEnumType;
   typedef T Z__EnumType;
@@ -222,6 +230,7 @@ public:
    * Template parameter - `Interpreter`.
    */
   typedef EnumInterpreter Interpreter;
+
 public:
   /**
    * Enum interpreted `AsString`.
@@ -237,21 +246,26 @@ public:
    * Enum with `NotNull` interpretation constraint.
    */
   typedef EnumObjectWrapper<T, typename EnumInterpreter::template InterpreterType<true>> NotNull;
-public:
 
+public:
   EnumObjectWrapper(const std::shared_ptr<T>& ptr, const type::Type* const valueType)
     : type::ObjectWrapper<T, EnumObjectClass>(ptr, valueType)
-  {}
+  {
+  }
 
   /**
    * Default constructor.
    */
-  EnumObjectWrapper() {}
+  EnumObjectWrapper()
+  {
+  }
 
   /**
    * Nullptr constructor.
    */
-  EnumObjectWrapper(std::nullptr_t) {}
+  EnumObjectWrapper(std::nullptr_t)
+  {
+  }
 
   /**
    * Constructor.
@@ -259,7 +273,8 @@ public:
    */
   EnumObjectWrapper(const std::shared_ptr<T>& ptr)
     : type::ObjectWrapper<T, EnumObjectClass>(ptr)
-  {}
+  {
+  }
 
   /**
    * Constructor.
@@ -267,7 +282,8 @@ public:
    */
   EnumObjectWrapper(std::shared_ptr<T>&& ptr)
     : type::ObjectWrapper<T, EnumObjectClass>(std::forward<std::shared_ptr<T>>(ptr))
-  {}
+  {
+  }
 
   /**
    * Copy-constructor.
@@ -277,7 +293,8 @@ public:
   template<class OtherInter>
   EnumObjectWrapper(const EnumObjectWrapper<T, OtherInter>& other)
     : type::ObjectWrapper<T, EnumObjectClass>(other.getPtr())
-  {}
+  {
+  }
 
   /**
    * Move-constructor.
@@ -287,106 +304,113 @@ public:
   template<class OtherInter>
   EnumObjectWrapper(EnumObjectWrapper<T, OtherInter>&& other)
     : type::ObjectWrapper<T, EnumObjectClass>(std::move(other.getPtr()))
-  {}
+  {
+  }
 
-  inline EnumObjectWrapper& operator = (std::nullptr_t) {
+  inline EnumObjectWrapper& operator=(std::nullptr_t)
+  {
     this->m_ptr.reset();
     return *this;
   }
 
   template<class OtherInter>
-  inline EnumObjectWrapper& operator = (const EnumObjectWrapper<T, OtherInter>& other) {
+  inline EnumObjectWrapper& operator=(const EnumObjectWrapper<T, OtherInter>& other)
+  {
     this->m_ptr = other.m_ptr;
     return *this;
   }
 
   template<class OtherInter>
-  inline EnumObjectWrapper& operator = (EnumObjectWrapper<T, OtherInter>&& other) {
+  inline EnumObjectWrapper& operator=(EnumObjectWrapper<T, OtherInter>&& other)
+  {
     this->m_ptr = std::forward<std::shared_ptr<T>>(other.m_ptr);
     return *this;
   }
 
 public:
-
   /**
    * Constructor by value.
    * @param value
    */
   EnumObjectWrapper(T value)
     : type::ObjectWrapper<T, EnumObjectClass>(std::make_shared<T>(value))
-  {}
+  {
+  }
 
-  EnumObjectWrapper& operator = (T value) {
+  EnumObjectWrapper& operator=(T value)
+  {
     this->m_ptr = std::make_shared<T>(value);
     return *this;
   }
 
-  T operator*() const {
+  T operator*() const
+  {
     return this->m_ptr.operator*();
   }
 
-  template<typename TP,
-    typename enabled = typename std::enable_if<std::is_same<TP, std::nullptr_t>::value, void>::type
-  >
-  inline bool operator == (TP){
+  template<typename TP, typename enabled = typename std::enable_if<std::is_same<TP, std::nullptr_t>::value, void>::type>
+  inline bool operator==(TP)
+  {
     return this->m_ptr.get() == nullptr;
   }
 
-  template<typename TP,
-    typename enabled = typename std::enable_if<std::is_same<TP, std::nullptr_t>::value, void>::type
-  >
-  inline bool operator != (TP){
+  template<typename TP, typename enabled = typename std::enable_if<std::is_same<TP, std::nullptr_t>::value, void>::type>
+  inline bool operator!=(TP)
+  {
     return this->m_ptr.get() != nullptr;
   }
 
-  template<typename TP,
-    typename enabled = typename std::enable_if<std::is_same<TP, T>::value, void>::type
-  >
-  inline bool operator == (TP value) const {
-    if(!this->m_ptr) return false;
+  template<typename TP, typename enabled = typename std::enable_if<std::is_same<TP, T>::value, void>::type>
+  inline bool operator==(TP value) const
+  {
+    if(!this->m_ptr)
+      return false;
     return *this->m_ptr == value;
   }
 
-  template<typename TP,
-    typename enabled = typename std::enable_if<std::is_same<TP, T>::value, void>::type
-  >
-  inline bool operator != (TP value) const {
-    if(!this->m_ptr) return true;
+  template<typename TP, typename enabled = typename std::enable_if<std::is_same<TP, T>::value, void>::type>
+  inline bool operator!=(TP value) const
+  {
+    if(!this->m_ptr)
+      return true;
     return *this->m_ptr != value;
   }
 
-  template<typename TP,
-    typename enabled = typename std::enable_if<std::is_same<typename TP::Z__EnumType, Z__EnumType>::value, void>::type
-  >
-  inline bool operator == (const TP &other) const {
-    if(this->m_ptr.get() == other.m_ptr.get()) return true;
-    if(!this->m_ptr || !other.m_ptr) return false;
+  template<
+   typename TP,
+   typename enabled = typename std::enable_if<std::is_same<typename TP::Z__EnumType, Z__EnumType>::value, void>::type>
+  inline bool operator==(const TP& other) const
+  {
+    if(this->m_ptr.get() == other.m_ptr.get())
+      return true;
+    if(!this->m_ptr || !other.m_ptr)
+      return false;
     return *this->m_ptr == *other.m_ptr;
   }
 
-  template<typename TP,
-    typename enabled = typename std::enable_if<std::is_same<typename TP::Z__EnumType, Z__EnumType>::value, void>::type
-  >
-  inline bool operator != (const TP &other) const {
-    return !operator == (other);
+  template<
+   typename TP,
+   typename enabled = typename std::enable_if<std::is_same<typename TP::Z__EnumType, Z__EnumType>::value, void>::type>
+  inline bool operator!=(const TP& other) const
+  {
+    return !operator==(other);
   }
 
-  template<typename TP,
-    typename enabled = typename std::enable_if<std::is_same<TP, T>::value, void>::type
-  >
-  inline operator TP() const {
+  template<typename TP, typename enabled = typename std::enable_if<std::is_same<TP, T>::value, void>::type>
+  inline operator TP() const
+  {
     return *this->m_ptr;
   }
 
 public:
-
   /**
    * Get &l:EnumValueInfo <T>; by name.
    * @param name - name or name-qualifier of the enum entry.
    * @return - &l:EnumValueInfo <T>;.
    * @throws - `std::runtime_error` if not found.
    */
-  static const EnumValueInfo<T>& getEntryByName(const String& name) {
+  static const EnumValueInfo<T>& getEntryByName(const String& name)
+  {
     auto it = EnumMeta<T>::getInfo()->byName.find(name);
     if(it != EnumMeta<T>::getInfo()->byName.end()) {
       return it->second;
@@ -400,7 +424,8 @@ public:
    * @return - &l:EnumValueInfo <T>;.
    * @throws - `std::runtime_error` if not found.
    */
-  static const EnumValueInfo<T>& getEntryByValue(T value) {
+  static const EnumValueInfo<T>& getEntryByValue(T value)
+  {
     auto it = EnumMeta<T>::getInfo()->byValue.find(static_cast<v_uint64>(value));
     if(it != EnumMeta<T>::getInfo()->byValue.end()) {
       return it->second;
@@ -414,7 +439,8 @@ public:
    * @return - &l:EnumValueInfo <T>;.
    * @throws - `std::runtime_error` if not found.
    */
-  static const EnumValueInfo<T>& getEntryByUnderlyingValue(UnderlyingEnumType value) {
+  static const EnumValueInfo<T>& getEntryByUnderlyingValue(UnderlyingEnumType value)
+  {
     auto it = EnumMeta<T>::getInfo()->byValue.find(static_cast<v_uint64>(value));
     if(it != EnumMeta<T>::getInfo()->byValue.end()) {
       return it->second;
@@ -428,9 +454,10 @@ public:
    * @return - &l:EnumValueInfo <T>;.
    * @throws - `std::runtime_error` if not found.
    */
-  static const EnumValueInfo<T>& getEntryByIndex(v_int32 index) {
+  static const EnumValueInfo<T>& getEntryByIndex(v_int32 index)
+  {
     if(index >= 0 && index < EnumMeta<T>::getInfo()->byIndex.size()) {
-      return EnumMeta<T>::getInfo()->byIndex[index];
+      return EnumMeta<T>::getInfo()->byIndex [ index ];
     }
     throw std::runtime_error("[oatpp::data::mapping::type::Enum::getEntryByIndex()]: Error. Entry not found.");
   }
@@ -439,20 +466,21 @@ public:
    * Get `std::vector` of &l:EnumValueInfo <T>;.
    * @return - `std::vector` of &l:EnumValueInfo <T>;.
    */
-  static const std::vector<EnumValueInfo<T>>& getEntries() {
+  static const std::vector<EnumValueInfo<T>>& getEntries()
+  {
     return EnumMeta<T>::getInfo()->byIndex;
   }
-
 };
 
 /**
  * Mapping-enabled Enum. See &l:EnumObjectWrapper;.
  */
-template <class T>
+template<class T>
 using Enum = EnumObjectWrapper<T, EnumInterpreterAsString<T, false>>;
 
 template<class T, bool notnull>
-Void EnumInterpreterAsString<T, notnull>::toInterpretation(const Void& enumValue, EnumInterpreterError& error) {
+Void EnumInterpreterAsString<T, notnull>::toInterpretation(const Void& enumValue, EnumInterpreterError& error)
+{
   typedef EnumObjectWrapper<T, EnumInterpreterAsString<T, notnull>> EnumOW;
 
   if(enumValue.valueType != EnumOW::Class::getType()) {
@@ -474,7 +502,8 @@ Void EnumInterpreterAsString<T, notnull>::toInterpretation(const Void& enumValue
 }
 
 template<class T, bool notnull>
-Void EnumInterpreterAsString<T, notnull>::fromInterpretation(const Void& interValue, EnumInterpreterError& error) {
+Void EnumInterpreterAsString<T, notnull>::fromInterpretation(const Void& interValue, EnumInterpreterError& error)
+{
   typedef EnumObjectWrapper<T, EnumInterpreterAsString<T, notnull>> EnumOW;
 
   if(interValue.valueType != String::Class::getType()) {
@@ -491,21 +520,23 @@ Void EnumInterpreterAsString<T, notnull>::fromInterpretation(const Void& interVa
   }
 
   try {
-    const auto &entry = EnumOW::getEntryByName(interValue.staticCast<String>());
+    const auto& entry = EnumOW::getEntryByName(interValue.staticCast<String>());
     return EnumOW(entry.value);
-  } catch (const std::runtime_error& e) { // TODO - add a specific error for this.
+  } catch(const std::runtime_error& e) { // TODO - add a specific error for this.
     error = EnumInterpreterError::ENTRY_NOT_FOUND;
   }
   return Void(nullptr, EnumOW::Class::getType());
 }
 
 template<class T, bool notnull>
-Type* EnumInterpreterAsString<T, notnull>::getInterpretationType() {
+Type* EnumInterpreterAsString<T, notnull>::getInterpretationType()
+{
   return String::Class::getType();
 }
 
 template<class T, bool notnull>
-Void EnumInterpreterAsNumber<T, notnull>::toInterpretation(const Void& enumValue, EnumInterpreterError& error) {
+Void EnumInterpreterAsNumber<T, notnull>::toInterpretation(const Void& enumValue, EnumInterpreterError& error)
+{
 
   typedef EnumObjectWrapper<T, EnumInterpreterAsNumber<T, notnull>> EnumOW;
   typedef typename std::underlying_type<T>::type EnumUT;
@@ -526,11 +557,11 @@ Void EnumInterpreterAsNumber<T, notnull>::toInterpretation(const Void& enumValue
 
   const auto& ow = enumValue.staticCast<EnumOW>();
   return UTOW(static_cast<EnumUT>(*ow));
-
 }
 
 template<class T, bool notnull>
-Void EnumInterpreterAsNumber<T, notnull>::fromInterpretation(const Void& interValue, EnumInterpreterError& error) {
+Void EnumInterpreterAsNumber<T, notnull>::fromInterpretation(const Void& interValue, EnumInterpreterError& error)
+{
   typedef EnumObjectWrapper<T, EnumInterpreterAsNumber<T, notnull>> EnumOW;
 
   typedef typename std::underlying_type<T>::type EnumUT;
@@ -549,86 +580,92 @@ Void EnumInterpreterAsNumber<T, notnull>::fromInterpretation(const Void& interVa
     return Void(nullptr, EnumOW::Class::getType());
   }
 
-  try{
-    const auto& entry = EnumOW::getEntryByUnderlyingValue(
-      interValue.staticCast<OW>()
-    );
+  try {
+    const auto& entry = EnumOW::getEntryByUnderlyingValue(interValue.staticCast<OW>());
     return EnumOW(entry.value);
-  } catch (const std::runtime_error& e) { // TODO - add a specific error for this.
+  } catch(const std::runtime_error& e) { // TODO - add a specific error for this.
     error = EnumInterpreterError::ENTRY_NOT_FOUND;
   }
   return Void(nullptr, EnumOW::Class::getType());
 }
 
 template<class T, bool notnull>
-Type* EnumInterpreterAsNumber<T, notnull>::getInterpretationType() {
+Type* EnumInterpreterAsNumber<T, notnull>::getInterpretationType()
+{
   typedef typename std::underlying_type<T>::type EnumUT;
   return ObjectWrapperByUnderlyingType<EnumUT>::ObjectWrapper::Class::getType();
 }
 
 namespace __class {
 
-  template<class T, class Interpreter>
-  class Enum : public AbstractEnum {
-  private:
-
-    class PolymorphicDispatcher : public AbstractPolymorphicDispatcher {
-    public:
-      PolymorphicDispatcher()
-        : AbstractPolymorphicDispatcher(Interpreter::notNull)
-      {}
-
-      type::Void toInterpretation(const type::Void& enumValue, EnumInterpreterError& error) const override {
-        return Interpreter::toInterpretation(enumValue, error);
-      }
-
-      type::Void fromInterpretation(const type::Void& interValue, EnumInterpreterError& error) const override {
-        return Interpreter::fromInterpretation(interValue, error);
-      }
-
-      type::Type* getInterpretationType() const override {
-        return Interpreter::getInterpretationType();
-      }
-
-      std::vector<type::Any> getInterpretedEnum() const override {
-
-        typedef type::EnumObjectWrapper<T, Interpreter> EnumOW;
-
-        std::vector<type::Any> result({});
-
-        for(const auto& e : EnumOW::getEntries()) {
-          type::EnumInterpreterError error = type::EnumInterpreterError::OK;
-          result.push_back(type::Any(toInterpretation(EnumOW(e.value), error)));
-          if(error != type::EnumInterpreterError::OK) {
-            throw std::runtime_error("[oatpp::data::mapping::type::__class::Enum<T, Interpreter>::getInterpretedEnum()]: Unknown error.");
-          }
-        }
-
-        return result;
-
-      }
-
-    };
-
-  private:
-
-    static type::Void creator() {
-      return type::Void(std::make_shared<T>(), getType());
-    }
-
-    static Type createType() {
-      Type type(__class::AbstractEnum::CLASS_ID, type::EnumMeta<T>::getInfo()->nameQualifier, &creator, nullptr, new PolymorphicDispatcher());
-      return type;
-    }
-
+template<class T, class Interpreter>
+class Enum: public AbstractEnum {
+private:
+  class PolymorphicDispatcher: public AbstractPolymorphicDispatcher {
   public:
-
-    static Type* getType() {
-      static Type type = createType();
-      return &type;
+    PolymorphicDispatcher()
+      : AbstractPolymorphicDispatcher(Interpreter::notNull)
+    {
     }
 
+    type::Void toInterpretation(const type::Void& enumValue, EnumInterpreterError& error) const override
+    {
+      return Interpreter::toInterpretation(enumValue, error);
+    }
+
+    type::Void fromInterpretation(const type::Void& interValue, EnumInterpreterError& error) const override
+    {
+      return Interpreter::fromInterpretation(interValue, error);
+    }
+
+    type::Type* getInterpretationType() const override
+    {
+      return Interpreter::getInterpretationType();
+    }
+
+    std::vector<type::Any> getInterpretedEnum() const override
+    {
+
+      typedef type::EnumObjectWrapper<T, Interpreter> EnumOW;
+
+      std::vector<type::Any> result({});
+
+      for(const auto& e: EnumOW::getEntries()) {
+        type::EnumInterpreterError error = type::EnumInterpreterError::OK;
+        result.push_back(type::Any(toInterpretation(EnumOW(e.value), error)));
+        if(error != type::EnumInterpreterError::OK) {
+          throw std::runtime_error(
+           "[oatpp::data::mapping::type::__class::Enum<T, Interpreter>::getInterpretedEnum()]: Unknown error.");
+        }
+      }
+
+      return result;
+    }
   };
+
+private:
+  static type::Void creator()
+  {
+    return type::Void(std::make_shared<T>(), getType());
+  }
+
+  static Type createType()
+  {
+    Type type(__class::AbstractEnum::CLASS_ID,
+              type::EnumMeta<T>::getInfo()->nameQualifier,
+              &creator,
+              nullptr,
+              new PolymorphicDispatcher());
+    return type;
+  }
+
+public:
+  static Type* getType()
+  {
+    static Type type = createType();
+    return &type;
+  }
+};
 
 }
 
@@ -636,18 +673,19 @@ namespace __class {
 
 namespace std {
 
-  template<class T, class I>
-  struct hash <oatpp::data::mapping::type::EnumObjectWrapper<T, I>> {
+template<class T, class I>
+struct hash<oatpp::data::mapping::type::EnumObjectWrapper<T, I>> {
 
-    typedef oatpp::data::mapping::type::EnumObjectWrapper<T, I> argument_type;
-    typedef v_uint64 result_type;
+  typedef oatpp::data::mapping::type::EnumObjectWrapper<T, I> argument_type;
+  typedef v_uint64 result_type;
 
-    result_type operator()(argument_type const &e) const noexcept {
-      if (e.get() == nullptr) return 0;
-      return static_cast<v_uint64>(*e);
-    }
-
-  };
+  result_type operator()(argument_type const& e) const noexcept
+  {
+    if(e.get() == nullptr)
+      return 0;
+    return static_cast<v_uint64>(*e);
+  }
+};
 
 }
 

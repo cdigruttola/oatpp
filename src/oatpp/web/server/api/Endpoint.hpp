@@ -27,9 +27,9 @@
 
 #include "oatpp/web/server/HttpRequestHandler.hpp"
 
+#include <functional>
 #include <list>
 #include <unordered_map>
-#include <functional>
 
 namespace oatpp { namespace web { namespace server { namespace api {
 
@@ -37,26 +37,24 @@ namespace oatpp { namespace web { namespace server { namespace api {
  * Endpoint - class which holds information about endpoint.
  * It holds API documentation info, and pointer to RequestHandler
  */
-class Endpoint : public oatpp::base::Countable {
+class Endpoint: public oatpp::base::Countable {
 public:
-
   /**
    * Convenience typedef for &id:oatpp::web::server::HttpRequestHandler;.
    */
   typedef oatpp::web::server::HttpRequestHandler RequestHandler;
-public:
 
+public:
   /**
    * Info holds API documentation information about endpoint
    */
-  class Info : public oatpp::base::Countable {
+  class Info: public oatpp::base::Countable {
   public:
-
     /**
      * Param holds info about parameter
      */
     struct Param {
-      
+
       Param();
       Param(const oatpp::String& pName, oatpp::data::mapping::type::Type* pType);
 
@@ -67,7 +65,6 @@ public:
       oatpp::Boolean required = true;
       oatpp::Boolean deprecated = false;
       oatpp::Boolean allowEmptyValue;
-      
     };
 
     /**
@@ -77,8 +74,8 @@ public:
     private:
       std::list<oatpp::String> m_order;
       std::unordered_map<oatpp::String, Param> m_params;
-    public:
 
+    public:
       const std::list<oatpp::String>& getOrder() const;
 
       /**
@@ -95,7 +92,8 @@ public:
        * @return new or existing parameter
        */
       template<class T>
-      Param& add(const oatpp::String& name) {
+      Param& add(const oatpp::String& name)
+      {
         return add(name, T::Class::getType());
       }
 
@@ -104,8 +102,7 @@ public:
        * @param name
        * @return
        */
-      Param& operator [](const oatpp::String& name);
-
+      Param& operator[](const oatpp::String& name);
     };
 
     /**
@@ -116,9 +113,8 @@ public:
       oatpp::data::mapping::type::Type* schema;
       oatpp::String description;
     };
-    
-  public:
 
+  public:
     /**
      * Constructor;
      */
@@ -204,13 +200,13 @@ public:
      * Query params.
      */
     Params queryParams;
-    
+
     /**
      *  ResponseCode to {ContentType, Type} mapping.
      *  Example responses[Status::CODE_200] = {"application/json", MyDto::ObjectWrapper::Class::getType()};
      */
     std::unordered_map<oatpp::web::protocol::http::Status, ResponseHints> responses;
-    
+
     oatpp::String toString();
 
     /**
@@ -219,7 +215,8 @@ public:
      * @param contentType
      */
     template<class Wrapper>
-    void addConsumes(const oatpp::String& contentType) {
+    void addConsumes(const oatpp::String& contentType)
+    {
       consumes.push_back({contentType, Wrapper::Class::getType()});
     }
 
@@ -231,8 +228,13 @@ public:
      * @param responseDescription
      */
     template<class Wrapper>
-    void addResponse(const oatpp::web::protocol::http::Status& status, const oatpp::String& contentType, const oatpp::String& responseDescription = oatpp::String()) {
-      responses[status] = {contentType, Wrapper::Class::getType(), responseDescription.get() == nullptr ? status.description : responseDescription};
+    void addResponse(const oatpp::web::protocol::http::Status& status,
+                     const oatpp::String& contentType,
+                     const oatpp::String& responseDescription = oatpp::String())
+    {
+      responses [ status ] = {contentType,
+                              Wrapper::Class::getType(),
+                              responseDescription.get() == nullptr ? status.description : responseDescription};
     }
 
     /**
@@ -240,26 +242,29 @@ public:
      * @param requirement
      * @param scopes
      */
-    void addSecurityRequirement(const oatpp::String &requirement, const std::shared_ptr<std::list<oatpp::String>> &scopes = nullptr) {
-      securityRequirements[requirement] = scopes;
+    void addSecurityRequirement(const oatpp::String& requirement,
+                                const std::shared_ptr<std::list<oatpp::String>>& scopes = nullptr)
+    {
+      securityRequirements [ requirement ] = scopes;
     }
 
     /**
      * Add tag.
      * @param tag
      */
-    void addTag(const oatpp::String& tag) {
+    void addTag(const oatpp::String& tag)
+    {
       tags.push_back(tag);
     }
-
   };
-public:
 
-  Endpoint(const std::shared_ptr<RequestHandler>& pHandler, const std::function<std::shared_ptr<Endpoint::Info>()>& infoBuilder);
-  
+public:
+  Endpoint(const std::shared_ptr<RequestHandler>& pHandler,
+           const std::function<std::shared_ptr<Endpoint::Info>()>& infoBuilder);
+
   static std::shared_ptr<Endpoint> createShared(const std::shared_ptr<RequestHandler>& handler,
                                                 const std::function<std::shared_ptr<Endpoint::Info>()>& infoBuilder);
-  
+
   const std::shared_ptr<RequestHandler> handler;
 
   std::shared_ptr<Info> info();
@@ -267,9 +272,8 @@ public:
 private:
   std::shared_ptr<Info> m_info;
   std::function<std::shared_ptr<Endpoint::Info>()> m_infoBuilder;
-  
 };
-  
+
 }}}}
 
 #endif /* oatpp_web_server_rest_Endpoint_hpp */

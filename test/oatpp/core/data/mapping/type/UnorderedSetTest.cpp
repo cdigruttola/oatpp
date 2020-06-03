@@ -26,9 +26,10 @@
 
 #include "oatpp/core/Types.hpp"
 
-namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace  type {
+namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace type {
 
-void UnorderedSetTest::onRun() {
+void UnorderedSetTest::onRun()
+{
 
 
   {
@@ -98,8 +99,8 @@ void UnorderedSetTest::onRun() {
     OATPP_ASSERT(set1->size() == 1);
     OATPP_ASSERT(set2->size() == 2);
 
-    OATPP_ASSERT(set2["b"] == true);
-    OATPP_ASSERT(set2["c"] == true);
+    OATPP_ASSERT(set2 [ "b" ] == true);
+    OATPP_ASSERT(set2 [ "c" ] == true);
 
     OATPP_LOGI(TAG, "OK");
   }
@@ -120,9 +121,9 @@ void UnorderedSetTest::onRun() {
     OATPP_LOGI(TAG, "test polymorphicDispatcher...");
     oatpp::UnorderedSet<oatpp::String> set = {"a", "b", "c"};
 
-    auto polymorphicDispatcher = static_cast<const typename oatpp::UnorderedSet<oatpp::String>::Class::AbstractPolymorphicDispatcher*>(
-      set.valueType->polymorphicDispatcher
-    );
+    auto polymorphicDispatcher =
+     static_cast<const typename oatpp::UnorderedSet<oatpp::String>::Class::AbstractPolymorphicDispatcher*>(
+      set.valueType->polymorphicDispatcher);
 
     polymorphicDispatcher->addPolymorphicItem(set, oatpp::String("a"));
     polymorphicDispatcher->addPolymorphicItem(set, oatpp::String("b"));
@@ -132,13 +133,12 @@ void UnorderedSetTest::onRun() {
 
     OATPP_ASSERT(set->size() == 4);
 
-    OATPP_ASSERT(set["a"]);
-    OATPP_ASSERT(set["b"]);
-    OATPP_ASSERT(set["c"]);
-    OATPP_ASSERT(set["d"]);
+    OATPP_ASSERT(set [ "a" ]);
+    OATPP_ASSERT(set [ "b" ]);
+    OATPP_ASSERT(set [ "c" ]);
+    OATPP_ASSERT(set [ "d" ]);
     OATPP_LOGI(TAG, "OK");
   }
-
 }
 
 }}}}}}

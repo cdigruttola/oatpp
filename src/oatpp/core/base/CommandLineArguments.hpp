@@ -34,13 +34,11 @@ namespace oatpp { namespace base {
  */
 class CommandLineArguments {
 public:
-
   /**
    * Command Line arguments parser.
    */
   class Parser {
   public:
-
     /**
      * Check the specified argument is present among command line arguments.
      * @param argc - count of arguments in argv array.
@@ -48,8 +46,8 @@ public:
      * @param argName - name of the target argument.
      * @return - `true` if `getArgumentIndex(argName) >= 0`
      */
-    static bool hasArgument(int argc, const char * argv[], const char* argName);
-    
+    static bool hasArgument(int argc, const char* argv [], const char* argName);
+
     /**
      * get index of the argument with the name == argName
      */
@@ -61,7 +59,7 @@ public:
      * @param argName - name of the target argument.
      * @return - index of the argument in argv[] array. -1 if there is no such argument.
      */
-    static v_int32 getArgumentIndex(int argc, const char * argv[], const char* argName);
+    static v_int32 getArgumentIndex(int argc, const char* argv [], const char* argName);
 
     /**
      * Get argument which starts with the prefix. <br>
@@ -74,7 +72,10 @@ public:
      * @param defaultValue - default value to return in case not found.
      * @return - argument which starts with the specified prefix.
      */
-    static const char* getArgumentStartingWith(int argc, const char * argv[], const char* argNamePrefix, const char* defaultValue = nullptr);
+    static const char* getArgumentStartingWith(int argc,
+                                               const char* argv [],
+                                               const char* argNamePrefix,
+                                               const char* defaultValue = nullptr);
 
     /**
      * Get value preceded by the argument. <br>
@@ -87,15 +88,17 @@ public:
      * @param defaultValue - default value to return in case not found.
      * @return - value preceded by the argument.
      */
-    static const char* getNamedArgumentValue(int argc, const char * argv[], const char* argName, const char* defaultValue = nullptr);
-    
+    static const char* getNamedArgumentValue(int argc,
+                                             const char* argv [],
+                                             const char* argName,
+                                             const char* defaultValue = nullptr);
   };
-  
+
 private:
   int m_argc;
-  const char ** m_argv;
-public:
+  const char** m_argv;
 
+public:
   /**
    * Default constructor.
    */
@@ -106,14 +109,15 @@ public:
    * @param argc - count of arguments in argv[] array.
    * @param argv - array of arguments.
    */
-  CommandLineArguments(int argc, const char * argv[]);
+  CommandLineArguments(int argc, const char* argv []);
 
   /**
    * Check the specified argument is present.
    * @param argName - name of the target argument.
    * @return - `true` if present.
    */
-  bool hasArgument(const char* argName) const {
+  bool hasArgument(const char* argName) const
+  {
     return Parser::hasArgument(m_argc, m_argv, argName);
   }
 
@@ -122,7 +126,8 @@ public:
    * @param argName - name of the target argument.
    * @return - index of the argument in argv[] array. -1 if there is no such argument.
    */
-  v_int32 getArgumentIndex(const char* argName) const {
+  v_int32 getArgumentIndex(const char* argName) const
+  {
     return Parser::getArgumentIndex(m_argc, m_argv, argName);
   }
 
@@ -135,7 +140,8 @@ public:
    * @param defaultValue - default value to return in case not found.
    * @return - argument which starts with the specified prefix. defaultValue if not found.
    */
-  const char* getArgumentStartingWith(const char* argNamePrefix, const char* defaultValue = nullptr) const {
+  const char* getArgumentStartingWith(const char* argNamePrefix, const char* defaultValue = nullptr) const
+  {
     return Parser::getArgumentStartingWith(m_argc, m_argv, argNamePrefix, defaultValue);
   }
 
@@ -148,12 +154,12 @@ public:
    * @param defaultValue - default value to return in case not found.
    * @return - value preceded by the argument. defaultValue if not found.
    */
-  const char* getNamedArgumentValue(const char* argName, const char* defaultValue = nullptr) const {
+  const char* getNamedArgumentValue(const char* argName, const char* defaultValue = nullptr) const
+  {
     return Parser::getNamedArgumentValue(m_argc, m_argv, argName, defaultValue);
   }
-  
 };
-  
+
 }}
 
 #endif /* oatpp_base_CommandLineArguments_hpp */

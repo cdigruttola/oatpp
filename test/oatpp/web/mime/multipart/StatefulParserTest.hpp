@@ -29,12 +29,13 @@
 
 namespace oatpp { namespace test { namespace web { namespace mime { namespace multipart {
 
-class StatefulParserTest : public UnitTest {
+class StatefulParserTest: public UnitTest {
 public:
-
-  StatefulParserTest():UnitTest("TEST[web::mime::multipart::StatefulParserTest]"){}
+  StatefulParserTest()
+    : UnitTest("TEST[web::mime::multipart::StatefulParserTest]")
+  {
+  }
   void onRun() override;
-
 };
 
 }}}}}

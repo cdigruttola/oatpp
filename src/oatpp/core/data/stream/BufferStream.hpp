@@ -27,22 +27,23 @@
 
 #include "Stream.hpp"
 
-namespace oatpp { namespace data{ namespace stream {
+namespace oatpp { namespace data { namespace stream {
 
 /**
  * BufferOutputStream
  */
-class BufferOutputStream : public ConsistentOutputStream {
+class BufferOutputStream: public ConsistentOutputStream {
 public:
   static data::stream::DefaultInitializedContext DEFAULT_CONTEXT;
+
 private:
   p_char8 m_data;
   v_buff_size m_capacity;
   v_buff_size m_position;
   v_buff_size m_growBytes;
   IOMode m_ioMode;
-public:
 
+public:
   /**
    * Constructor.
    * @param growBytes
@@ -62,7 +63,7 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual number of bytes written. &id:oatpp::v_io_size;.
    */
-  v_io_size write(const void *data, v_buff_size count, async::Action& action) override;
+  v_io_size write(const void* data, v_buff_size count, async::Action& action) override;
 
   /**
    * Set stream I/O mode.
@@ -139,24 +140,25 @@ public:
    * @param stream - stream to flush all data to.
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  static oatpp::async::CoroutineStarter flushToStreamAsync(const std::shared_ptr<BufferOutputStream>& _this, const std::shared_ptr<OutputStream>& stream);
-
+  static oatpp::async::CoroutineStarter flushToStreamAsync(const std::shared_ptr<BufferOutputStream>& _this,
+                                                           const std::shared_ptr<OutputStream>& stream);
 };
 
 /**
  * BufferInputStream
  */
-class BufferInputStream : public InputStream {
+class BufferInputStream: public InputStream {
 public:
   static data::stream::DefaultInitializedContext DEFAULT_CONTEXT;
+
 private:
   std::shared_ptr<base::StrBuffer> m_memoryHandle;
   p_char8 m_data;
   v_buff_size m_size;
   v_buff_size m_position;
   IOMode m_ioMode;
-public:
 
+public:
   /**
    * Constructor.
    * @param memoryHandle - buffer memory handle. May be nullptr.
@@ -195,7 +197,7 @@ public:
    * caller MUST return this action on coroutine iteration.
    * @return - actual number of bytes read. 0 - designates end of the buffer.
    */
-  v_io_size read(void *data, v_buff_size count, async::Action& action) override;
+  v_io_size read(void* data, v_buff_size count, async::Action& action) override;
 
   /**
    * Set stream I/O mode.
@@ -244,8 +246,6 @@ public:
    * @param position - data read position.
    */
   void setCurrentPosition(v_buff_size position);
-
-
 };
 
 }}}

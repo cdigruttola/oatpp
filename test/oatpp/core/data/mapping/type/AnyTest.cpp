@@ -26,36 +26,36 @@
 
 #include "oatpp/core/data/mapping/type/Any.hpp"
 
-#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 #include "oatpp/core/macro/codegen.hpp"
+#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 
-namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace  type {
+namespace oatpp { namespace test { namespace core { namespace data { namespace mapping { namespace type {
 
 namespace {
 
 #include OATPP_CODEGEN_BEGIN(DTO)
 
-class Dto1 : public oatpp::DTO {
+class Dto1: public oatpp::DTO {
   DTO_INIT(Dto1, DTO);
 };
 
-class Dto2 : public oatpp::DTO {
+class Dto2: public oatpp::DTO {
   DTO_INIT(Dto2, DTO);
 };
 
-class Test : public oatpp::DTO {
+class Test: public oatpp::DTO {
 
   DTO_INIT(Test, DTO);
 
   DTO_FIELD(oatpp::Any, any);
-
 };
 
 #include OATPP_CODEGEN_END(DTO)
 
 }
 
-void AnyTest::onRun() {
+void AnyTest::onRun()
+{
 
   {
     OATPP_LOGI(TAG, "Test default constructor...");
@@ -116,7 +116,7 @@ void AnyTest::onRun() {
 
     try {
       auto obj = any.retrieve<oatpp::Object<Dto2>>(); // wrong object
-    } catch (std::runtime_error& e) {
+    } catch(std::runtime_error& e) {
       wasError = true;
     }
 
@@ -177,7 +177,6 @@ void AnyTest::onRun() {
     OATPP_ASSERT(str2 == "Hello!");
     OATPP_LOGI(TAG, "OK");
   }
-
 }
 
 }}}}}}

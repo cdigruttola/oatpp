@@ -34,27 +34,24 @@ namespace oatpp { namespace encoding {
  */
 class Base64 {
 public:
-
   /**
    * DecodingError.
    */
-  class DecodingError : public std::runtime_error {
+  class DecodingError: public std::runtime_error {
   public:
-
     /**
      * Constructor.
      * @param message - error message.
      */
     DecodingError(const char* message)
-      :std::runtime_error(message)
-    {}
-    
+      : std::runtime_error(message)
+    {
+    }
   };
-  
+
 private:
-  
   static v_char8 getAlphabetCharIndex(v_char8 a, const char* auxiliaryChars);
-  
+
 public:
   /**
    * Standard base64 Alphabet - `['A'-'Z', 'a'-'z', '0'-'9', '+', '/', '=']`.
@@ -73,7 +70,7 @@ public:
    * Alphabet is array of 65 chars. 64 chars encoding chars, and 65th padding char.<br>
    */
   static const char* const ALPHABET_BASE64_URL_SAFE;
-  
+
   /**
    * Standard base64 Alphabet auxiliary chars ['+', '/', '='].
    * alphabet auxiliary chars - last 3 chars of alphabet including padding char.
@@ -100,7 +97,8 @@ public:
   static v_buff_size calcEncodedStringSize(v_buff_size size);
 
   /**
-   * Calculate size of decoding result. this method assumes that data passed as a param consists of standard base64 set of chars
+   * Calculate size of decoding result. this method assumes that data passed as a param consists of standard base64 set
+   * of chars
    * `['A'-'Z', 'a'-'z', '0'-'9']` and three configurable auxiliary chars.
    * @param data - pointer to data.
    * @param size - size of the data.
@@ -108,7 +106,10 @@ public:
    * @param auxiliaryChars - configurable auxiliary chars.
    * @return - size of decoded data. If data passed is not a base64 string then -1 is returned.
    */
-  static v_buff_size calcDecodedStringSize(const char* data, v_buff_size size, v_buff_size& base64StrLength, const char* auxiliaryChars = ALPHABET_BASE64_AUXILIARY_CHARS);
+  static v_buff_size calcDecodedStringSize(const char* data,
+                                           v_buff_size size,
+                                           v_buff_size& base64StrLength,
+                                           const char* auxiliaryChars = ALPHABET_BASE64_AUXILIARY_CHARS);
 
   /**
    * Check if data is a valid base64 encoded string.
@@ -117,7 +118,9 @@ public:
    * @param auxiliaryChars - configurable auxiliary chars.
    * @return `(calcDecodedStringSize(data, size, base64StrLength, auxiliaryChars) >= 0)`.
    */
-  static bool isBase64String(const char* data, v_buff_size size, const char* auxiliaryChars = ALPHABET_BASE64_AUXILIARY_CHARS);
+  static bool isBase64String(const char* data,
+                             v_buff_size size,
+                             const char* auxiliaryChars = ALPHABET_BASE64_AUXILIARY_CHARS);
 
   /**
    * Encode data as base64 string.
@@ -145,8 +148,10 @@ public:
    * @return - decoded data as &id:oatpp::String;.
    * @throws - &l:Base64::DecodingError;
    */
-  static oatpp::String decode(const char* data, v_buff_size size, const char* auxiliaryChars = ALPHABET_BASE64_AUXILIARY_CHARS);
-  
+  static oatpp::String decode(const char* data,
+                              v_buff_size size,
+                              const char* auxiliaryChars = ALPHABET_BASE64_AUXILIARY_CHARS);
+
   /**
    * Decode base64 encoded data. This method assumes that data passed as a param consists of standard base64 set of chars
    * `['A'-'Z', 'a'-'z', '0'-'9']` and three configurable auxiliary chars.
@@ -156,9 +161,8 @@ public:
    * @throws - &l:Base64::DecodingError;
    */
   static oatpp::String decode(const oatpp::String& data, const char* auxiliaryChars = ALPHABET_BASE64_AUXILIARY_CHARS);
-  
 };
-  
+
 }}
 
 #endif /* oatpp_encoding_Base64_hpp */

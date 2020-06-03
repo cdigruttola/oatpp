@@ -36,57 +36,72 @@ Response::Response(v_int32 statusCode,
   , m_headers(headers)
   , m_bodyStream(bodyStream)
   , m_bodyDecoder(bodyDecoder)
-{}
+{
+}
 
 std::shared_ptr<Response> Response::createShared(v_int32 statusCode,
                                                  const oatpp::String& statusDescription,
                                                  const http::Headers& headers,
                                                  const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
-                                                 const std::shared_ptr<const http::incoming::BodyDecoder>& bodyDecoder) {
+                                                 const std::shared_ptr<const http::incoming::BodyDecoder>& bodyDecoder)
+{
   return Shared_Incoming_Response_Pool::allocateShared(statusCode, statusDescription, headers, bodyStream, bodyDecoder);
 }
 
-v_int32 Response::getStatusCode() const {
+v_int32 Response::getStatusCode() const
+{
   return m_statusCode;
 }
 
-oatpp::String Response::getStatusDescription() const {
+oatpp::String Response::getStatusDescription() const
+{
   return m_statusDescription;
 }
 
-const http::Headers& Response::getHeaders() const {
+const http::Headers& Response::getHeaders() const
+{
   return m_headers;
 }
 
-oatpp::String Response::getHeader(const oatpp::data::share::StringKeyLabelCI_FAST& headerName) const{
+oatpp::String Response::getHeader(const oatpp::data::share::StringKeyLabelCI_FAST& headerName) const
+{
   return m_headers.get(headerName);
 }
 
-std::shared_ptr<oatpp::data::stream::InputStream> Response::getBodyStream() const {
+std::shared_ptr<oatpp::data::stream::InputStream> Response::getBodyStream() const
+{
   return m_bodyStream;
 }
 
-std::shared_ptr<const http::incoming::BodyDecoder> Response::getBodyDecoder() const {
+std::shared_ptr<const http::incoming::BodyDecoder> Response::getBodyDecoder() const
+{
   return m_bodyDecoder;
 }
 
-void Response::transferBody(data::stream::WriteCallback* writeCallback) const {
+void Response::transferBody(data::stream::WriteCallback* writeCallback) const
+{
   m_bodyDecoder->decode(m_headers, m_bodyStream.get(), writeCallback);
 }
 
-void Response::transferBodyToStream(oatpp::data::stream::OutputStream* toStream) const {
+void Response::transferBodyToStream(oatpp::data::stream::OutputStream* toStream) const
+{
   m_bodyDecoder->decode(m_headers, m_bodyStream.get(), toStream);
 }
 
-oatpp::String Response::readBodyToString() const {
+oatpp::String Response::readBodyToString() const
+{
   return m_bodyDecoder->decodeToString(m_headers, m_bodyStream.get());
 }
 
-async::CoroutineStarter Response::transferBodyAsync(const std::shared_ptr<data::stream::WriteCallback>& writeCallback) const {
+async::CoroutineStarter Response::transferBodyAsync(
+ const std::shared_ptr<data::stream::WriteCallback>& writeCallback) const
+{
   return m_bodyDecoder->decodeAsync(m_headers, m_bodyStream, writeCallback);
 }
 
-oatpp::async::CoroutineStarter Response::transferBodyToStreamAsync(const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const {
+oatpp::async::CoroutineStarter Response::transferBodyToStreamAsync(
+ const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const
+{
   return m_bodyDecoder->decodeAsync(m_headers, m_bodyStream, toStream);
 }
 

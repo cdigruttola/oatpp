@@ -31,12 +31,12 @@
 
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 
-#include "oatpp/network/server/SimpleTCPConnectionProvider.hpp"
 #include "oatpp/network/client/SimpleTCPConnectionProvider.hpp"
+#include "oatpp/network/server/SimpleTCPConnectionProvider.hpp"
 
+#include "oatpp/network/virtual_/Interface.hpp"
 #include "oatpp/network/virtual_/client/ConnectionProvider.hpp"
 #include "oatpp/network/virtual_/server/ConnectionProvider.hpp"
-#include "oatpp/network/virtual_/Interface.hpp"
 
 #include "oatpp/core/data/stream/BufferStream.hpp"
 #include "oatpp/core/macro/component.hpp"
@@ -50,83 +50,73 @@ namespace {
 class TestComponent {
 private:
   v_int32 m_port;
-public:
 
+public:
   TestComponent(v_int32 port)
     : m_port(port)
-  {}
+  {
+  }
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::async::Executor>, executor)([] {
-    return std::make_shared<oatpp::async::Executor>(1, 1, 1);
-  }());
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::async::Executor>, executor)
+  ([] { return std::make_shared<oatpp::async::Executor>(1, 1, 1); }());
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::virtual_::Interface>, virtualInterface)([] {
-    return oatpp::network::virtual_::Interface::obtainShared("virtualhost");
-  }());
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::virtual_::Interface>, virtualInterface)
+  ([] { return oatpp::network::virtual_::Interface::obtainShared("virtualhost"); }());
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ServerConnectionProvider>, serverConnectionProvider)([this] {
-
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ServerConnectionProvider>, serverConnectionProvider)
+  ([ this ] {
     if(m_port == 0) { // Use oatpp virtual interface
       OATPP_COMPONENT(std::shared_ptr<oatpp::network::virtual_::Interface>, interface);
       return std::static_pointer_cast<oatpp::network::ServerConnectionProvider>(
-        oatpp::network::virtual_::server::ConnectionProvider::createShared(interface)
-      );
+       oatpp::network::virtual_::server::ConnectionProvider::createShared(interface));
     }
 
     return std::static_pointer_cast<oatpp::network::ServerConnectionProvider>(
-      oatpp::network::server::SimpleTCPConnectionProvider::createShared(m_port)
-    );
-
+     oatpp::network::server::SimpleTCPConnectionProvider::createShared(m_port));
   }());
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, httpRouter)([] {
-    return oatpp::web::server::HttpRouter::createShared();
-  }());
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, httpRouter)
+  ([] { return oatpp::web::server::HttpRouter::createShared(); }());
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::server::ConnectionHandler>, serverConnectionHandler)([] {
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::server::ConnectionHandler>, serverConnectionHandler)
+  ([] {
     OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
     OATPP_COMPONENT(std::shared_ptr<oatpp::async::Executor>, executor);
     return oatpp::web::server::AsyncHttpConnectionHandler::createShared(router, executor);
   }());
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, objectMapper)([] {
-    return oatpp::parser::json::mapping::ObjectMapper::createShared();
-  }());
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, objectMapper)
+  ([] { return oatpp::parser::json::mapping::ObjectMapper::createShared(); }());
 
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ClientConnectionProvider>, clientConnectionProvider)([this] {
-
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ClientConnectionProvider>, clientConnectionProvider)
+  ([ this ] {
     if(m_port == 0) {
       OATPP_COMPONENT(std::shared_ptr<oatpp::network::virtual_::Interface>, interface);
       return std::static_pointer_cast<oatpp::network::ClientConnectionProvider>(
-        oatpp::network::virtual_::client::ConnectionProvider::createShared(interface)
-      );
+       oatpp::network::virtual_::client::ConnectionProvider::createShared(interface));
     }
 
     return std::static_pointer_cast<oatpp::network::ClientConnectionProvider>(
-      oatpp::network::client::SimpleTCPConnectionProvider::createShared("127.0.0.1", m_port)
-    );
-
+     oatpp::network::client::SimpleTCPConnectionProvider::createShared("127.0.0.1", m_port));
   }());
-
 };
 
-const char* const SAMPLE_IN =
-  "GET / HTTP/1.1\r\n"
-  "Connection: keep-alive\r\n"
-  "Content-Length: 0\r\n"
-  "\r\n";
+const char* const SAMPLE_IN = "GET / HTTP/1.1\r\n"
+                              "Connection: keep-alive\r\n"
+                              "Content-Length: 0\r\n"
+                              "\r\n";
 
-const char* const SAMPLE_OUT =
-  "HTTP/1.1 200 OK\r\n"
-  "Content-Length: 20\r\n"
-  "Connection: keep-alive\r\n"
-  "Server: oatpp/" OATPP_VERSION "\r\n"
-  "\r\n"
-  "Hello World Async!!!";
+const char* const SAMPLE_OUT = "HTTP/1.1 200 OK\r\n"
+                               "Content-Length: 20\r\n"
+                               "Connection: keep-alive\r\n"
+                               "Server: oatpp/" OATPP_VERSION "\r\n"
+                               "\r\n"
+                               "Hello World Async!!!";
 
 }
 
-void PipelineAsyncTest::onRun() {
+void PipelineAsyncTest::onRun()
+{
 
   TestComponent component(m_port);
 
@@ -134,61 +124,60 @@ void PipelineAsyncTest::onRun() {
 
   runner.addController(app::ControllerAsync::createShared());
 
-  runner.run([this, &runner] {
+  runner.run(
+   [ this, &runner ] {
+     OATPP_COMPONENT(std::shared_ptr<oatpp::network::ClientConnectionProvider>, clientConnectionProvider);
 
-    OATPP_COMPONENT(std::shared_ptr<oatpp::network::ClientConnectionProvider>, clientConnectionProvider);
+     auto connection = clientConnectionProvider->getConnection();
+     connection->setInputStreamIOMode(oatpp::data::stream::IOMode::BLOCKING);
 
-    auto connection = clientConnectionProvider->getConnection();
-    connection->setInputStreamIOMode(oatpp::data::stream::IOMode::BLOCKING);
+     std::thread pipeInThread([ this, connection ] {
+       oatpp::data::stream::ChunkedBuffer pipelineStream;
 
-    std::thread pipeInThread([this, connection] {
+       for(v_int32 i = 0; i < m_pipelineSize; i++) {
+         pipelineStream << SAMPLE_IN;
+       }
 
-      oatpp::data::stream::ChunkedBuffer pipelineStream;
+       oatpp::data::stream::BufferInputStream inputStream(pipelineStream.toString());
 
-      for (v_int32 i = 0; i < m_pipelineSize; i++) {
-        pipelineStream << SAMPLE_IN;
-      }
+       oatpp::data::buffer::IOBuffer ioBuffer;
 
-      oatpp::data::stream::BufferInputStream inputStream(pipelineStream.toString());
+       oatpp::data::stream::transfer(&inputStream, connection.get(), 0, ioBuffer.getData(), ioBuffer.getSize());
+     });
 
-      oatpp::data::buffer::IOBuffer ioBuffer;
+     std::thread pipeOutThread([ this, connection ] {
+       oatpp::String sample = SAMPLE_OUT;
+       oatpp::data::stream::ChunkedBuffer receiveStream;
+       oatpp::data::buffer::IOBuffer ioBuffer;
 
-      oatpp::data::stream::transfer(&inputStream, connection.get(), 0, ioBuffer.getData(), ioBuffer.getSize());
+       auto res = oatpp::data::stream::transfer(connection.get(),
+                                                &receiveStream,
+                                                sample->getSize() * m_pipelineSize,
+                                                ioBuffer.getData(),
+                                                ioBuffer.getSize());
 
-    });
+       auto result = receiveStream.toString();
 
-    std::thread pipeOutThread([this, connection] {
+       OATPP_ASSERT(result->getSize() == sample->getSize() * m_pipelineSize);
+       // OATPP_ASSERT(result == wantedResult); // headers may come in different order on different OSs
+     });
 
-      oatpp::String sample = SAMPLE_OUT;
-      oatpp::data::stream::ChunkedBuffer receiveStream;
-      oatpp::data::buffer::IOBuffer ioBuffer;
+     pipeOutThread.join();
+     pipeInThread.join();
 
-      auto res = oatpp::data::stream::transfer(connection.get(), &receiveStream, sample->getSize() * m_pipelineSize, ioBuffer.getData(), ioBuffer.getSize());
+     ///////////////////////////////////////////////////////////////////////////////////////////////////////
+     // Stop server and unblock accepting thread
 
-      auto result = receiveStream.toString();
-
-      OATPP_ASSERT(result->getSize() == sample->getSize() * m_pipelineSize);
-      //OATPP_ASSERT(result == wantedResult); // headers may come in different order on different OSs
-
-    });
-
-    pipeOutThread.join();
-    pipeInThread.join();
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Stop server and unblock accepting thread
-
-    //connection.reset();
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
-  }, std::chrono::minutes(10));
+     // connection.reset();
+     std::this_thread::sleep_for(std::chrono::milliseconds(200));
+   },
+   std::chrono::minutes(10));
 
   OATPP_COMPONENT(std::shared_ptr<oatpp::async::Executor>, executor);
 
   executor->waitTasksFinished();
   executor->stop();
   executor->join();
-
 }
 
 }}}

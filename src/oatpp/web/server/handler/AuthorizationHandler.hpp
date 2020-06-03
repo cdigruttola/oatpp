@@ -26,11 +26,11 @@
 #ifndef oatpp_web_server_handler_AuthorizationHandler_hpp
 #define oatpp_web_server_handler_AuthorizationHandler_hpp
 
-#include <oatpp/web/protocol/http/incoming/Request.hpp>
-#include "oatpp/web/protocol/http/Http.hpp"
-#include "oatpp/core/macro/codegen.hpp"
 #include "oatpp/core/data/mapping/type/Type.hpp"
 #include "oatpp/core/data/stream/ChunkedBuffer.hpp"
+#include "oatpp/core/macro/codegen.hpp"
+#include "oatpp/web/protocol/http/Http.hpp"
+#include <oatpp/web/protocol/http/incoming/Request.hpp>
 
 
 namespace oatpp { namespace web { namespace server { namespace handler {
@@ -38,7 +38,7 @@ namespace oatpp { namespace web { namespace server { namespace handler {
 /**
  * The AuthorizationObject superclass, all AuthorizationObjects have to extend this class.
  */
-class AuthorizationObject : public oatpp::base::Countable {
+class AuthorizationObject: public oatpp::base::Countable {
 protected:
   AuthorizationObject() = default;
 };
@@ -62,11 +62,12 @@ public:
    * Convenience typedef for &id:oatpp::web::protocol::http::Headers;.
    */
   typedef oatpp::web::protocol::http::Headers Headers;
+
 private:
   oatpp::String m_scheme;
   oatpp::String m_realm;
-public:
 
+public:
   /**
    * Constructor.
    * @param scheme - authorization type scheme. &id:oatpp::String;.
@@ -110,15 +111,14 @@ public:
    * @return
    */
   oatpp::String getRealm();
-
 };
 
 /**
- * Default Basic AuthorizationObject - Convenience object to enable Basic-Authorization without the need to implement anything.
+ * Default Basic AuthorizationObject - Convenience object to enable Basic-Authorization without the need to implement
+ * anything.
  */
-class DefaultBasicAuthorizationObject : public AuthorizationObject {
+class DefaultBasicAuthorizationObject: public AuthorizationObject {
 public:
-
   /**
    * User-Id. &id:oatpp::String;.
    */
@@ -128,7 +128,6 @@ public:
    * Password. &id:oatpp::String;.
    */
   oatpp::String password;
-
 };
 
 /**
@@ -136,9 +135,8 @@ public:
  * See [RFC 7617](https://tools.ietf.org/html/rfc7617). <br>
  * Extend this class to implement Custom Basic Authorization.
  */
-class BasicAuthorizationHandler : public AuthorizationHandler {
+class BasicAuthorizationHandler: public AuthorizationHandler {
 public:
-
   /**
    * Constructor.
    * @param realm
@@ -150,29 +148,28 @@ public:
    * @param header - &id:oatpp::String;.
    * @return - std::shared_ptr to &id:oatpp::web::server::handler::AuthorizationObject;.
    */
-  std::shared_ptr<AuthorizationObject> handleAuthorization(const oatpp::String &header) override;
+  std::shared_ptr<AuthorizationObject> handleAuthorization(const oatpp::String& header) override;
 
   /**
-   * Implement this method! Do the actual authorization here. When not implemented returns &l:DefaultBasicAuthorizationObject;.
+   * Implement this method! Do the actual authorization here. When not implemented returns
+   * &l:DefaultBasicAuthorizationObject;.
    * @param userId - user id. &id:oatpp::String;.
    * @param password - password. &id:oatpp::String;.
    * @return - `std::shared_ptr` to &l:AuthorizationObject;. `nullptr` - for "Unauthorized".
    */
   virtual std::shared_ptr<AuthorizationObject> authorize(const oatpp::String& userId, const oatpp::String& password);
-
 };
 
 /**
- * Default Bearer AuthorizationObject - Convenience object to enable Bearer-Authorization without the need to implement anything.
+ * Default Bearer AuthorizationObject - Convenience object to enable Bearer-Authorization without the need to implement
+ * anything.
  */
-class DefaultBearerAuthorizationObject : public AuthorizationObject {
+class DefaultBearerAuthorizationObject: public AuthorizationObject {
 public:
-
   /**
    * Token. &id:oatpp::String;.
    */
   oatpp::String token;
-
 };
 
 /**
@@ -180,9 +177,8 @@ public:
  * See [RFC 6750](https://tools.ietf.org/html/rfc6750). <br>
  * Extend this class to implement Custom Bearer Authorization.
  */
-class BearerAuthorizationHandler : public AuthorizationHandler {
+class BearerAuthorizationHandler: public AuthorizationHandler {
 public:
-
   /**
    * Constructor.
    * @param realm
@@ -194,15 +190,15 @@ public:
    * @param header - &id:oatpp::String;.
    * @return - std::shared_ptr to &id:oatpp::web::server::handler::AuthorizationObject;.
    */
-  std::shared_ptr<AuthorizationObject> handleAuthorization(const oatpp::String &header) override;
+  std::shared_ptr<AuthorizationObject> handleAuthorization(const oatpp::String& header) override;
 
   /**
-   * Implement this method! Do the actual authorization here. When not implemented returns &l:DefaultBearerAuthorizationObject;.
+   * Implement this method! Do the actual authorization here. When not implemented returns
+   * &l:DefaultBearerAuthorizationObject;.
    * @param token - access token.
    * @return - `std::shared_ptr` to &l:AuthorizationObject;. `nullptr` - for "Unauthorized".
    */
   virtual std::shared_ptr<AuthorizationObject> authorize(const oatpp::String& token);
-
 };
 
 }}}}

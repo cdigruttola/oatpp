@@ -27,40 +27,50 @@
 namespace oatpp { namespace data { namespace mapping { namespace type {
 
 namespace __class {
-  const ClassId Any::CLASS_ID("Any");
+const ClassId Any::CLASS_ID("Any");
 }
 
 Any::Any()
   : ObjectWrapper(__class::Any::getType())
-{}
+{
+}
 
-Any::Any(std::nullptr_t) : Any() {}
+Any::Any(std::nullptr_t)
+  : Any()
+{
+}
 
 Any::Any(const std::shared_ptr<AnyHandle>& handle, const Type* const type)
   : ObjectWrapper(handle, __class::Any::getType())
-{}
+{
+}
 
 Any::Any(const Any& other)
   : ObjectWrapper(std::make_shared<AnyHandle>(other.m_ptr->ptr, other.m_ptr->type), __class::Any::getType())
-{}
+{
+}
 
 Any::Any(Any&& other)
-  : ObjectWrapper(std::move(other.m_ptr),  __class::Any::getType())
-{}
+  : ObjectWrapper(std::move(other.m_ptr), __class::Any::getType())
+{
+}
 
-const Type* Any::getStoredType() const {
+const Type* Any::getStoredType() const
+{
   if(m_ptr) {
     return m_ptr->type;
   }
   return nullptr;
 }
 
-Any& Any::operator=(std::nullptr_t) {
+Any& Any::operator=(std::nullptr_t)
+{
   m_ptr.reset();
   return *this;
 }
 
-Any& Any::operator=(const Any& other) {
+Any& Any::operator=(const Any& other)
+{
   if(other) {
     m_ptr = std::make_shared<AnyHandle>(other.m_ptr->ptr, other.m_ptr->type);
   } else {
@@ -69,27 +79,34 @@ Any& Any::operator=(const Any& other) {
   return *this;
 }
 
-Any& Any::operator=(Any&& other) {
+Any& Any::operator=(Any&& other)
+{
   m_ptr = std::move(other.m_ptr);
   return *this;
 }
 
-bool Any::operator == (std::nullptr_t) const {
+bool Any::operator==(std::nullptr_t) const
+{
   return m_ptr == nullptr || m_ptr->ptr == nullptr;
 }
 
-bool Any::operator != (std::nullptr_t) const {
-  return !operator == (nullptr);
+bool Any::operator!=(std::nullptr_t) const
+{
+  return !operator==(nullptr);
 }
 
-bool Any::operator == (const Any& other) const {
-  if(!m_ptr && !other.m_ptr) return true;
-  if(!m_ptr || !other.m_ptr) return false;
+bool Any::operator==(const Any& other) const
+{
+  if(!m_ptr && !other.m_ptr)
+    return true;
+  if(!m_ptr || !other.m_ptr)
+    return false;
   return m_ptr->ptr.get() == other.m_ptr->ptr.get();
 }
 
-bool Any::operator != (const Any& other) const {
-  return !operator == (other);
+bool Any::operator!=(const Any& other) const
+{
+  return !operator==(other);
 }
 
 }}}}

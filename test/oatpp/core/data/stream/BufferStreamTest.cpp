@@ -29,15 +29,16 @@
 
 namespace oatpp { namespace test { namespace core { namespace data { namespace stream {
 
-void BufferStreamTest::onRun() {
+void BufferStreamTest::onRun()
+{
 
   typedef oatpp::data::stream::BufferOutputStream BufferOutputStream;
 
   {
     BufferOutputStream stream;
 
-    stream  << "int=" << 1 << ", float=" << 1.1 << ", "
-            << "bool=" << true << " or " << false;
+    stream << "int=" << 1 << ", float=" << 1.1 << ", "
+           << "bool=" << true << " or " << false;
 
     OATPP_LOGV(TAG, "str='%s'", stream.toString()->c_str());
 
@@ -96,7 +97,6 @@ void BufferStreamTest::onRun() {
     stream.setCurrentPosition(0);
     stream << oatpp::Boolean(false);
     OATPP_ASSERT(stream.toString() == "false");
-
   }
 
   {
@@ -113,10 +113,10 @@ void BufferStreamTest::onRun() {
     OATPP_ASSERT(wholeText->getSize() == fragmentsCount * 10);
 
     v_int32 substringSize = 10;
-    for(v_int32 i = 0; i < wholeText->getSize() - substringSize; i ++) {
-      OATPP_ASSERT(oatpp::String((const char*)&wholeText->getData()[i], substringSize, false) == stream.getSubstring(i, substringSize));
+    for(v_int32 i = 0; i < wholeText->getSize() - substringSize; i++) {
+      OATPP_ASSERT(oatpp::String((const char*)&wholeText->getData() [ i ], substringSize, false) ==
+                   stream.getSubstring(i, substringSize));
     }
-
   }
 
   {
@@ -124,29 +124,25 @@ void BufferStreamTest::onRun() {
     oatpp::String sample = "0123456789";
     oatpp::String text = "";
 
-    for(v_int32 i = 0; i < 1024; i++ ) {
+    for(v_int32 i = 0; i < 1024; i++) {
       text = text + sample;
     }
 
-    for(v_int32 incStep = 1; incStep <= 1024; incStep ++) {
+    for(v_int32 incStep = 1; incStep <= 1024; incStep++) {
 
       BufferOutputStream stream(0, incStep);
 
-      for(v_int32 i = 0; i < 1024; i++ ) {
+      for(v_int32 i = 0; i < 1024; i++) {
         stream << sample;
 
         OATPP_ASSERT(stream.getCapacity() >= stream.getCurrentPosition());
-
       }
 
       OATPP_ASSERT(text == stream.toString());
 
       OATPP_ASSERT(stream.getCapacity() < 1024 * (10 + 1));
-
     }
-
   }
-
 }
 
 }}}}}

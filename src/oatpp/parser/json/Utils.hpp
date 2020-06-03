@@ -25,8 +25,8 @@
 #ifndef oatpp_parser_json_Utils_hpp
 #define oatpp_parser_json_Utils_hpp
 
-#include "oatpp/core/parser/Caret.hpp"
 #include "oatpp/core/Types.hpp"
+#include "oatpp/core/parser/Caret.hpp"
 
 #include <string>
 
@@ -38,7 +38,6 @@ namespace oatpp { namespace parser { namespace json {
  */
 class Utils {
 public:
-
   /**
    * ERROR_CODE_INVALID_ESCAPED_CHAR
    */
@@ -58,14 +57,18 @@ public:
 public:
   typedef oatpp::String String;
   typedef oatpp::parser::Caret ParsingCaret;
+
 private:
   static v_buff_size escapeUtf8Char(p_char8 sequence, p_char8 buffer);
   static v_buff_size calcEscapedStringSize(p_char8 data, v_buff_size size, v_buff_size& safeSize);
-  static v_buff_size calcUnescapedStringSize(p_char8 data, v_buff_size size, v_int64& errorCode, v_buff_size& errorPosition);
+  static v_buff_size calcUnescapedStringSize(p_char8 data,
+                                             v_buff_size size,
+                                             v_int64& errorCode,
+                                             v_buff_size& errorPosition);
   static void unescapeStringToBuffer(p_char8 data, v_buff_size size, p_char8 resultData);
   static p_char8 preparseString(ParsingCaret& caret, v_buff_size& size);
-public:
 
+public:
   /**
    * Escape string as for json standard. <br>
    * *Note:* if(copyAsOwnData == false && escapedString == initialString) then result string will point to initial data.
@@ -106,7 +109,10 @@ public:
    * @param errorPosition - out parameter. Error position in data.
    * @return - &id:oatpp::String;.
    */
-  static std::string unescapeStringToStdString(p_char8 data, v_buff_size size, v_int64& errorCode, v_buff_size& errorPosition);
+  static std::string unescapeStringToStdString(p_char8 data,
+                                               v_buff_size size,
+                                               v_int64& errorCode,
+                                               v_buff_size& errorPosition);
 
   /**
    * Parse string enclosed in `"<string>"`.
@@ -121,9 +127,8 @@ public:
    * @return - `std::string`.
    */
   static std::string parseStringToStdString(ParsingCaret& caret);
-  
 };
-  
+
 }}}
 
 #endif /* oatpp_parser_json_Utils_hpp */

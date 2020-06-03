@@ -27,47 +27,50 @@
 
 #include "./RequestExecutor.hpp"
 
-#include "oatpp/web/protocol/http/incoming/SimpleBodyDecoder.hpp"
 #include "oatpp/network/ConnectionPool.hpp"
 #include "oatpp/network/ConnectionProvider.hpp"
+#include "oatpp/web/protocol/http/incoming/SimpleBodyDecoder.hpp"
 
 namespace oatpp { namespace web { namespace client {
 
 /**
  * Default implementation of &id:oatpp::web::client::RequestExecutor; for making http request.
  */
-class HttpRequestExecutor : public oatpp::base::Countable, public RequestExecutor {
+class HttpRequestExecutor
+  : public oatpp::base::Countable
+  , public RequestExecutor {
 private:
   typedef oatpp::web::protocol::http::Header Header;
   typedef oatpp::network::ClientConnectionProvider ClientConnectionProvider;
   typedef oatpp::web::protocol::http::incoming::BodyDecoder BodyDecoder;
+
 protected:
   std::shared_ptr<ClientConnectionProvider> m_connectionProvider;
   std::shared_ptr<const BodyDecoder> m_bodyDecoder;
-public:
 
+public:
   /**
    * Connection handle for &l:HttpRequestExecutor; <br>
    * For more details see &id:oatpp::web::client::RequestExecutor::ConnectionHandle;.
    */
-  class HttpConnectionHandle : public ConnectionHandle {
+  class HttpConnectionHandle: public ConnectionHandle {
   public:
-
     /**
      * Constructor.
      * @param stream - &id:oatpp::data::stream::IOStream;.
      */
     HttpConnectionHandle(const std::shared_ptr<oatpp::data::stream::IOStream>& stream)
       : connection(stream)
-    {}
+    {
+    }
 
     /**
      * Connection.
      */
     std::shared_ptr<oatpp::data::stream::IOStream> connection;
   };
-public:
 
+public:
   /**
    * Constructor.
    * @param connectionProvider - &id:oatpp::network::ClientConnectionProvider;.
@@ -76,20 +79,20 @@ public:
   HttpRequestExecutor(const std::shared_ptr<ClientConnectionProvider>& connectionProvider,
                       const std::shared_ptr<RetryPolicy>& retryPolicy = nullptr,
                       const std::shared_ptr<const BodyDecoder>& bodyDecoder =
-                      std::make_shared<oatpp::web::protocol::http::incoming::SimpleBodyDecoder>());
-public:
+                       std::make_shared<oatpp::web::protocol::http::incoming::SimpleBodyDecoder>());
 
+public:
   /**
    * Create shared HttpRequestExecutor.
    * @param connectionProvider - &id:oatpp::network::ClientConnectionProvider;.
    * @param bodyDecoder - &id:oatpp::web::protocol::http::incoming::BodyDecoder;.
    * @return - `std::shared_ptr` to `HttpRequestExecutor`.
    */
-  static std::shared_ptr<HttpRequestExecutor>
-  createShared(const std::shared_ptr<ClientConnectionProvider>& connectionProvider,
-               const std::shared_ptr<RetryPolicy>& retryPolicy = nullptr,
-               const std::shared_ptr<const BodyDecoder>& bodyDecoder =
-               std::make_shared<oatpp::web::protocol::http::incoming::SimpleBodyDecoder>());
+  static std::shared_ptr<HttpRequestExecutor> createShared(
+   const std::shared_ptr<ClientConnectionProvider>& connectionProvider,
+   const std::shared_ptr<RetryPolicy>& retryPolicy = nullptr,
+   const std::shared_ptr<const BodyDecoder>& bodyDecoder =
+    std::make_shared<oatpp::web::protocol::http::incoming::SimpleBodyDecoder>());
 
   /**
    * Get &id:oatpp::web::client::RequestExecutor::ConnectionHandle;
@@ -101,7 +104,8 @@ public:
    * Same as &l:HttpRequestExecutor::getConnection (); but async.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<HttpRequestExecutor::ConnectionHandle>&> getConnectionAsync() override;
+  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<HttpRequestExecutor::ConnectionHandle>&>
+   getConnectionAsync() override;
 
   /**
    * Invalidate connection.
@@ -134,15 +138,14 @@ public:
    * @param connectionHandle - ConnectionHandle obtain in call to &l:HttpRequestExecutor::getConnection ();.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<Response>&>
-  executeOnceAsync(const String& method,
-                   const String& path,
-                   const Headers& headers,
-                   const std::shared_ptr<Body>& body,
-                   const std::shared_ptr<ConnectionHandle>& connectionHandle = nullptr) override;
-  
+  oatpp::async::CoroutineStarterForResult<const std::shared_ptr<Response>&> executeOnceAsync(
+   const String& method,
+   const String& path,
+   const Headers& headers,
+   const std::shared_ptr<Body>& body,
+   const std::shared_ptr<ConnectionHandle>& connectionHandle = nullptr) override;
 };
-  
+
 }}}
 
 #endif /* oatpp_web_client_HttpRequestExecutor_hpp */

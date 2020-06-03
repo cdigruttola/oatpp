@@ -45,8 +45,8 @@ public:
    * Convenience typedef for &id:oatpp::data::stream::InputStream;.
    */
   typedef oatpp::data::stream::InputStream InputStream;
-public:
 
+public:
   /**
    * Default virtual destructor.
    */
@@ -66,7 +66,6 @@ public:
    * @return
    */
   virtual std::shared_ptr<InputStream> getInputStream(const std::shared_ptr<Part>& part) = 0;
-
 };
 
 /**
@@ -83,8 +82,8 @@ public:
    * Convenience typedef for &id:oatpp::data::stream::InputStream;.
    */
   typedef oatpp::data::stream::InputStream InputStream;
-public:
 
+public:
   /**
    * Default virtual destructor.
    */
@@ -108,18 +107,17 @@ public:
    */
   virtual async::CoroutineStarter getInputStreamAsync(const std::shared_ptr<Part>& part,
                                                       std::shared_ptr<data::stream::InputStream>& stream) = 0;
-
 };
 
 /**
  * Part reader used in order to stream part data.
  */
-class StreamPartReader : public PartReader {
+class StreamPartReader: public PartReader {
 private:
   static const char* const TAG_NAME;
-private:
 
-  class TagObject : public oatpp::base::Countable {
+private:
+  class TagObject: public oatpp::base::Countable {
   public:
     v_io_size size = 0;
     std::shared_ptr<oatpp::data::stream::OutputStream> outputStream;
@@ -128,15 +126,14 @@ private:
 private:
   std::shared_ptr<PartReaderStreamProvider> m_streamProvider;
   v_io_size m_maxDataSize;
-public:
 
+public:
   /**
    * Constructor.
    * @param streamProvider
    * @param maxDataSize - use `-1` for no limit.
    */
-  StreamPartReader(const std::shared_ptr<PartReaderStreamProvider>& streamProvider,
-                   v_io_size maxDataSize = -1);
+  StreamPartReader(const std::shared_ptr<PartReaderStreamProvider>& streamProvider, v_io_size maxDataSize = -1);
 
   /**
    * Called when new part headers are parsed and part object is created.
@@ -152,18 +149,17 @@ public:
    * @param size - size of the buffer.
    */
   void onPartData(const std::shared_ptr<Part>& part, p_char8 data, oatpp::v_io_size size) override;
-
 };
 
 /**
  * Async part reader used in order to stream part data in Asynchronous manner.
  */
-class AsyncStreamPartReader : public AsyncPartReader {
+class AsyncStreamPartReader: public AsyncPartReader {
 private:
   static const char* const TAG_NAME;
-private:
 
-  class TagObject : public oatpp::base::Countable {
+private:
+  class TagObject: public oatpp::base::Countable {
   public:
     v_io_size size = 0;
     std::shared_ptr<oatpp::data::stream::OutputStream> outputStream;
@@ -171,11 +167,12 @@ private:
 
 private:
   async::CoroutineStarter onPartDone(const std::shared_ptr<Part>& part);
+
 private:
   std::shared_ptr<AsyncPartReaderStreamProvider> m_streamProvider;
   v_io_size m_maxDataSize;
-public:
 
+public:
   /**
    * Constructor.
    * @param streamProvider
@@ -199,8 +196,9 @@ public:
    * @param size - size of the buffer.
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  async::CoroutineStarter onPartDataAsync(const std::shared_ptr<Part>& part, p_char8 data, oatpp::v_io_size size) override;
-
+  async::CoroutineStarter onPartDataAsync(const std::shared_ptr<Part>& part,
+                                          p_char8 data,
+                                          oatpp::v_io_size size) override;
 };
 
 }}}}

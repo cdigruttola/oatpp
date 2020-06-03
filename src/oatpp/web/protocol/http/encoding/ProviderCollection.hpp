@@ -38,8 +38,8 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
 class ProviderCollection {
 private:
   std::unordered_map<data::share::StringKeyLabelCI, std::shared_ptr<EncoderProvider>> m_providers;
-public:
 
+public:
   /**
    * Add encoder to collection.
    * @param provider
@@ -59,7 +59,6 @@ public:
    * @return
    */
   std::shared_ptr<EncoderProvider> get(const std::unordered_set<data::share::StringKeyLabelCI>& encodings) const;
-
 };
 
 }}}}}

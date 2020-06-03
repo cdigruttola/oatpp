@@ -25,10 +25,10 @@
 #ifndef oatpp_base_Countable
 #define oatpp_base_Countable
 
-#include <memory>
 #include "./Environment.hpp"
+#include <memory>
 
-namespace oatpp { namespace base{
+namespace oatpp { namespace base {
 
 /**
  * Class instantiations of which can be counted.
@@ -51,11 +51,9 @@ public:
    */
   virtual ~Countable();
 
-  Countable& operator = (Countable&) = default;
-
-
+  Countable& operator=(Countable&) = default;
 };
-  
+
 }}
 
 #endif /* oatpp_base_Countable */

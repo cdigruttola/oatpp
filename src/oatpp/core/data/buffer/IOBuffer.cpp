@@ -24,26 +24,31 @@
 
 #include "IOBuffer.hpp"
 
-namespace oatpp { namespace data{ namespace buffer {
+namespace oatpp { namespace data { namespace buffer {
 
 IOBuffer::IOBuffer()
   : m_entry(getBufferPool().obtain())
-{}
+{
+}
 
-std::shared_ptr<IOBuffer> IOBuffer::createShared(){
+std::shared_ptr<IOBuffer> IOBuffer::createShared()
+{
   return Shared_IOBuffer_Pool::allocateShared();
 }
 
-IOBuffer::~IOBuffer() {
+IOBuffer::~IOBuffer()
+{
   oatpp::base::memory::MemoryPool::free(m_entry);
 }
 
-void* IOBuffer::getData(){
+void* IOBuffer::getData()
+{
   return m_entry;
 }
 
-v_buff_size IOBuffer::getSize(){
+v_buff_size IOBuffer::getSize()
+{
   return BUFFER_SIZE;
 }
-  
+
 }}}

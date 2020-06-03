@@ -25,8 +25,8 @@
 #ifndef oatpp_parser_json_mapping_ObjectMapper_hpp
 #define oatpp_parser_json_mapping_ObjectMapper_hpp
 
-#include "./Serializer.hpp"
 #include "./Deserializer.hpp"
+#include "./Serializer.hpp"
 
 #include "oatpp/core/data/mapping/ObjectMapper.hpp"
 
@@ -37,15 +37,20 @@ namespace oatpp { namespace parser { namespace json { namespace mapping {
  * See [Data Transfer Object(DTO) component](https://oatpp.io/docs/components/dto/). <br>
  * Extends &id:oatpp::base::Countable;, &id:oatpp::data::mapping::ObjectMapper;.
  */
-class ObjectMapper : public oatpp::base::Countable, public oatpp::data::mapping::ObjectMapper {
+class ObjectMapper
+  : public oatpp::base::Countable
+  , public oatpp::data::mapping::ObjectMapper {
 private:
-  static Info& getMapperInfo() {
+  static Info& getMapperInfo()
+  {
     static Info info("application/json");
     return info;
   }
+
 private:
   std::shared_ptr<Serializer> m_serializer;
   std::shared_ptr<Deserializer> m_deserializer;
+
 public:
   /**
    * Constructor.
@@ -62,17 +67,16 @@ public:
    */
   ObjectMapper(const std::shared_ptr<Serializer>& serializer = std::make_shared<Serializer>(),
                const std::shared_ptr<Deserializer>& deserializer = std::make_shared<Deserializer>());
-public:
 
+public:
   /**
    * Create shared ObjectMapper.
    * @param serializerConfig - &id:oatpp::parser::json::mapping::Serializer::Config;.
    * @param deserializerConfig - &id:oatpp::parser::json::mapping::Deserializer::Config;.
    * @return - `std::shared_ptr` to ObjectMapper.
    */
-  static std::shared_ptr<ObjectMapper>
-  createShared(const std::shared_ptr<Serializer::Config>& serializerConfig,
-               const std::shared_ptr<Deserializer::Config>& deserializerConfig);
+  static std::shared_ptr<ObjectMapper> createShared(const std::shared_ptr<Serializer::Config>& serializerConfig,
+                                                    const std::shared_ptr<Deserializer::Config>& deserializerConfig);
 
   /**
    * Create shared ObjectMapper.
@@ -80,9 +84,9 @@ public:
    * @param deserializer
    * @return
    */
-  static std::shared_ptr<ObjectMapper>
-  createShared(const std::shared_ptr<Serializer>& serializer = std::make_shared<Serializer>(),
-               const std::shared_ptr<Deserializer>& deserializer = std::make_shared<Deserializer>());
+  static std::shared_ptr<ObjectMapper> createShared(
+   const std::shared_ptr<Serializer>& serializer = std::make_shared<Serializer>(),
+   const std::shared_ptr<Deserializer>& deserializer = std::make_shared<Deserializer>());
 
   /**
    * Implementation of &id:oatpp::data::mapping::ObjectMapper::write;.
@@ -111,9 +115,8 @@ public:
    * @return
    */
   std::shared_ptr<Deserializer> getDeserializer();
-  
 };
-  
+
 }}}}
 
 #endif /* oatpp_parser_json_mapping_ObjectMapper_hpp */

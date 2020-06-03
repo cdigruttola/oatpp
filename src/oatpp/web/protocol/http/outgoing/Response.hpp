@@ -25,9 +25,9 @@
 #ifndef oatpp_web_protocol_http_outgoing_Response_hpp
 #define oatpp_web_protocol_http_outgoing_Response_hpp
 
-#include "oatpp/web/protocol/http/outgoing/Body.hpp"
-#include "oatpp/web/protocol/http/encoding/EncoderProvider.hpp"
 #include "oatpp/web/protocol/http/Http.hpp"
+#include "oatpp/web/protocol/http/encoding/EncoderProvider.hpp"
+#include "oatpp/web/protocol/http/outgoing/Body.hpp"
 
 #include "oatpp/network/server/ConnectionHandler.hpp"
 
@@ -39,7 +39,7 @@ namespace oatpp { namespace web { namespace protocol { namespace http { namespac
 /**
  * Class which stores information of outgoing http Response.
  */
-class Response : public oatpp::base::Countable {
+class Response: public oatpp::base::Countable {
 public:
   /**
    * Convenience typedef for Headers. <br>
@@ -51,6 +51,7 @@ public:
    * Convenience typedef for &id:oatpp::network::server::ConnectionHandler;.
    */
   typedef oatpp::network::server::ConnectionHandler ConnectionHandler;
+
 public:
   OBJECT_POOL(Outgoing_Response_Pool, Response, 32)
   SHARED_OBJECT_POOL(Shared_Outgoing_Response_Pool, Response, 32)
@@ -60,6 +61,7 @@ private:
   std::shared_ptr<Body> m_body;
   std::shared_ptr<ConnectionHandler> m_connectionUpgradeHandler;
   std::shared_ptr<const ConnectionHandler::ParameterMap> m_connectionUpgradeParameters;
+
 public:
   /**
    * Constructor.
@@ -67,8 +69,8 @@ public:
    * @param body - response body.
    */
   Response(const Status& status, const std::shared_ptr<Body>& body);
-public:
 
+public:
   /**
    * Create shared outgoing response with status and body.
    * @param status - http status.
@@ -102,7 +104,8 @@ public:
    * @param value - &id:oatpp::data::share::StringKeyLabel;.
    * @return - `true` if header was added.
    */
-  bool putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key, const oatpp::data::share::StringKeyLabel& value);
+  bool putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key,
+                            const oatpp::data::share::StringKeyLabel& value);
 
   /**
    * Get header value
@@ -127,7 +130,8 @@ public:
 
   /**
    * Set connection upgrade parameters. <br>
-   * Use it to set additional parameters for upgraded connection handling. See &l:Response::setConnectionUpgradeHandler ();.
+   * Use it to set additional parameters for upgraded connection handling. See &l:Response::setConnectionUpgradeHandler
+   * ();.
    * @param parameters - `std::shared_ptr` to const &id:oatpp::network::server::ConnectionHandler::ParameterMap;.
    */
   void setConnectionUpgradeParameters(const std::shared_ptr<const ConnectionHandler::ParameterMap>& parameters);
@@ -156,13 +160,13 @@ public:
    * @param contentEncoderProvider - `std::shared_ptr` to &id:oatpp::web::protocol::http::encoding::EncoderProvider;.
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  static oatpp::async::CoroutineStarter sendAsync(const std::shared_ptr<Response>& _this,
-                                                  const std::shared_ptr<data::stream::OutputStream>& stream,
-                                                  const std::shared_ptr<data::stream::BufferOutputStream>& headersWriteBuffer,
-                                                  const std::shared_ptr<http::encoding::EncoderProvider>& contentEncoderProvider);
-  
+  static oatpp::async::CoroutineStarter sendAsync(
+   const std::shared_ptr<Response>& _this,
+   const std::shared_ptr<data::stream::OutputStream>& stream,
+   const std::shared_ptr<data::stream::BufferOutputStream>& headersWriteBuffer,
+   const std::shared_ptr<http::encoding::EncoderProvider>& contentEncoderProvider);
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_outgoing_Response_hpp */

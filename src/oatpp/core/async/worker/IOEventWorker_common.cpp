@@ -51,9 +51,10 @@ IOEventWorker::IOEventWorker(IOEventWorkerForeman* foreman, Action::IOEventType 
 }
 
 
-IOEventWorker::~IOEventWorker() {
+IOEventWorker::~IOEventWorker()
+{
 #if !defined(WIN32) && !defined(_WIN32)
-  if(m_eventQueueHandle >=0) {
+  if(m_eventQueueHandle >= 0) {
     ::close(m_eventQueueHandle);
   }
 
@@ -64,8 +65,9 @@ IOEventWorker::~IOEventWorker() {
 }
 
 
-void IOEventWorker::pushTasks(oatpp::collection::FastQueue<CoroutineHandle> &tasks) {
-  if (tasks.first != nullptr) {
+void IOEventWorker::pushTasks(oatpp::collection::FastQueue<CoroutineHandle>& tasks)
+{
+  if(tasks.first != nullptr) {
     {
       std::lock_guard<oatpp::concurrency::SpinLock> guard(m_backlogLock);
       oatpp::collection::FastQueue<CoroutineHandle>::moveAll(tasks, m_backlog);
@@ -74,7 +76,8 @@ void IOEventWorker::pushTasks(oatpp::collection::FastQueue<CoroutineHandle> &tas
   }
 }
 
-void IOEventWorker::pushOneTask(CoroutineHandle *task) {
+void IOEventWorker::pushOneTask(CoroutineHandle* task)
+{
   {
     std::lock_guard<oatpp::concurrency::SpinLock> guard(m_backlogLock);
     m_backlog.pushBack(task);
@@ -82,18 +85,19 @@ void IOEventWorker::pushOneTask(CoroutineHandle *task) {
   triggerWakeup();
 }
 
-void IOEventWorker::run() {
+void IOEventWorker::run()
+{
 
   initEventQueue();
 
-  while (m_running) {
+  while(m_running) {
     consumeBacklog();
     waitEvents();
   }
-
 }
 
-void IOEventWorker::stop() {
+void IOEventWorker::stop()
+{
   {
     std::lock_guard<oatpp::concurrency::SpinLock> lock(m_backlogLock);
     m_running = false;
@@ -101,11 +105,13 @@ void IOEventWorker::stop() {
   triggerWakeup();
 }
 
-void IOEventWorker::join() {
+void IOEventWorker::join()
+{
   m_thread.join();
 }
 
-void IOEventWorker::detach() {
+void IOEventWorker::detach()
+{
   m_thread.detach();
 }
 
@@ -116,12 +122,15 @@ IOEventWorkerForeman::IOEventWorkerForeman()
   : Worker(Type::IO)
   , m_reader(this, Action::IOEventType::IO_EVENT_READ)
   , m_writer(this, Action::IOEventType::IO_EVENT_WRITE)
-{}
-
-IOEventWorkerForeman::~IOEventWorkerForeman() {
+{
 }
 
-void IOEventWorkerForeman::pushTasks(oatpp::collection::FastQueue<CoroutineHandle>& tasks) {
+IOEventWorkerForeman::~IOEventWorkerForeman()
+{
+}
+
+void IOEventWorkerForeman::pushTasks(oatpp::collection::FastQueue<CoroutineHandle>& tasks)
+{
 
   oatpp::collection::FastQueue<CoroutineHandle> readerTasks;
   oatpp::collection::FastQueue<CoroutineHandle> writerTasks;
@@ -133,19 +142,18 @@ void IOEventWorkerForeman::pushTasks(oatpp::collection::FastQueue<CoroutineHandl
 
     switch(action.getIOEventType()) {
 
-      case Action::IOEventType::IO_EVENT_READ:
-        readerTasks.pushBack(coroutine);
-        break;
+    case Action::IOEventType::IO_EVENT_READ:
+      readerTasks.pushBack(coroutine);
+      break;
 
-      case Action::IOEventType::IO_EVENT_WRITE:
-        writerTasks.pushBack(coroutine);
-        break;
+    case Action::IOEventType::IO_EVENT_WRITE:
+      writerTasks.pushBack(coroutine);
+      break;
 
-      default:
-        throw std::runtime_error("[oatpp::async::worker::IOEventWorkerForeman::pushTasks()]: Error. Unknown Action Event Type.");
-
+    default:
+      throw std::runtime_error(
+       "[oatpp::async::worker::IOEventWorkerForeman::pushTasks()]: Error. Unknown Action Event Type.");
     }
-
   }
 
   if(readerTasks.first != nullptr) {
@@ -155,41 +163,43 @@ void IOEventWorkerForeman::pushTasks(oatpp::collection::FastQueue<CoroutineHandl
   if(writerTasks.first != nullptr) {
     m_writer.pushTasks(writerTasks);
   }
-
 }
 
-void IOEventWorkerForeman::pushOneTask(CoroutineHandle* task) {
+void IOEventWorkerForeman::pushOneTask(CoroutineHandle* task)
+{
 
   auto& action = getCoroutineScheduledAction(task);
 
   switch(action.getIOEventType()) {
 
-    case Action::IOEventType::IO_EVENT_READ:
-      m_reader.pushOneTask(task);
-      break;
+  case Action::IOEventType::IO_EVENT_READ:
+    m_reader.pushOneTask(task);
+    break;
 
-    case Action::IOEventType::IO_EVENT_WRITE:
-      m_writer.pushOneTask(task);
-      break;
+  case Action::IOEventType::IO_EVENT_WRITE:
+    m_writer.pushOneTask(task);
+    break;
 
-    default:
-      throw std::runtime_error("[oatpp::async::worker::IOEventWorkerForeman::pushTasks()]: Error. Unknown Action Event Type.");
-
+  default:
+    throw std::runtime_error(
+     "[oatpp::async::worker::IOEventWorkerForeman::pushTasks()]: Error. Unknown Action Event Type.");
   }
-
 }
 
-void IOEventWorkerForeman::stop() {
+void IOEventWorkerForeman::stop()
+{
   m_writer.stop();
   m_reader.stop();
 }
 
-void IOEventWorkerForeman::join() {
+void IOEventWorkerForeman::join()
+{
   m_reader.join();
   m_writer.join();
 }
 
-void IOEventWorkerForeman::detach() {
+void IOEventWorkerForeman::detach()
+{
   m_reader.detach();
   m_writer.detach();
 }

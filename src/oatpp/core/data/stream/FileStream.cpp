@@ -24,7 +24,7 @@
 
 #include "FileStream.hpp"
 
-namespace oatpp { namespace data{ namespace stream {
+namespace oatpp { namespace data { namespace stream {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,88 +36,109 @@ FileInputStream::FileInputStream(std::FILE* file, bool ownsFile)
   : m_file(file)
   , m_ownsFile(ownsFile)
   , m_ioMode(IOMode::ASYNCHRONOUS)
-{}
+{
+}
 
 FileInputStream::FileInputStream(const char* filename)
   : FileInputStream(std::fopen(filename, "rb"), true)
 {
   if(!m_file) {
-    OATPP_LOGE("[oatpp::data::stream::FileInputStream::FileInputStream(filename)]", "Error. Can't open file '%s'.", filename);
-    throw std::runtime_error("[oatpp::data::stream::FileInputStream::FileInputStream(filename)]: Error. Can't open file.");
+    OATPP_LOGE("[oatpp::data::stream::FileInputStream::FileInputStream(filename)]",
+               "Error. Can't open file '%s'.",
+               filename);
+    throw std::runtime_error(
+     "[oatpp::data::stream::FileInputStream::FileInputStream(filename)]: Error. Can't open file.");
   }
 }
 
-FileInputStream::~FileInputStream() {
+FileInputStream::~FileInputStream()
+{
   if(m_ownsFile && m_file) {
     std::fclose(m_file);
   }
 }
 
-std::FILE* FileInputStream::getFile() {
+std::FILE* FileInputStream::getFile()
+{
   return m_file;
 }
 
-v_io_size FileInputStream::read(void *data, v_buff_size count, async::Action& action) {
-  (void) action;
+v_io_size FileInputStream::read(void* data, v_buff_size count, async::Action& action)
+{
+  (void)action;
   return std::fread(data, 1, count, m_file);
 }
 
-void FileInputStream::setInputStreamIOMode(IOMode ioMode) {
+void FileInputStream::setInputStreamIOMode(IOMode ioMode)
+{
   m_ioMode = ioMode;
 }
 
-IOMode FileInputStream::getInputStreamIOMode() {
+IOMode FileInputStream::getInputStreamIOMode()
+{
   return m_ioMode;
 }
 
-Context& FileInputStream::getInputStreamContext() {
+Context& FileInputStream::getInputStreamContext()
+{
   return DEFAULT_CONTEXT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // FileOutputStream
 
-oatpp::data::stream::DefaultInitializedContext FileOutputStream::DEFAULT_CONTEXT(data::stream::StreamType::STREAM_FINITE);
+oatpp::data::stream::DefaultInitializedContext FileOutputStream::DEFAULT_CONTEXT(
+ data::stream::StreamType::STREAM_FINITE);
 
 FileOutputStream::FileOutputStream(std::FILE* file, bool ownsFile)
   : m_file(file)
   , m_ownsFile(ownsFile)
   , m_ioMode(IOMode::ASYNCHRONOUS)
-{}
+{
+}
 
 FileOutputStream::FileOutputStream(const char* filename, const char* mode)
   : FileOutputStream(std::fopen(filename, mode), true)
 {
   if(!m_file) {
-    OATPP_LOGE("[oatpp::data::stream::FileOutputStream::FileOutputStream(filename, mode)]", "Error. Can't open file '%s'.", filename);
-    throw std::runtime_error("[oatpp::data::stream::FileOutputStream::FileOutputStream(filename, mode)]: Error. Can't open file.");
+    OATPP_LOGE("[oatpp::data::stream::FileOutputStream::FileOutputStream(filename, mode)]",
+               "Error. Can't open file '%s'.",
+               filename);
+    throw std::runtime_error(
+     "[oatpp::data::stream::FileOutputStream::FileOutputStream(filename, mode)]: Error. Can't open file.");
   }
 }
 
-FileOutputStream::~FileOutputStream() {
+FileOutputStream::~FileOutputStream()
+{
   if(m_ownsFile && m_file) {
     std::fclose(m_file);
   }
 }
 
-std::FILE* FileOutputStream::getFile() {
+std::FILE* FileOutputStream::getFile()
+{
   return m_file;
 }
 
-v_io_size FileOutputStream::write(const void *data, v_buff_size count, async::Action& action) {
-  (void) action;
+v_io_size FileOutputStream::write(const void* data, v_buff_size count, async::Action& action)
+{
+  (void)action;
   return std::fwrite(data, 1, count, m_file);
 }
 
-void FileOutputStream::setOutputStreamIOMode(IOMode ioMode) {
+void FileOutputStream::setOutputStreamIOMode(IOMode ioMode)
+{
   m_ioMode = ioMode;
 }
 
-IOMode FileOutputStream::getOutputStreamIOMode() {
+IOMode FileOutputStream::getOutputStreamIOMode()
+{
   return m_ioMode;
 }
 
-Context& FileOutputStream::getOutputStreamContext() {
+Context& FileOutputStream::getOutputStreamContext()
+{
   return DEFAULT_CONTEXT;
 }
 

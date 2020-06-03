@@ -25,28 +25,27 @@
 #ifndef oatpp_web_protocol_http_incoming_Request_hpp
 #define oatpp_web_protocol_http_incoming_Request_hpp
 
+#include "oatpp/network/Url.hpp"
 #include "oatpp/web/protocol/http/Http.hpp"
 #include "oatpp/web/protocol/http/incoming/BodyDecoder.hpp"
 #include "oatpp/web/url/mapping/Pattern.hpp"
-#include "oatpp/network/Url.hpp"
 
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace incoming {
 
 /**
  * Class http::incoming::Request AKA IncomingRequest represents client's incoming request.
  */
-class Request : public oatpp::base::Countable {
+class Request: public oatpp::base::Countable {
 public:
   OBJECT_POOL(Incoming_Request_Pool, Request, 32)
   SHARED_OBJECT_POOL(Shared_Incoming_Request_Pool, Request, 32)
 private:
-
   std::shared_ptr<oatpp::data::stream::IOStream> m_connection;
   http::RequestStartingLine m_startingLine;
   url::mapping::Pattern::MatchMap m_pathVariables;
   http::Headers m_headers;
   std::shared_ptr<oatpp::data::stream::InputStream> m_bodyStream;
-  
+
   /*
    * Request should be preconfigured with default BodyDecoder.
    * Custom BodyDecoder can be set on demand
@@ -57,15 +56,14 @@ private:
   mutable http::QueryParams m_queryParams;
 
 public:
-  
   Request(const std::shared_ptr<oatpp::data::stream::IOStream>& connection,
           const http::RequestStartingLine& startingLine,
           const url::mapping::Pattern::MatchMap& pathVariables,
           const http::Headers& headers,
           const std::shared_ptr<oatpp::data::stream::InputStream>& bodyStream,
           const std::shared_ptr<const http::incoming::BodyDecoder>& bodyDecoder);
+
 public:
-  
   static std::shared_ptr<Request> createShared(const std::shared_ptr<oatpp::data::stream::IOStream>& connection,
                                                const http::RequestStartingLine& startingLine,
                                                const url::mapping::Pattern::MatchMap& pathVariables,
@@ -100,7 +98,8 @@ public:
    * @param defaultValue
    * @return query parameter value or defaultValue if no such parameter found
    */
-  oatpp::String getQueryParameter(const oatpp::data::share::StringKeyLabel& name, const oatpp::String& defaultValue) const;
+  oatpp::String getQueryParameter(const oatpp::data::share::StringKeyLabel& name,
+                                  const oatpp::String& defaultValue) const;
 
   /**
    * Get request starting line. (method, path, protocol)
@@ -148,7 +147,8 @@ public:
    * @param value - &id:oatpp::data::share::StringKeyLabel;.
    * @return - `true` if header was added.
    */
-  bool putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key, const oatpp::data::share::StringKeyLabel& value);
+  bool putHeaderIfNotExists(const oatpp::data::share::StringKeyLabelCI_FAST& key,
+                            const oatpp::data::share::StringKeyLabel& value);
 
   /**
    * Get header value
@@ -199,10 +199,11 @@ public:
    * @return DTO
    */
   template<class Wrapper>
-  Wrapper readBodyToDto(data::mapping::ObjectMapper* objectMapper) const {
+  Wrapper readBodyToDto(data::mapping::ObjectMapper* objectMapper) const
+  {
     return objectMapper->readFromString<Wrapper>(m_bodyDecoder->decodeToString(m_headers, m_bodyStream.get()));
   }
-  
+
   // Async
 
   /**
@@ -218,7 +219,8 @@ public:
    * @param toStream
    * @return - &id:oatpp::async::CoroutineStarter;.
    */
-  oatpp::async::CoroutineStarter transferBodyToStreamAsync(const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const;
+  oatpp::async::CoroutineStarter transferBodyToStreamAsync(
+   const std::shared_ptr<oatpp::data::stream::OutputStream>& toStream) const;
 
   /**
    * Transfer body stream to string Async.
@@ -233,14 +235,13 @@ public:
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
   template<class Wrapper>
-  oatpp::async::CoroutineStarterForResult<const Wrapper&>
-  readBodyToDtoAsync(const std::shared_ptr<oatpp::data::mapping::ObjectMapper>& objectMapper) const {
+  oatpp::async::CoroutineStarterForResult<const Wrapper&> readBodyToDtoAsync(
+   const std::shared_ptr<oatpp::data::mapping::ObjectMapper>& objectMapper) const
+  {
     return m_bodyDecoder->decodeToDtoAsync<Wrapper>(m_headers, m_bodyStream, objectMapper);
   }
-  
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_incoming_Request_hpp */
-

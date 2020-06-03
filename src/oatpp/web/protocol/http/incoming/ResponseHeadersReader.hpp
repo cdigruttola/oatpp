@@ -25,8 +25,8 @@
 #ifndef oatpp_web_protocol_http_incoming_ResponseHeadersReader_hpp
 #define oatpp_web_protocol_http_incoming_ResponseHeadersReader_hpp
 
-#include "oatpp/web/protocol/http/Http.hpp"
 #include "oatpp/core/async/Coroutine.hpp"
+#include "oatpp/web/protocol/http/Http.hpp"
 
 namespace oatpp { namespace web { namespace protocol { namespace http { namespace incoming {
 
@@ -39,10 +39,11 @@ public:
    * Convenience typedef for &id:oatpp::async::Action;.
    */
   typedef oatpp::async::Action Action;
+
 private:
   static constexpr v_uint32 SECTION_END = ('\r' << 24) | ('\n' << 16) | ('\r' << 8) | ('\n');
-public:
 
+public:
   /**
    * Result of headers reading and parsing.
    */
@@ -67,8 +68,8 @@ public:
      */
     v_buff_size bufferPosEnd;
   };
-private:
 
+private:
   struct ReadHeadersIteration {
     v_uint32 accumulator = 0;
     v_buff_size progress = 0;
@@ -76,18 +77,17 @@ private:
   };
 
 private:
-
   v_io_size readHeadersSectionIterative(ReadHeadersIteration& iteration,
-                                              const std::shared_ptr<oatpp::data::stream::IOStream>& connection,
-                                              data::stream::ConsistentOutputStream* bufferStream,
-                                              Result& result,
-                                              async::Action& action);
+                                        const std::shared_ptr<oatpp::data::stream::IOStream>& connection,
+                                        data::stream::ConsistentOutputStream* bufferStream,
+                                        Result& result,
+                                        async::Action& action);
 
 private:
   oatpp::data::share::MemoryLabel m_buffer;
   v_buff_size m_maxHeadersSize;
-public:
 
+public:
   /**
    * Constructor.
    * @param buffer - buffer to use to read data from stream. &id:oatpp::data::share::MemoryLabel;.
@@ -96,7 +96,8 @@ public:
   ResponseHeadersReader(const oatpp::data::share::MemoryLabel& buffer, v_buff_size maxHeadersSize)
     : m_buffer(buffer)
     , m_maxHeadersSize(maxHeadersSize)
-  {}
+  {
+  }
 
   /**
    * Read and parse http headers from stream.
@@ -111,10 +112,10 @@ public:
    * @param connection - `std::shared_ptr` to &id:oatpp::data::stream::IOStream;.
    * @return - &id:oatpp::async::CoroutineStarterForResult;.
    */
-  oatpp::async::CoroutineStarterForResult<const Result&> readHeadersAsync(const std::shared_ptr<oatpp::data::stream::IOStream>& connection);
-  
+  oatpp::async::CoroutineStarterForResult<const Result&> readHeadersAsync(
+   const std::shared_ptr<oatpp::data::stream::IOStream>& connection);
 };
-  
+
 }}}}}
 
 #endif /* oatpp_web_protocol_http_incoming_ResponseHeadersReader_hpp */

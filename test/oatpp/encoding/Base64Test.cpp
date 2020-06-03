@@ -27,12 +27,13 @@
 #include "oatpp/encoding/Base64.hpp"
 
 namespace oatpp { namespace test { namespace encoding {
-  
-void Base64Test::onRun() {
+
+void Base64Test::onRun()
+{
 
   oatpp::String message = "oat++ web framework";
   oatpp::String messageEncoded = "b2F0Kysgd2ViIGZyYW1ld29yaw==";
-  
+
   {
     oatpp::String encoded = oatpp::encoding::Base64::encode(message);
     OATPP_LOGV(TAG, "encoded='%s'", encoded->c_str());
@@ -40,14 +41,14 @@ void Base64Test::onRun() {
     oatpp::String decoded = oatpp::encoding::Base64::decode(encoded);
     OATPP_ASSERT(message->equals(decoded.get()));
   }
-  
+
   {
     oatpp::String encoded = oatpp::encoding::Base64::encode(message, oatpp::encoding::Base64::ALPHABET_BASE64_URL_SAFE);
     OATPP_LOGV(TAG, "encoded='%s'", encoded->c_str());
-    oatpp::String decoded = oatpp::encoding::Base64::decode(encoded, oatpp::encoding::Base64::ALPHABET_BASE64_URL_SAFE_AUXILIARY_CHARS);
+    oatpp::String decoded =
+     oatpp::encoding::Base64::decode(encoded, oatpp::encoding::Base64::ALPHABET_BASE64_URL_SAFE_AUXILIARY_CHARS);
     OATPP_ASSERT(message->equals(decoded.get()));
   }
-
 }
-  
+
 }}}

@@ -28,41 +28,44 @@
 
 namespace oatpp { namespace web { namespace client {
 
-ApiClient::PathSegment ApiClient::parsePathSegment(p_char8 data, v_buff_size size, v_buff_size& position) {
-  for(v_buff_size i = position; i < size; i++){
-    v_char8 a = data[i];
-    if(a == '{'){
-      auto result = PathSegment(std::string((char*) &data[position], i - position), PathSegment::SEG_PATH);
+ApiClient::PathSegment ApiClient::parsePathSegment(p_char8 data, v_buff_size size, v_buff_size& position)
+{
+  for(v_buff_size i = position; i < size; i++) {
+    v_char8 a = data [ i ];
+    if(a == '{') {
+      auto result = PathSegment(std::string((char*)&data [ position ], i - position), PathSegment::SEG_PATH);
       position = i;
       return result;
     }
   }
-  auto result = PathSegment(std::string((char*) &data[position], size - position), PathSegment::SEG_PATH);
+  auto result = PathSegment(std::string((char*)&data [ position ], size - position), PathSegment::SEG_PATH);
   position = size;
   return result;
 }
 
-ApiClient::PathSegment ApiClient::parseVarSegment(p_char8 data, v_buff_size size, v_buff_size& position) {
-  for(v_buff_size i = position; i < size; i++){
-    v_char8 a = data[i];
-    if(a == '}'){
-      auto result = PathSegment(std::string((char*) &data[position], i - position), PathSegment::SEG_VAR);
+ApiClient::PathSegment ApiClient::parseVarSegment(p_char8 data, v_buff_size size, v_buff_size& position)
+{
+  for(v_buff_size i = position; i < size; i++) {
+    v_char8 a = data [ i ];
+    if(a == '}') {
+      auto result = PathSegment(std::string((char*)&data [ position ], i - position), PathSegment::SEG_VAR);
       position = i + 1;
       return result;
     }
   }
-  auto result = PathSegment(std::string((char*) &data[position], size - position), PathSegment::SEG_VAR);
+  auto result = PathSegment(std::string((char*)&data [ position ], size - position), PathSegment::SEG_VAR);
   position = size;
   return result;
 }
-  
-ApiClient::PathPattern ApiClient::parsePathPattern(p_char8 data, v_buff_size size) {
+
+ApiClient::PathPattern ApiClient::parsePathPattern(p_char8 data, v_buff_size size)
+{
   v_buff_size pos = 0;
   PathPattern result;
-  while (pos < size) {
-    v_char8 a = data[pos];
+  while(pos < size) {
+    v_char8 a = data [ pos ];
     if(a == '{') {
-      pos ++;
+      pos++;
       result.push_back(parseVarSegment(data, size, pos));
     } else {
       result.push_back(parsePathSegment(data, size, pos));
@@ -70,31 +73,32 @@ ApiClient::PathPattern ApiClient::parsePathPattern(p_char8 data, v_buff_size siz
   }
   return result;
 }
-  
+
 void ApiClient::formatPath(oatpp::data::stream::ConsistentOutputStream* stream,
                            const PathPattern& pathPattern,
-                           const std::shared_ptr<StringToStringMap>& params) {
-  
-  for (auto it = pathPattern.begin(); it != pathPattern.end(); ++ it) {
+                           const std::shared_ptr<StringToStringMap>& params)
+{
+
+  for(auto it = pathPattern.begin(); it != pathPattern.end(); ++it) {
     const PathSegment& seg = *it;
     if(seg.type == PathSegment::SEG_PATH) {
       stream->writeSimple(seg.text.data(), seg.text.size());
     } else {
       auto key = oatpp::String(seg.text.data(), seg.text.length(), false);
       auto& param = params->get(key, nullptr);
-      if(!param){
+      if(!param) {
         OATPP_LOGD(TAG, "Path parameter '%s' not provided in the api call", seg.text.c_str());
         throw std::runtime_error("[oatpp::web::client::ApiClient::formatPath()]: Path parameter missing");
       }
       stream->data::stream::OutputStream::writeSimple(param);
     }
   }
-  
 }
 
 void ApiClient::addPathQueryParams(data::stream::ConsistentOutputStream* stream,
-                                   const std::shared_ptr<StringToStringMap>& params) {
-  
+                                   const std::shared_ptr<StringToStringMap>& params)
+{
+
   auto curr = params->getFirstEntry();
   if(curr != nullptr) {
     stream->writeSimple("?", 1);
@@ -102,7 +106,7 @@ void ApiClient::addPathQueryParams(data::stream::ConsistentOutputStream* stream,
     stream->writeSimple("=", 1);
     stream->writeSimple(curr->getValue());
     curr = curr->getNext();
-    while (curr != nullptr) {
+    while(curr != nullptr) {
       stream->writeSimple("&", 1);
       stream->writeSimple(curr->getKey());
       stream->writeSimple("=", 1);
@@ -110,7 +114,6 @@ void ApiClient::addPathQueryParams(data::stream::ConsistentOutputStream* stream,
       curr = curr->getNext();
     }
   }
-  
 }
 
 oatpp::String ApiClient::formatPath(const PathPattern& pathPattern,
@@ -125,13 +128,14 @@ oatpp::String ApiClient::formatPath(const PathPattern& pathPattern,
   return stream.toString();
 }
 
-web::protocol::http::Headers ApiClient::mapToHeaders(const std::shared_ptr<StringToStringMap>& params) {
+web::protocol::http::Headers ApiClient::mapToHeaders(const std::shared_ptr<StringToStringMap>& params)
+{
 
   oatpp::web::protocol::http::Headers result;
   if(params) {
     auto curr = params->getFirstEntry();
 
-    while (curr != nullptr) {
+    while(curr != nullptr) {
       if(curr->getValue()) {
         result.put_LockFree(curr->getKey(), curr->getValue());
       } else {
@@ -142,28 +146,32 @@ web::protocol::http::Headers ApiClient::mapToHeaders(const std::shared_ptr<Strin
     }
   }
   return result;
-
 }
 
-std::shared_ptr<RequestExecutor::ConnectionHandle> ApiClient::getConnection() {
+std::shared_ptr<RequestExecutor::ConnectionHandle> ApiClient::getConnection()
+{
   return m_requestExecutor->getConnection();
 }
 
-oatpp::async::CoroutineStarterForResult<const std::shared_ptr<RequestExecutor::ConnectionHandle>&> ApiClient::getConnectionAsync() {
+oatpp::async::CoroutineStarterForResult<const std::shared_ptr<RequestExecutor::ConnectionHandle>&>
+ ApiClient::getConnectionAsync()
+{
   return m_requestExecutor->getConnectionAsync();
 }
 
-void ApiClient::invalidateConnection(const std::shared_ptr<RequestExecutor::ConnectionHandle>& connectionHandle) {
+void ApiClient::invalidateConnection(const std::shared_ptr<RequestExecutor::ConnectionHandle>& connectionHandle)
+{
   m_requestExecutor->invalidateConnection(connectionHandle);
 }
 
-std::shared_ptr<ApiClient::Response> ApiClient::executeRequest(const oatpp::String& method,
-                                                               const PathPattern& pathPattern,
-                                                               const std::shared_ptr<StringToStringMap>& headers,
-                                                               const std::shared_ptr<StringToStringMap>& pathParams,
-                                                               const std::shared_ptr<StringToStringMap>& queryParams,
-                                                               const std::shared_ptr<RequestExecutor::Body>& body,
-                                                               const std::shared_ptr<RequestExecutor::ConnectionHandle>& connectionHandle)
+std::shared_ptr<ApiClient::Response> ApiClient::executeRequest(
+ const oatpp::String& method,
+ const PathPattern& pathPattern,
+ const std::shared_ptr<StringToStringMap>& headers,
+ const std::shared_ptr<StringToStringMap>& pathParams,
+ const std::shared_ptr<StringToStringMap>& queryParams,
+ const std::shared_ptr<RequestExecutor::Body>& body,
+ const std::shared_ptr<RequestExecutor::ConnectionHandle>& connectionHandle)
 {
 
   return m_requestExecutor->execute(method,
@@ -171,17 +179,16 @@ std::shared_ptr<ApiClient::Response> ApiClient::executeRequest(const oatpp::Stri
                                     mapToHeaders(headers),
                                     body,
                                     connectionHandle);
-
 }
 
-oatpp::async::CoroutineStarterForResult<const std::shared_ptr<ApiClient::Response>&>
-ApiClient::executeRequestAsync(const oatpp::String& method,
-                               const PathPattern& pathPattern,
-                               const std::shared_ptr<StringToStringMap>& headers,
-                               const std::shared_ptr<StringToStringMap>& pathParams,
-                               const std::shared_ptr<StringToStringMap>& queryParams,
-                               const std::shared_ptr<RequestExecutor::Body>& body,
-                               const std::shared_ptr<RequestExecutor::ConnectionHandle>& connectionHandle)
+oatpp::async::CoroutineStarterForResult<const std::shared_ptr<ApiClient::Response>&> ApiClient::executeRequestAsync(
+ const oatpp::String& method,
+ const PathPattern& pathPattern,
+ const std::shared_ptr<StringToStringMap>& headers,
+ const std::shared_ptr<StringToStringMap>& pathParams,
+ const std::shared_ptr<StringToStringMap>& queryParams,
+ const std::shared_ptr<RequestExecutor::Body>& body,
+ const std::shared_ptr<RequestExecutor::ConnectionHandle>& connectionHandle)
 {
 
   return m_requestExecutor->executeAsync(method,
@@ -189,7 +196,6 @@ ApiClient::executeRequestAsync(const oatpp::String& method,
                                          mapToHeaders(headers),
                                          body,
                                          connectionHandle);
-
 }
 
 }}}

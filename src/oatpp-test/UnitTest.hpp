@@ -32,18 +32,19 @@ namespace oatpp { namespace test {
 /**
  * Base class for unit tests.
  */
-class UnitTest{
+class UnitTest {
 protected:
   const char* const TAG;
-public:
 
+public:
   /**
    * Constructor.
    * @param testTAG - tag used for logs.
    */
   UnitTest(const char* testTAG)
     : TAG(testTAG)
-  {}
+  {
+  }
 
   /**
    * Default virtual destructor.
@@ -59,7 +60,8 @@ public:
   /**
    * Run this test.
    */
-  void run(){
+  void run()
+  {
     run(1);
   }
 
@@ -74,11 +76,11 @@ public:
    * @param times - number of times to run this test.
    */
   template<class T>
-  static void runTest(v_int32 times){
+  static void runTest(v_int32 times)
+  {
     T test;
     test.run(times);
   }
-  
 };
 
 /**
@@ -86,9 +88,8 @@ public:
  * Usage Example:<br>
  * `OATPP_RUN_TEST(oatpp::test::web::FullTest);`
  */
-#define OATPP_RUN_TEST(TEST) \
-oatpp::test::UnitTest::runTest<TEST>(1)
-  
+#define OATPP_RUN_TEST(TEST) oatpp::test::UnitTest::runTest<TEST>(1)
+
 }}
 
 #endif /* oatpp_test_UnitTest_hpp */
