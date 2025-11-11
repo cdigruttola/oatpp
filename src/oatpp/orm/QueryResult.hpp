@@ -82,7 +82,7 @@ public:
    * Count of rows affected by the operation.
    * Might be 0
    */
-  virtual v_uint64 getRowsAffected() const = 0;
+  virtual v_uint64 getRowsAffected() const;
 
   /**
    * Fetch result entries.
