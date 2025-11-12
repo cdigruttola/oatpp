@@ -26,5 +26,8 @@
 
 namespace oatpp { namespace orm {
 
+  v_uint64 QueryResult::getRowsAffected() const {
+    throw std::runtime_error("[oatpp::orm::QueryResult::getRowsAffected()]: Error. Not implemented!");
+  }
 
 }}

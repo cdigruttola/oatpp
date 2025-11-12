@@ -79,6 +79,12 @@ public:
   virtual bool hasMoreToFetch() const = 0;
 
   /**
+   * Count of rows affected by the operation.
+   * Might be 0
+   */
+  virtual v_uint64 getRowsAffected() const;
+
+  /**
    * Fetch result entries.
    * @param resultType - wanted output type.
    * @param count - how many entries to fetch. Use `-1` to fetch all.
